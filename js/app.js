@@ -244,7 +244,28 @@ function hasFrenchVoice() {
   return _voicesLoaded && !!_frVoice;
 }
 
+function playGoogle() {
+  // Natural French voice via Google TTS (network), played through an <audio>
+  // element. This is reliable on every device and sounds natural — preferred
+  // over system voices, which on some devices (Chromebooks, Android) are listed
+  // by speechSynthesis but produce no sound.
+  return new Promise((resolve) => {
+    const audio = new Audio();
+    let settled = false;
+    const finish = (ok) => { if (!settled) { settled = true; resolve(ok); } };
+    const url = "https://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob&tl=fr&q=" +
+      encodeURIComponent(currentKey);
+    audio.src = url;
+    audio.onplaying = () => finish(true);
+    audio.onended = () => finish(true);
+    audio.onerror = () => finish(false);
+    audio.play().catch(() => finish(false));
+    setTimeout(() => finish(false), 15000); // stall guard
+  });
+}
+
 function speakLocal() {
+  // Offline fallback: system French voice if the browser has one.
   if (!("speechSynthesis" in window) || !hasFrenchVoice()) return false;
   window.speechSynthesis.cancel();
   const u = new SpeechSynthesisUtterance(currentKey);
@@ -255,24 +276,10 @@ function speakLocal() {
   return true;
 }
 
-function speakGoogle() {
-  // Reliable fallback: Google TTS audio — works even when the device has no
-  // French system voice (common on Android).
-  return new Promise((resolve) => {
-    const audio = new Audio();
-    const url = "https://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob&tl=fr&q=" +
-      encodeURIComponent(currentKey);
-    audio.src = url;
-    audio.onended = () => resolve(true);
-    audio.onerror = () => resolve(false);
-    audio.play().catch(() => resolve(false));
-  });
-}
-
 async function speak() {
   if (!currentKey) return;
-  const ok = speakLocal();
-  if (!ok) await speakGoogle();
+  const ok = await playGoogle();
+  if (!ok) speakLocal();
 }
 
 // ---- vocabulary -----------------------------------------------------------
