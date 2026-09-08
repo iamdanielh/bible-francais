@@ -1,0 +1,24 @@
+{
+  "name": "Bible en français — Español",
+  "short_name": "Bible FR-ES",
+  "description": "Lee la Biblia en francés y toca cualquier palabra para ver su traducción al español, nota gramatical y pronunciación.",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#1b1d26",
+  "theme_color": "#1b1d26",
+  "lang": "es",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

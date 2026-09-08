@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#1b1d26" />
+  <title>Bible en français — Español</title>
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-title">
+      <span class="brand">📖</span>
+      <span>Bible en français</span>
+    </div>
+    <div class="topbar-controls">
+      <select id="bookSelect" aria-label="Libro"></select>
+      <button id="prevBtn" title="Capítulo anterior">‹</button>
+      <select id="chapterSelect" aria-label="Capítulo"></select>
+      <button id="nextBtn" title="Capítulo siguiente">›</button>
+      <button id="vocabBtn" title="Ver vocabulario">⭐</button>
+    </div>
+  </header>
+
+  <div id="loading" class="loading">Cargando la Biblia…</div>
+
+  <main class="layout">
+    <section class="reader">
+      <h1 id="chapterTitle"></h1>
+      <div id="verseText" class="verse-text"></div>
+    </section>
+
+    <aside class="panel" id="lookupPanel">
+      <div class="word-head">
+        <h2 id="wordLabel"></h2>
+        <button id="speakBtn" title="Escuchar pronunciación" disabled>🔊</button>
+      </div>
+      <div id="meaning" class="meaning"></div>
+      <div id="grammar" class="grammar"></div>
+      <button id="saveBtn" disabled>Guardar en el vocabulario</button>
+      <div id="note" class="note"></div>
+      <hr />
+      <h3>Vocabulario</h3>
+      <ul id="vocabList" class="vocab-list"></ul>
+    </aside>
+  </main>
+
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
