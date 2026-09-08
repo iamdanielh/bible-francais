@@ -376,7 +376,7 @@ async function init() {
 
   // register service worker for offline/PWA
   if ("serviceWorker" in navigator) {
-    try { await navigator.serviceWorker.register("sw.js"); } catch (e) { /* offline not critical to start */ }
+    try { await navigator.serviceWorker.register("sw.js", { updateViaCache: "none" }); } catch (e) { /* offline not critical to start */ }
   }
 }
 
