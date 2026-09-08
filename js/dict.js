@@ -1349,6 +1349,12 @@ function friendlyForm(label) {
 class Dictionary {
   constructor(map) {
     this._map = map;
+    // accent-preserving index of the raw dict (the normalize() key strips accents,
+    // so accented entries in dict.json are otherwise unreachable)
+    this._accent = new Map();
+    for (const [key, val] of Object.entries(map)) {
+      this._accent.set(String(key).toLowerCase().replace(/[’‘]/g, "'"), val);
+    }
     // layer curated overlays (mirroring the python __init__ merge)
     for (const [key, val] of Object.entries(_CURATED)) {
       const k = normalize(key);
@@ -1438,6 +1444,9 @@ class Dictionary {
         const meanings = this.lookup(v2);
         if (meanings) return [meanings, info];
       }
+      // last resort: exact accented key in the raw dict (lookup() strips accents)
+      const acc = this._accent.get(variant.toLowerCase().replace(/[’‘]/g, "'"));
+      if (acc) return [acc.slice(), info];
     }
     return [null, info];
   }
