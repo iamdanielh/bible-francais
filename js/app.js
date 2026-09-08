@@ -164,6 +164,38 @@ function presentWord(word) {
   currentES = meanings.slice(0, 4).join(" · ");
 }
 
+function presentSelection(segments) {
+  if (!segments.length) return;
+  currentKey = segments.map(s => s[0]).join(" ");
+  currentES = "";
+  el.wordLabel.textContent = currentKey;
+  const lines = [];
+  const meaningsAll = [];
+  for (const [span, meanings, info] of segments) {
+    if (meanings && meanings.length) {
+      const right = meanings.slice(0, 4).map(esc).join(" · ");
+      let line = `<b>${esc(span)}</b> — ${right}`;
+      const details = [];
+      if (info.form) details.push(esc(friendlyForm(info.form)));
+      if (info.infinitive || info.tense) {
+        const note = verbNote(info, false);
+        if (note) details.push(esc(note));
+      }
+      if (details.length) line += ` <span class='dim'>(${details.join(", ")})</span>`;
+      lines.push(line);
+      meaningsAll.push(meanings[0]);
+    } else {
+      lines.push(`<b>${esc(span)}</b> — <span class='dim'>sin traducción</span>`);
+    }
+  }
+  el.meaning.innerHTML = lines.join("<br/>");
+  el.grammar.textContent = "";
+  el.note.textContent = "";
+  el.saveBtn.disabled = false;
+  el.speakBtn.disabled = false;
+  currentES = meaningsAll.join(" · ");
+}
+
 function verbNote(info, withMeaning) {
   const parts = [];
   const inf = info.infinitive;
@@ -193,13 +225,54 @@ function esc(s) {
 }
 
 // ---- pronunciation --------------------------------------------------------
-function speak() {
-  if (!currentKey || !("speechSynthesis" in window)) return;
+let _frVoice = null;
+let _voicesLoaded = false;
+
+function cacheVoices() {
+  if (!("speechSynthesis" in window)) return;
+  const voices = window.speechSynthesis.getVoices();
+  if (!voices || !voices.length) return;
+  _voicesLoaded = true;
+  _frVoice = voices.find(v => /^fr/i.test(v.lang)) || null;
+}
+if ("speechSynthesis" in window) {
+  cacheVoices();
+  window.speechSynthesis.onvoiceschanged = cacheVoices;
+}
+
+function hasFrenchVoice() {
+  return _voicesLoaded && !!_frVoice;
+}
+
+function speakLocal() {
+  if (!("speechSynthesis" in window) || !hasFrenchVoice()) return false;
   window.speechSynthesis.cancel();
   const u = new SpeechSynthesisUtterance(currentKey);
   u.lang = "fr-FR";
+  if (_frVoice) u.voice = _frVoice;
   u.rate = 0.9;
   window.speechSynthesis.speak(u);
+  return true;
+}
+
+function speakGoogle() {
+  // Reliable fallback: Google TTS audio — works even when the device has no
+  // French system voice (common on Android).
+  return new Promise((resolve) => {
+    const audio = new Audio();
+    const url = "https://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob&tl=fr&q=" +
+      encodeURIComponent(currentKey);
+    audio.src = url;
+    audio.onended = () => resolve(true);
+    audio.onerror = () => resolve(false);
+    audio.play().catch(() => resolve(false));
+  });
+}
+
+async function speak() {
+  if (!currentKey) return;
+  const ok = speakLocal();
+  if (!ok) await speakGoogle();
 }
 
 // ---- vocabulary -----------------------------------------------------------
@@ -259,6 +332,32 @@ el.nextBtn.addEventListener("click", () => {
 el.speakBtn.addEventListener("click", speak);
 el.saveBtn.addEventListener("click", saveCurrent);
 el.vocabBtn.addEventListener("click", refreshVocab);
+
+// ---- multi-word selection (phrase lookup) ---------------------------------
+let _selectedTimer = null;
+el.verseText.addEventListener("mouseup", () => {
+  clearTimeout(_selectedTimer);
+  _selectedTimer = setTimeout(handleSelection, 60);
+});
+document.addEventListener("selectionchange", () => {
+  const sel = window.getSelection();
+  if (!sel || sel.isCollapsed) return;
+  if (!el.verseText.contains(sel.anchorNode) && !el.verseText.contains(sel.focusNode)) return;
+  clearTimeout(_selectedTimer);
+  _selectedTimer = setTimeout(handleSelection, 60);
+});
+
+function handleSelection() {
+  const sel = window.getSelection();
+  if (!sel || sel.isCollapsed) return;
+  if (!el.verseText.contains(sel.anchorNode) || !el.verseText.contains(sel.focusNode)) return;
+  const text = sel.toString().trim();
+  // require at least two words (single-word taps are handled by click)
+  if (!text || text.split(/\s+/).filter(Boolean).length < 2) return;
+  el.saveBtn.disabled = true;
+  const segments = dictionary.segment(text.replace(/\s+/g, " "));
+  if (segments && segments.length) presentSelection(segments);
+}
 
 // ---- init -----------------------------------------------------------------
 async function init() {
