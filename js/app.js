@@ -103,14 +103,17 @@ function renderChapter() {
     docFrag.appendChild(vnum);
     // split into tokens, keep punctuation attached for display but strip for lookup
     const tokens = text.split(" ");
+    let sentenceStart = true;
     tokens.forEach((token, ti) => {
       const word = document.createElement("span");
       word.className = "word";
       word.textContent = token;
       word.dataset.word = token.replace(/[.,;:!?«»"'“”‘’()[\]*–—]+$/g, "").replace(/^[.,;:!?«»"'“”‘’()[\]*–—]+/g, "");
-      word.addEventListener("click", () => presentWord(word.dataset.word, ti, token));
+      const atSentenceStart = sentenceStart;
+      word.addEventListener("click", () => presentWord(word.dataset.word, ti, token, atSentenceStart));
       docFrag.appendChild(word);
       if (ti < tokens.length - 1) docFrag.appendChild(document.createTextNode(" "));
+      sentenceStart = /[.!?…]+$/.test(token);
     });
     docFrag.appendChild(document.createElement("br"));
   });
@@ -135,9 +138,9 @@ function selectBook(index, restoreChapter = false) {
 let currentKey = "";
 let currentES = "";
 
-function presentWord(word) {
+function presentWord(word, ti, token, sentenceInitial) {
   if (!dictionary) return;
-  const [meanings, info] = dictionary.resolve(word);
+  const [meanings, info] = dictionary.resolve(word, { sentenceInitial });
   currentKey = word;
   el.wordLabel.textContent = word;
   let grammar = "";
@@ -149,6 +152,15 @@ function presentWord(word) {
   }
   grammar = parts.join("  ·  ");
   if (!meanings) {
+    if (info.isName) {
+      el.meaning.innerHTML = "<span class='dim'>Nombre propio: persona o lugar.</span>";
+      el.grammar.textContent = "nombre propio";
+      el.note.textContent = "Selecciona una palabra del texto para ver su significado.";
+      el.saveBtn.disabled = true;
+      el.speakBtn.disabled = false;
+      currentES = "";
+      return;
+    }
     el.meaning.innerHTML = "<span class='dim'>Sin traducción disponible en el diccionario.</span>";
     el.grammar.textContent = "";
     el.note.textContent = "Selecciona una palabra del texto para ver su significado.";
@@ -185,7 +197,7 @@ function presentSelection(segments) {
       lines.push(line);
       meaningsAll.push(meanings[0]);
     } else {
-      lines.push(`<b>${esc(span)}</b> — <span class='dim'>sin traducción</span>`);
+      lines.push(`<b>${esc(span)}</b> — <span class='dim'>${info && info.isName ? "nombre propio" : "sin traducción"}</span>`);
     }
   }
   el.meaning.innerHTML = lines.join("<br/>");
