@@ -108,7 +108,7 @@ function renderChapter() {
       const word = document.createElement("span");
       word.className = "word";
       word.textContent = token;
-      word.dataset.word = token.replace(/[.,;:!?«»"'“”‘’()[\]*–—]+$/g, "").replace(/^[.,;:!?«»"'“”‘’()[\]*–—]+/g, "");
+      word.dataset.word = token.replace(/[.,;:!?…«»"'“”‘’()[\]*–—]+$/g, "").replace(/^[.,;:!?…«»"'“”‘’()[\]*–—]+/g, "");
       const atSentenceStart = sentenceStart;
       word.addEventListener("click", () => presentWord(word.dataset.word, ti, token, atSentenceStart));
       docFrag.appendChild(word);
