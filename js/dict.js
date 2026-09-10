@@ -8688,10 +8688,11 @@ class Dictionary {
       const acc = this._accent.get(variant.toLowerCase().replace(/[’‘]/g, "'"));
       if (acc) return [acc.slice(), info];
     }
-    // last resort: an unresolved capitalized word (not sentence-initial) is
-    // almost certainly a proper noun — person or place name.
+    // last resort: an unresolved capitalized word is almost certainly a
+    // proper noun — person or place name (every common word now resolves,
+    // so sentence-initial capitals are names too).
     const probe = candidates[candidates.length - 1];
-    if (!sentenceInitial && probe && /^[A-ZÀ-Ý]/.test(probe)) {
+    if (probe && !info.isName && !info.form && /^[A-ZÀ-Ý]/.test(probe)) {
       info.isName = true;
       info.form = "nombre propio";
     }
