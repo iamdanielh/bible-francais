@@ -42,10 +42,12 @@ function saveState() {
 // ---- data loading ---------------------------------------------------------
 async function loadData() {
   try {
-    const [raw, dict] = await Promise.all([
-      fetch("data/bible.json").then(r => r.text()),
-      fetch("data/dict.json").then(r => r.json()),
-    ]);
+    const [raw, dict] = window.__DATA__
+      ? [JSON.stringify(window.__DATA__.bible), window.__DATA__.dict]
+      : await Promise.all([
+          fetch("data/bible.json").then(r => r.text()),
+          fetch("data/dict.json").then(r => r.json()),
+        ]);
     const rawBible = JSON.parse(raw.replace(/^\uFEFF/, ""));
     bible = [];
     for (const testament of rawBible.Testaments || []) {
