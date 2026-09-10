@@ -7410,6 +7410,8 @@ const _BIBLE_WORDS = {
   "éphésiens": "efesios",
   "pharisien": "fariseo",
   "quénites": "quenitas",
+
+  "-": "-",
 };
 
 // Proper names (people and places) -> Spanish renderings.
