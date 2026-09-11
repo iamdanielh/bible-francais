@@ -22,6 +22,7 @@ const el = {
   chapterTitle: $("chapterTitle"), verseText: $("verseText"),
   wordLabel: $("wordLabel"), speakBtn: $("speakBtn"), meaning: $("meaning"),
   grammar: $("grammar"), saveBtn: $("saveBtn"), note: $("note"), vocabList: $("vocabList"),
+  ctxWrap: $("ctxWrap"), ctxBtn: $("ctxBtn"), ctxResult: $("ctxResult"),
 };
 
 // ---- persistence ----------------------------------------------------------
@@ -201,6 +202,7 @@ function closePanel() {
 
 function presentWord(word, ti, token, sentenceInitial) {
   if (!dictionary) return;
+  hideContextTranslation();
   const [meanings, info] = dictionary.resolve(word, { sentenceInitial });
   currentKey = word;
   el.wordLabel.textContent = word;
@@ -241,6 +243,7 @@ function presentWord(word, ti, token, sentenceInitial) {
 function presentSelection(segments) {
   if (!segments.length) return;
   openPanel("word");
+  showContextTranslation();
   currentKey = segments.map(s => s[0]).join(" ");
   currentES = "";
   el.wordLabel.textContent = currentKey;
@@ -269,6 +272,52 @@ function presentSelection(segments) {
   el.saveBtn.disabled = false;
   el.speakBtn.disabled = false;
   currentES = meaningsAll.join(" · ");
+}
+
+// ---- contextual (whole-phrase) translation ----------------------------------
+let _ctxQuery = "";
+let _translateBusy = false;
+
+function showContextTranslation() {
+  el.ctxWrap.hidden = false;
+  el.ctxResult.innerHTML = "";
+  el.ctxBtn.disabled = false;
+}
+
+function hideContextTranslation() {
+  _ctxQuery = "";
+  el.ctxWrap.hidden = true;
+  el.ctxResult.innerHTML = "";
+  el.ctxBtn.disabled = true;
+}
+
+async function translateContext() {
+  if (!_ctxQuery || _translateBusy) return;
+  _translateBusy = true;
+  el.ctxBtn.disabled = true;
+  el.ctxResult.innerHTML = "<span class='dim'>Traduciendo…</span>";
+  try {
+    const body = new URLSearchParams({ q: _ctxQuery.slice(0, 3000), langpair: "fr|es" });
+    const resp = await fetch("https://api.mymemory.translated.net/get", {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body,
+    });
+    if (!resp.ok) throw new Error("HTTP " + resp.status);
+    const data = await resp.json();
+    if (data && data.responseStatus === 429) throw new Error("límite diario agotado");
+    const t = data && data.responseData && data.responseData.translatedText;
+    if (!t) throw new Error(data && data.responseDetails ? data.responseDetails : "respuesta vacía");
+    el.ctxResult.innerHTML = "<b>Contexto:</b> " + esc(t) +
+      " <span class='ctx-meta'>— traducción automática · " +
+      "<a href='https://mymemory.translated.net/' target='_blank' rel='noopener'>MyMemory</a></span>";
+  } catch (e) {
+    el.ctxResult.innerHTML = "<span class='dim'>No se pudo traducir en línea (" + esc(e.message) +
+      "). Revisa tu conexión e inténtalo de nuevo.</span>";
+  } finally {
+    _translateBusy = false;
+    el.ctxBtn.disabled = false;
+  }
 }
 
 function verbNote(info, withMeaning) {
@@ -447,6 +496,7 @@ el.nextBtn.addEventListener("click", () => {
 });
 el.speakBtn.addEventListener("click", speak);
 el.saveBtn.addEventListener("click", saveCurrent);
+el.ctxBtn.addEventListener("click", translateContext);
 el.vocabBtn.addEventListener("click", () => { refreshVocab(); openPanel("vocab"); });
 $("panelCloseBtn").addEventListener("click", closePanel);
 scrim.addEventListener("click", closePanel);
@@ -473,7 +523,9 @@ function handleSelection() {
   // require at least two words (single-word taps are handled by click)
   if (!text || text.split(/\s+/).filter(Boolean).length < 2) return;
   el.saveBtn.disabled = true;
-  const segments = dictionary.segment(text.replace(/\s+/g, " "));
+  const cleaned = text.replace(/\s+/g, " ");
+  _ctxQuery = cleaned;
+  const segments = dictionary.segment(cleaned);
   if (segments && segments.length) presentSelection(segments);
 }
 

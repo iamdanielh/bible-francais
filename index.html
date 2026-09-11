@@ -7,7 +7,7 @@
   <title>Bible en français — Español</title>
   <link rel="manifest" href="manifest.webmanifest" />
   <link rel="apple-touch-icon" href="icon-180.png" />
-  <link rel="stylesheet" href="css/style.css?v=5" />
+  <link rel="stylesheet" href="css/style.css?v=6" />
 </head>
 <body>
   <header class="topbar">
@@ -49,6 +49,10 @@
           <div id="grammar" class="grammar"></div>
           <button id="saveBtn" class="primary-btn" disabled>Guardar en el vocabulario</button>
           <div id="note" class="note"></div>
+          <div id="ctxWrap" class="ctx-wrap" hidden>
+            <button id="ctxBtn" class="secondary-btn">🌐 Traducir frase en contexto</button>
+            <div id="ctxResult" class="ctx-result"></div>
+          </div>
         </div>
         <div id="vocabContent" hidden>
           <ul id="vocabList" class="vocab-list"></ul>
@@ -58,6 +62,6 @@
     <div class="scrim" id="scrim"></div>
   </main>
 
-  <script type="module" src="js/app.js?v=5"></script>
+  <script type="module" src="js/app.js?v=6"></script>
 </body>
 </html>
