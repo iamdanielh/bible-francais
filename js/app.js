@@ -27,6 +27,26 @@ const el = {
 
 // ---- persistence ----------------------------------------------------------
 const readerEl = document.querySelector(".reader");
+const topbarEl = document.querySelector(".topbar");
+
+// --- auto-hiding top bar ------------------------------------------------
+let _topbarHidden = false;
+let _lastScrollY = 0;
+
+function showTopbar() {
+  if (!_topbarHidden) return;
+  _topbarHidden = false;
+  document.body.classList.remove("topbar-hidden");
+}
+function hideTopbar() {
+  if (_topbarHidden) return;
+  _topbarHidden = true;
+  document.body.classList.add("topbar-hidden");
+}
+function syncTopbarHeight() {
+  if (topbarEl) document.documentElement.style.setProperty("--topbar-h", topbarEl.offsetHeight + "px");
+}
+window.addEventListener("resize", syncTopbarHeight);
 
 function loadState() {
   try {
@@ -52,6 +72,12 @@ if (readerEl) {
     state.scrollTop = readerEl.scrollTop;
     clearTimeout(_scrollSaveTimer);
     _scrollSaveTimer = setTimeout(saveState, 400);
+
+    // auto-hide the top bar while reading downward, bring it back on scroll-up
+    if (!_topbarHidden && readerEl.scrollTop - _lastScrollY > 14) hideTopbar();
+    else if (_topbarHidden &&
+             (readerEl.scrollTop < _lastScrollY - 8 || readerEl.scrollTop < 40)) showTopbar();
+    _lastScrollY = readerEl.scrollTop;
   });
 }
 function flushReadingPosition() {
@@ -174,6 +200,8 @@ function renderChapter() {
   });
   el.verseText.appendChild(docFrag);
   if (readerEl) readerEl.scrollTop = 0; // new chapter starts at the top
+  _lastScrollY = 0;
+  showTopbar();
 }
 
 function selectBook(index, restoreChapter = false) {
@@ -216,6 +244,7 @@ function openPanel(mode) {
   panel.classList.add("open");
   scrim.classList.add("show");
   panel.setAttribute("aria-hidden", "false");
+  showTopbar();
 }
 
 function closePanel() {
@@ -721,6 +750,7 @@ async function init() {
   buildChapterList();
   el.chapterSelect.value = currentChapter;
   renderChapter();
+  syncTopbarHeight();
   if (readerEl && state.scrollTop) {
     // re-apply a few times: line metrics settle after fonts/layout paint
     readerEl.scrollTop = state.scrollTop;
