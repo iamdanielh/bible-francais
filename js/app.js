@@ -12,7 +12,7 @@ const BOOK_ALIASES = {
 
 let bible = [];       // [{name, chapters:[[verseText,...],...]}]
 let dictionary = null;
-let state = { book: 0, chapter: 0, vocab: [] };
+let state = { book: 0, chapter: 0, vocab: [], scrollTop: 0 };
 
 // ---- DOM refs -------------------------------------------------------------
 const $ = (id) => document.getElementById(id);
@@ -26,19 +26,44 @@ const el = {
 };
 
 // ---- persistence ----------------------------------------------------------
+const readerEl = document.querySelector(".reader");
+
 function loadState() {
   try {
     const s = JSON.parse(localStorage.getItem("biblefr") || "{}");
     if (Array.isArray(s.vocab)) state.vocab = s.vocab;
     if (typeof s.book === "number") state.book = s.book;
     if (typeof s.chapter === "number") state.chapter = s.chapter;
+    if (typeof s.scrollTop === "number") state.scrollTop = s.scrollTop;
   } catch (e) { /* ignore */ }
 }
 function saveState() {
   state.book = currentBookIndex;
   state.chapter = currentChapter;
+  if (readerEl) state.scrollTop = readerEl.scrollTop;
   try { localStorage.setItem("biblefr", JSON.stringify(state)); } catch (e) {}
 }
+
+// Remember where the reader is scrolled to, so reopening resumes at the same
+// verse. Save debounced while scrolling and flushed when the app is hidden.
+let _scrollSaveTimer = null;
+if (readerEl) {
+  readerEl.addEventListener("scroll", () => {
+    state.scrollTop = readerEl.scrollTop;
+    clearTimeout(_scrollSaveTimer);
+    _scrollSaveTimer = setTimeout(saveState, 400);
+  });
+}
+function flushReadingPosition() {
+  if (readerEl) {
+    state.scrollTop = readerEl.scrollTop;
+    saveState();
+  }
+}
+window.addEventListener("pagehide", flushReadingPosition);
+document.addEventListener("visibilitychange", () => {
+  if (document.visibilityState === "hidden") flushReadingPosition();
+});
 
 // ---- theme -----------------------------------------------------------------
 const THEME_KEY = "biblefr-theme";
@@ -148,7 +173,7 @@ function renderChapter() {
     docFrag.appendChild(document.createElement("br"));
   });
   el.verseText.appendChild(docFrag);
-  el.verseText.scrollTop = 0;
+  if (readerEl) readerEl.scrollTop = 0; // new chapter starts at the top
 }
 
 function selectBook(index, restoreChapter = false) {
@@ -682,6 +707,9 @@ el.verseText.addEventListener("click", (e) => {
 // ---- init -----------------------------------------------------------------
 async function init() {
   loadState();
+  // Build the DOM is dynamic, so the browser's own scroll restoration can't
+  // know where to go — take the wheel and restore from localStorage instead.
+  if ("scrollRestoration" in history) history.scrollRestoration = "manual";
   el.loading.style.display = "block";
   await loadData();
   el.loading.style.display = "none";
@@ -692,6 +720,12 @@ async function init() {
   buildChapterList();
   el.chapterSelect.value = currentChapter;
   renderChapter();
+  if (readerEl && state.scrollTop) {
+    // re-apply a few times: line metrics settle after fonts/layout paint
+    readerEl.scrollTop = state.scrollTop;
+    requestAnimationFrame(() => { readerEl.scrollTop = state.scrollTop; });
+    setTimeout(() => { if (readerEl) readerEl.scrollTop = state.scrollTop; }, 150);
+  }
   refreshVocab();
 
   // register service worker for offline/PWA
