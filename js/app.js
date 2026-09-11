@@ -680,6 +680,7 @@ el.verseText.addEventListener("click", (e) => {
     dy = 0;
     vy = 0;
     panel.style.transition = "none";
+    try { panel.setPointerCapture(e.pointerId); } catch (err) { /* not critical */ }
   };
   const onMove = (e) => {
     if (!tracking) return;
