@@ -32,16 +32,36 @@ const topbarEl = document.querySelector(".topbar");
 // --- auto-hiding top bar ------------------------------------------------
 let _topbarHidden = false;
 let _lastScrollY = 0;
+let _scrollAccum = 0;
 
 function showTopbar() {
   if (!_topbarHidden) return;
   _topbarHidden = false;
-  document.body.classList.remove("topbar-hidden");
+  compensateTopbar(false);
+  _lastScrollY = readerEl ? readerEl.scrollTop : 0;
+  _scrollAccum = 0;
 }
 function hideTopbar() {
   if (_topbarHidden) return;
   _topbarHidden = true;
-  document.body.classList.add("topbar-hidden");
+  compensateTopbar(true);
+  _lastScrollY = readerEl ? readerEl.scrollTop : 0;
+  _scrollAccum = 0;
+}
+// Toggle the bar's reserved space but re-scroll so the same verse stays at the
+// same place on screen — hiding grows the viewport instead of nudging the text.
+function compensateTopbar(hidden) {
+  if (!readerEl) return;
+  const padBefore = parseFloat(getComputedStyle(readerEl).paddingTop);
+  document.body.classList.toggle("topbar-hidden", hidden);
+  const padAfter = parseFloat(getComputedStyle(readerEl).paddingTop);
+  const d = padAfter - padBefore;
+  if (d) {
+    setReaderScroll(Math.min(
+      Math.max(0, readerEl.scrollTop + d),
+      readerEl.scrollHeight - readerEl.clientHeight
+    ));
+  }
 }
 function syncTopbarHeight() {
   if (topbarEl) document.documentElement.style.setProperty("--topbar-h", topbarEl.offsetHeight + "px");
@@ -60,29 +80,56 @@ function loadState() {
 function saveState() {
   state.book = currentBookIndex;
   state.chapter = currentChapter;
-  if (readerEl) state.scrollTop = readerEl.scrollTop;
+  state.scrollTop = canonicalScrollTop();
   try { localStorage.setItem("biblefr", JSON.stringify(state)); } catch (e) {}
+}
+
+// Reading coordinates live in "bar visible" units: the reader's real scroll
+// position plus the reserved bar height when the bar is currently hidden, so
+// a saved position means the same verse whether the bar shows or not.
+function canonicalScrollTop() {
+  if (!readerEl) return 0;
+  return readerEl.scrollTop + (_topbarHidden && topbarEl ? topbarEl.offsetHeight : 0);
 }
 
 // Remember where the reader is scrolled to, so reopening resumes at the same
 // verse. Save debounced while scrolling and flushed when the app is hidden.
 let _scrollSaveTimer = null;
+let _programmaticScrolls = 0;
+// Browsers (Chromium at least) fire `scroll` events for programmatic scrollTop
+// writes too. We track those so the auto-hide / position-restore logic doesn't
+// mistake our own restore/compensation for the user scrolling.
+function setReaderScroll(v) {
+  _programmaticScrolls++;
+  readerEl.scrollTop = v;
+  setTimeout(() => { _programmaticScrolls = Math.max(0, _programmaticScrolls - 1); }, 80);
+}
 if (readerEl) {
   readerEl.addEventListener("scroll", () => {
-    state.scrollTop = readerEl.scrollTop;
+    state.scrollTop = canonicalScrollTop();
     clearTimeout(_scrollSaveTimer);
     _scrollSaveTimer = setTimeout(saveState, 400);
 
-    // auto-hide the top bar while reading downward, bring it back on scroll-up
-    if (!_topbarHidden && readerEl.scrollTop - _lastScrollY > 14) hideTopbar();
-    else if (_topbarHidden &&
-             (readerEl.scrollTop < _lastScrollY - 8 || readerEl.scrollTop < 40)) showTopbar();
+    const programmatic = _programmaticScrolls > 0;
+    if (programmatic) _programmaticScrolls--;
+
+    // auto-hide the top bar after a little cumulative downward travel, bring it
+    // back as soon as you scroll up (or when reaching the very top)
+    const delta = readerEl.scrollTop - _lastScrollY;
     _lastScrollY = readerEl.scrollTop;
+    if (!programmatic && delta !== 0) _scrollAccum += delta;
+    if (!programmatic) {
+      if (!_topbarHidden) {
+        if (_scrollAccum > 24) hideTopbar();
+      } else {
+        if (_scrollAccum < -18) showTopbar();
+      }
+    }
   });
 }
 function flushReadingPosition() {
   if (readerEl) {
-    state.scrollTop = readerEl.scrollTop;
+    state.scrollTop = canonicalScrollTop();
     saveState();
   }
 }
@@ -171,6 +218,18 @@ function buildChapterList() {
   }
 }
 
+function gotoNextChapter() {
+  closePanel();
+  const book = bible[currentBookIndex];
+  if (currentChapter < book.chapters.length - 1) { currentChapter++; el.chapterSelect.value = currentChapter; renderChapter(); saveState(); }
+  else if (currentBookIndex < bible.length - 1) selectBook(currentBookIndex + 1);
+}
+function gotoPrevChapter() {
+  closePanel();
+  if (currentChapter > 0) { currentChapter--; el.chapterSelect.value = currentChapter; renderChapter(); saveState(); }
+  else if (currentBookIndex > 0) selectBook(currentBookIndex - 1);
+}
+
 function renderChapter() {
   const book = bible[currentBookIndex];
   const verses = book.chapters[currentChapter] || [];
@@ -199,9 +258,13 @@ function renderChapter() {
     docFrag.appendChild(document.createElement("br"));
   });
   el.verseText.appendChild(docFrag);
-  if (readerEl) readerEl.scrollTop = 0; // new chapter starts at the top
+  if (readerEl) setReaderScroll(0); // new chapter starts at the top
   _lastScrollY = 0;
   showTopbar();
+  // showTopbar() re-scrolls to keep text pinned during a bar toggle, which
+  // would push a fresh chapter off its top — override it back to the top.
+  if (readerEl) setReaderScroll(0);
+  _lastScrollY = 0;
 }
 
 function selectBook(index, restoreChapter = false) {
@@ -327,6 +390,19 @@ function presentSelection(segments) {
   el.saveBtn.disabled = false;
   el.speakBtn.disabled = false;
   currentES = meaningsAll.join(" · ");
+  autoContextTranslate();
+}
+
+// Multi-word selections mean the reader wants the whole phrase understood, so
+// fetch the online translation without making them hunt for the button.
+let _ctxAutoTimer = null;
+function autoContextTranslate() {
+  clearTimeout(_ctxAutoTimer);
+  const q = _ctxQuery;
+  if (!q || q.split(/\s+/).filter(Boolean).length < 2) return;
+  _ctxAutoTimer = setTimeout(() => {
+    if (!el.ctxWrap.hidden && _ctxQuery === q && !_translateBusy) translateContext();
+  }, 250);
 }
 
 // ---- contextual (whole-phrase) translation ----------------------------------
@@ -538,17 +614,8 @@ el.chapterSelect.addEventListener("change", (e) => {
     closePanel();
   }
 });
-el.prevBtn.addEventListener("click", () => {
-  closePanel();
-  if (currentChapter > 0) { currentChapter--; el.chapterSelect.value = currentChapter; renderChapter(); saveState(); }
-  else if (currentBookIndex > 0) selectBook(currentBookIndex - 1);
-});
-el.nextBtn.addEventListener("click", () => {
-  closePanel();
-  const book = bible[currentBookIndex];
-  if (currentChapter < book.chapters.length - 1) { currentChapter++; el.chapterSelect.value = currentChapter; renderChapter(); saveState(); }
-  else if (currentBookIndex < bible.length - 1) selectBook(currentBookIndex + 1);
-});
+el.prevBtn.addEventListener("click", gotoPrevChapter);
+el.nextBtn.addEventListener("click", gotoNextChapter);
 el.speakBtn.addEventListener("click", speak);
 el.saveBtn.addEventListener("click", saveCurrent);
 el.ctxBtn.addEventListener("click", translateContext);
@@ -584,21 +651,34 @@ function handleSelection() {
   if (segments && segments.length) presentSelection(segments);
 }
 
-// ---- custom touch phrase selection -----------------------------------------
-// Native selection on touch devices (iOS in particular) breaks when the text
-// is split into interactive per-word <span>s: a long-press/undragged selection
-// snaps to "select everything". So on coarse-pointer devices we disable native
-// selection via CSS (.touch .verse-text) and do long-press + drag ourselves.
+// ---- custom touch gestures ----------------------------------------------
+// On coarse-pointer devices native selection is unusable over per-word <span>s
+// (long-press snaps to "select everything"), so we own the gestures:
+//   · tap a word        → open its translation (the element's click handler)
+//   · slide across words → phrase selection
+//   · fast wide flick L/R → previous/next chapter
 const TOUCH_NAV = typeof matchMedia === "function" && matchMedia("(pointer: coarse)").matches;
 if (TOUCH_NAV) document.documentElement.classList.add("touch");
 
 let _touchWords = [];
 let _lpTimer = null;
 let _touchOrigin = { x: 0, y: 0 };
+let _swipeStartT = 0;
+let _prevMove = { t: 0, adx: 0 };
+let _gestMode = "none"; // pending | scroll | select | hswipe
 let _selActive = false;
 let _anchorIdx = -1;
 let _lastIdx = -1;
 let _suppressClick = false;
+let _clickSuppressTimer = null;
+
+// Keep the post-gesture synthetic click from reopening the tapped word, but
+// always recover so the next real tap works.
+function armClickSuppress() {
+  _suppressClick = true;
+  clearTimeout(_clickSuppressTimer);
+  _clickSuppressTimer = setTimeout(() => { _suppressClick = false; }, 900);
+}
 
 function clearSelectionHighlights() {
   for (const w of _touchWords) w.classList.remove("sel");
@@ -611,11 +691,30 @@ function paintSelectionRange(a, b) {
   }
 }
 
-function startTouchSelection(wordEl) {
+function nearestWordAt(x, y) {
+  let best = null, bestD = Infinity;
+  for (const w of _touchWords) {
+    const r = w.getBoundingClientRect();
+    if (r.width === 0 && r.height === 0) continue;
+    const dx = (r.left + r.width / 2) - x, dy = (r.top + r.height / 2) - y;
+    const d = dx * dx + dy * dy;
+    if (d < bestD) { bestD = d; best = w; }
+  }
+  return best;
+}
+
+function wordAt(x, y) {
+  const hit = document.elementFromPoint(x, y);
+  const w = hit && hit.closest ? hit.closest(".word") : null;
+  return w || nearestWordAt(x, y);
+}
+
+function startTouchSelection(x, y) {
   if (_selActive) return;
   closePanel(); // hide an old translation drawer so hit-testing reaches the words
-  _suppressClick = true;
   _touchWords = [...el.verseText.querySelectorAll(".word")];
+  const wordEl = wordAt(x, y);
+  if (!wordEl) return;
   const idx = _touchWords.indexOf(wordEl);
   if (idx < 0) return;
   _anchorIdx = idx;
@@ -630,8 +729,8 @@ function startTouchSelection(wordEl) {
 function touchSelectMove(e) {
   if (!_selActive) return;
   if (e.cancelable) e.preventDefault(); // hold the page still while selecting
-  const hit = document.elementFromPoint(e.touches[0].clientX, e.touches[0].clientY);
-  const wordEl = hit && hit.closest ? hit.closest(".word") : null;
+  const t = e.touches[0];
+  const wordEl = wordAt(t.clientX, t.clientY);
   if (!wordEl) return;
   const idx = _touchWords.indexOf(wordEl);
   if (idx < 0 || idx === _lastIdx) return;
@@ -650,34 +749,113 @@ function touchSelectEnd() {
   _ctxQuery = text;
   const segments = dictionary.segment(text.replace(/\s+/g, " "));
   if (segments && segments.length) presentSelection(segments);
+  else closePanel();
 }
 
-const touchStartLp = (e) => {
-  if (!TOUCH_NAV || _selActive) return;
+function endSelectionForGesture() {
+  if (_selActive) {
+    touchSelectEnd();
+  } else {
+    clearSelectionHighlights();
+  }
+}
+
+const touchSwapStart = (e) => {
+  if (!TOUCH_NAV || _gestMode !== "none") return;
   if (e.touches.length !== 1) return;
   _suppressClick = false;
-  const wordEl = e.target.closest && e.target.closest(".word");
-  if (!wordEl) return;
   _touchOrigin = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+  _swipeStartT = e.timeStamp;
+  _prevMove = { t: e.timeStamp, adx: 0 };
+  _gestMode = "pending";
+  _selActive = false;
   clearTimeout(_lpTimer);
-  _lpTimer = setTimeout(() => startTouchSelection(wordEl), 420);
+  _lpTimer = setTimeout(() => {
+    if (_gestMode !== "pending") return;
+    _gestMode = "select";
+    if (!_selActive) { armClickSuppress(); startTouchSelection(_touchOrigin.x, _touchOrigin.y); }
+  }, 260);
 };
-const touchMoveLp = (e) => {
-  if (!TOUCH_NAV || _selActive) return;
+
+function touchSwapMove(e) {
+  if (!TOUCH_NAV || _gestMode === "none" || _gestMode === "scroll") return;
   if (e.touches.length !== 1) return;
   const t = e.touches[0];
-  if (Math.hypot(t.clientX - _touchOrigin.x, t.clientY - _touchOrigin.y) > 12) {
-    clearTimeout(_lpTimer); // user is scrolling, not selecting
+  const dx = t.clientX - _touchOrigin.x;
+  const dy = t.clientY - _touchOrigin.y;
+  const dist = Math.hypot(dx, dy);
+
+  if (_gestMode === "pending") {
+    if (dist > 10) {
+      clearTimeout(_lpTimer);
+      if (Math.abs(dx) > Math.abs(dy)) {
+        // Horizontal intent. A chapter flick is decisive: wide AND fast. A word
+        // drag is slower, so once it's wide enough we wait to see how fast it
+        // is: fast & wide → chapter flip, slow → phrase selection. Velocity is
+        // measured between consecutive moves so a sweep that starts late after
+        // a busy moment still reads as fast.
+        if (Math.abs(dx) >= 24) {
+          const stepV = e.timeStamp > _prevMove.t
+            ? (Math.abs(dx) - _prevMove.adx) / (e.timeStamp - _prevMove.t)
+            : Infinity;
+          _prevMove = { t: e.timeStamp, adx: Math.abs(dx) };
+          const startV = Math.abs(dx) / Math.max(1, e.timeStamp - _swipeStartT);
+          const fast = stepV >= 0.45 || startV >= 0.6;
+          if (Math.abs(dx) >= 130 && fast) {
+            _gestMode = "hswipe";
+            armClickSuppress();
+            if (e.cancelable) e.preventDefault();
+            return;
+          }
+          if (!fast || startV < 0.4) {
+            _gestMode = "select";
+            armClickSuppress();
+            if (e.cancelable) e.preventDefault();
+            if (!_selActive) startTouchSelection(_touchOrigin.x, _touchOrigin.y);
+            touchSelectMove(e);
+            return;
+          }
+        }
+        return; // fast but not clearly a full flick yet — keep watching
+      } else if (Math.abs(dy) > 12) {
+        _gestMode = "scroll"; // vertical intent → native scrolling wins
+        return;
+      }
+    }
   }
-};
-const touchEndLp = () => {
-  if (!_selActive) clearTimeout(_lpTimer); // quick tap — cancel the pending long-press
-};
-el.verseText.addEventListener("touchstart", touchStartLp, { passive: true });
-el.verseText.addEventListener("touchmove", touchMoveLp, { passive: true });
-el.verseText.addEventListener("touchend", touchEndLp, { passive: true });
-el.verseText.addEventListener("touchcancel", touchEndLp, { passive: true });
-// Suppress the synthetic click iOS fires ~500ms after a long-press; otherwise
+  if (_gestMode === "select") {
+    if (e.cancelable) e.preventDefault();
+    touchSelectMove(e);
+  } else if (_gestMode === "hswipe") {
+    if (e.cancelable) e.preventDefault();
+  }
+}
+
+function touchSwapEnd(e) {
+  if (!TOUCH_NAV || _gestMode === "none") return;
+  clearTimeout(_lpTimer);
+  const mode = _gestMode;
+  _gestMode = "none";
+  if (mode === "hswipe") {
+    const t = e.changedTouches && e.changedTouches[0];
+    const dx = t ? t.clientX - _touchOrigin.x : 0;
+    clearSelectionHighlights();
+    if (Math.abs(dx) >= 50) {
+      if (dx < 0) gotoNextChapter(); else gotoPrevChapter();
+    }
+  } else if (mode === "select") {
+    endSelectionForGesture();
+  } else if (mode === "pending") {
+    endSelectionForGesture(); // a slow press with no real movement = single- or multi-word select
+  }
+}
+
+const touchTarget = readerEl || el.verseText;
+touchTarget.addEventListener("touchstart", touchSwapStart, { passive: true });
+touchTarget.addEventListener("touchmove", touchSwapMove, { passive: false });
+touchTarget.addEventListener("touchend", touchSwapEnd, { passive: true });
+touchTarget.addEventListener("touchcancel", touchSwapEnd, { passive: true });
+// Suppress the synthetic click iOS fires ~300-500ms after a long-press; otherwise
 // it would reset the phrase panel to the single tapped word.
 el.verseText.addEventListener("click", (e) => {
   if (_suppressClick) {
@@ -753,9 +931,10 @@ async function init() {
   syncTopbarHeight();
   if (readerEl && state.scrollTop) {
     // re-apply a few times: line metrics settle after fonts/layout paint
-    readerEl.scrollTop = state.scrollTop;
-    requestAnimationFrame(() => { readerEl.scrollTop = state.scrollTop; });
-    setTimeout(() => { if (readerEl) readerEl.scrollTop = state.scrollTop; }, 150);
+    setReaderScroll(state.scrollTop);
+    requestAnimationFrame(() => setReaderScroll(state.scrollTop));
+    setTimeout(() => setReaderScroll(state.scrollTop), 150);
+    setTimeout(() => setReaderScroll(state.scrollTop), 800);
   }
   refreshVocab();
 

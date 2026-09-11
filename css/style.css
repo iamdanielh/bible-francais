@@ -196,12 +196,14 @@ button:disabled {
 
 .reader {
   overflow-y: auto;
+  overflow-x: hidden;
   padding: calc(var(--topbar-h, 88px) + 24px) 20px 24px;
   max-width: 46rem;
   margin: 0 auto;
   width: 100%;
-  transition: padding-top 0.26s ease;
+  scrollbar-width: none;
 }
+.reader::-webkit-scrollbar { display: none; width: 0; height: 0; }
 body.topbar-hidden .reader {
   padding-top: 24px;
 }
@@ -323,7 +325,9 @@ html.touch .scrim.show { opacity: 0; }
   min-height: 0;
   touch-action: pan-y;
   overscroll-behavior: contain;
+  scrollbar-width: none;
 }
+.panel-body::-webkit-scrollbar { display: none; width: 0; height: 0; }
 
 .word-head {
   display: flex;
