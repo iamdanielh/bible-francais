@@ -7,7 +7,7 @@
   <title>Bible en français — Español</title>
   <link rel="manifest" href="manifest.webmanifest" />
   <link rel="apple-touch-icon" href="icon-180.png" />
-  <link rel="stylesheet" href="css/style.css?v=12" />
+  <link rel="stylesheet" href="css/style.css?v=13" />
 </head>
 <body>
   <header class="topbar">
@@ -54,13 +54,42 @@
           </div>
         </div>
         <div id="vocabContent" hidden>
+          <div class="vocab-scope">
+            <div class="seg" role="group" aria-label="Ámbito">
+              <button id="scopeAll" class="seg-btn on">Todos</button>
+              <button id="scopeChapter" class="seg-btn">Este capítulo</button>
+            </div>
+            <div id="vocabCount" class="vocab-count"></div>
+          </div>
+          <button id="studyBtn" class="primary-btn">Estudiar con tarjetas</button>
           <ul id="vocabList" class="vocab-list"></ul>
+        </div>
+        <div id="studyContent" hidden>
+          <div class="study-head">
+            <button id="studyBack" class="ghost-btn">← Vocabulario</button>
+            <span id="studyTitle" class="study-title"></span>
+            <button id="studySpeak" class="round-btn" title="Escuchar">🔊</button>
+            <span id="studyProgress" class="study-progress"></span>
+          </div>
+          <div id="studyCard" class="study-card">
+            <div id="studyWord" class="study-word"></div>
+            <div id="studyMeaning" class="study-meaning" hidden></div>
+          </div>
+          <button id="studyFlip" class="primary-btn">Mostrar significado</button>
+          <div id="studyControls" class="study-controls" hidden>
+            <button id="studyAgain" class="ghost-btn">↻ Repasar</button>
+            <button id="studyKnow" class="primary-btn">✓ Lo sabía</button>
+          </div>
+          <div id="studyDone" class="study-done" hidden>
+            <div id="studyDoneMsg" class="study-done-msg">¡Lo has repasado todo!</div>
+            <button id="studyRestart" class="primary-btn">Empezar otra vez</button>
+          </div>
         </div>
       </div>
     </aside>
     <div class="scrim" id="scrim"></div>
   </main>
 
-  <script type="module" src="js/app.js?v=12"></script>
+  <script type="module" src="js/app.js?v=13"></script>
 </body>
 </html>

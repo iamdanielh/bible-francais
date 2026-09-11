@@ -262,6 +262,7 @@ function renderChapter() {
     docFrag.appendChild(document.createElement("br"));
   });
   el.verseText.appendChild(docFrag);
+  buildChapterTokens(book, currentChapter);
   if (readerEl) setReaderScroll(0); // new chapter starts at the top
   _lastScrollY = 0;
   showTopbar();
@@ -292,17 +293,16 @@ const panel = $("lookupPanel");
 const scrim = $("scrim");
 const wordContent = $("wordContent");
 const vocabContent = $("vocabContent");
+const studyContent = $("studyContent");
 
 function setPanelMode(mode) {
-  if (mode === "vocab") {
-    $("panelTitle").textContent = "Vocabulario";
-    wordContent.hidden = true;
-    vocabContent.hidden = false;
-  } else {
-    $("panelTitle").textContent = "Traducción";
-    vocabContent.hidden = true;
-    wordContent.hidden = false;
-  }
+  const vocab = mode === "vocab";
+  const study = mode === "study";
+  studyContent.hidden = !study;
+  if (study) { $("panelTitle").textContent = "Estudiar"; return; }
+  $("panelTitle").textContent = vocab ? "Vocabulario" : "Traducción";
+  wordContent.hidden = vocab;
+  vocabContent.hidden = !vocab;
 }
 
 function openPanel(mode) {
@@ -565,19 +565,69 @@ async function speak() {
 }
 
 // ---- vocabulary -----------------------------------------------------------
+let _chapterTokens = [];
+let _vocabScope = "all"; // "all" | "chapter"
+
+// Normalized lowercase tokens (no punctuation) of the current chapter, used to
+// tell which saved words/phrases actually turn up in the chapter you're reading.
+function buildChapterTokens(book, chapterIdx) {
+  _chapterTokens = [];
+  const verses = (book && book.chapters[chapterIdx]) || [];
+  for (const text of verses) {
+    for (const tok of text.split(/\s+/)) {
+      const w = tok.replace(/^[.,;:!?…«»"'“”‘’()[\]*–—]+|[.,;:!?…«»"'“”‘’()[\]*–—]+$/g, "").toLowerCase();
+      if (w) _chapterTokens.push(w);
+    }
+  }
+}
+function entryMatchesChapter(entry) {
+  const words = entry.fr.split(/\s+/)
+    .map(w => w.replace(/^[.,;:!?…«»"'“”‘’()[\]*–—]+|[.,;:!?…«»"'“”‘’()[\]*–—]+$/g, "").toLowerCase())
+    .filter(Boolean);
+  if (!words.length) return false;
+  if (words.length === 1) return _chapterTokens.includes(words[0]);
+  const n = words.length;
+  for (let i = 0; i + n <= _chapterTokens.length; i++) {
+    let ok = true;
+    for (let j = 0; j < n; j++) {
+      if (_chapterTokens[i + j] !== words[j]) { ok = false; break; }
+    }
+    if (ok) return true;
+  }
+  return false;
+}
+
+function scopedEntries() {
+  const entries = _vocabScope === "chapter" ? state.vocab.filter(entryMatchesChapter) : state.vocab;
+  return entries;
+}
+
 function refreshVocab() {
+  const entries = scopedEntries();
+  $("scopeAll").classList.toggle("on", _vocabScope === "all");
+  $("scopeChapter").classList.toggle("on", _vocabScope === "chapter");
+  const count = $("vocabCount");
+  if (_vocabScope === "chapter") {
+    count.textContent = entries.length
+      ? `${entries.length} palabra${entries.length === 1 ? "" : "s"} guardada${entries.length === 1 ? "" : "s"} en este capítulo`
+      : "No guardaste palabras de este capítulo todavía.";
+  } else {
+    count.textContent = entries.length
+      ? `Total: ${entries.length} palabra${entries.length === 1 ? "" : "s"}`
+      : "Tu vocabulario está vacío. Selecciona una palabra y guárdala aquí.";
+  }
   el.vocabList.innerHTML = "";
-  if (!state.vocab.length) {
+  if (!entries.length) {
     const empty = document.createElement("li");
     empty.className = "vocab-empty";
     empty.textContent = "Tu vocabulario está vacío. Selecciona una palabra y guárdala aquí.";
     el.vocabList.appendChild(empty);
     return;
   }
-  for (const entry of state.vocab) {
+  for (const entry of entries) {
     const li = document.createElement("li");
     const label = document.createElement("span");
-    label.textContent = `${entry.fr} — ${entry.es}`;
+    label.textContent = `${entry.fr} — ${entry.es || "—"}`;
     const del = document.createElement("button");
     del.className = "del";
     del.textContent = "✕";
@@ -587,6 +637,84 @@ function refreshVocab() {
     li.appendChild(del);
     el.vocabList.appendChild(li);
   }
+}
+
+// ---- study (flashcards) ---------------------------------------------------
+let _studyDeck = [];
+let _studyIdx = 0;
+let _studyScope = "all";
+
+function entryMeaning(fr, es) {
+  if (es && es.trim()) return es.trim();
+  if (!dictionary) return "";
+  const [meanings] = dictionary.resolve(fr);
+  return meanings && meanings.length ? meanings.slice(0, 4).join(" · ") : "";
+}
+function shuffle(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+function startStudy(scope) {
+  _studyScope = scope;
+  const cards = scope === "chapter"
+    ? state.vocab.filter(entryMatchesChapter)
+    : state.vocab;
+  _studyDeck = shuffle(cards.filter(e => e.fr && e.fr.trim())
+    .map(e => ({ fr: e.fr.trim(), es: entryMeaning(e.fr, e.es) })));
+  _studyIdx = 0;
+  currentKey = "";
+  openPanel("study");
+  renderStudyCard();
+}
+
+function renderStudyCard() {
+  $("studyDone").hidden = true;
+  if (!_studyDeck.length) { showStudyDone(false); return; }
+  if (_studyIdx >= _studyDeck.length) _studyIdx = 0;
+  const card = _studyDeck[_studyIdx];
+  currentKey = card.fr;
+  $("studyWord").textContent = card.fr;
+  $("studyMeaning").textContent = card.es || "Sin traducción guardada.";
+  $("studyMeaning").hidden = true;
+  $("studyFlip").hidden = false;
+  $("studyControls").hidden = true;
+  $("studyProgress").textContent = (_studyIdx + 1) + " / " + _studyDeck.length;
+  $("studyTitle").textContent = _studyScope === "chapter" ? "Capítulo" : "Todo";
+}
+
+function showStudyDone(done) {
+  $("studyWord").textContent = "";
+  $("studyMeaning").textContent = "";
+  $("studyFlip").hidden = true;
+  $("studyControls").hidden = true;
+  $("studyProgress").textContent = "";
+  $("studyDoneMsg").textContent = done
+    ? "¡Lo has repasado todo!"
+    : "No hay palabras guardadas para estudiar en este ámbito.";
+  $("studyDone").hidden = false;
+}
+
+function revealStudy() {
+  $("studyMeaning").hidden = false;
+  $("studyFlip").hidden = true;
+  $("studyControls").hidden = false;
+}
+
+function studyKnow() {
+  _studyDeck.splice(_studyIdx, 1);
+  if (!_studyDeck.length) showStudyDone(true);
+  else renderStudyCard();
+}
+
+function studyAgain() {
+  const card = _studyDeck.splice(_studyIdx, 1)[0];
+  if (!card) { renderStudyCard(); return; }
+  _studyDeck.push(card);
+  renderStudyCard();
 }
 
 function saveCurrent() {
@@ -621,6 +749,15 @@ el.nextBtn.addEventListener("click", gotoNextChapter);
 el.speakBtn.addEventListener("click", speak);
 el.saveBtn.addEventListener("click", saveCurrent);
 el.vocabBtn.addEventListener("click", () => { refreshVocab(); openPanel("vocab"); });
+$("scopeAll").addEventListener("click", () => { _vocabScope = "all"; refreshVocab(); });
+$("scopeChapter").addEventListener("click", () => { _vocabScope = "chapter"; refreshVocab(); });
+$("studyBtn").addEventListener("click", () => startStudy(_vocabScope));
+$("studyBack").addEventListener("click", () => { refreshVocab(); openPanel("vocab"); });
+$("studyFlip").addEventListener("click", revealStudy);
+$("studyKnow").addEventListener("click", studyKnow);
+$("studyAgain").addEventListener("click", studyAgain);
+$("studyRestart").addEventListener("click", () => startStudy(_studyScope));
+$("studySpeak").addEventListener("click", () => { if (currentKey) speak(); });
 $("panelCloseBtn").addEventListener("click", closePanel);
 scrim.addEventListener("click", closePanel);
 
