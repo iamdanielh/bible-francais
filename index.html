@@ -3,11 +3,11 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <meta name="theme-color" content="#1b1d26" />
+  <meta name="theme-color" content="#f6f1e7" />
   <title>Bible en français — Español</title>
   <link rel="manifest" href="manifest.webmanifest" />
-  <link rel="apple-touch-icon" href="icon-192.png" />
-  <link rel="stylesheet" href="css/style.css?v=4" />
+  <link rel="apple-touch-icon" href="icon-180.png" />
+  <link rel="stylesheet" href="css/style.css?v=5" />
 </head>
 <body>
   <header class="topbar">
@@ -33,20 +33,30 @@
     </section>
 
     <aside class="panel" id="lookupPanel">
-      <div class="word-head">
-        <h2 id="wordLabel"></h2>
-        <button id="speakBtn" title="Escuchar pronunciación" disabled>🔊</button>
+      <div class="grabber" aria-hidden="true"></div>
+      <div class="panel-head">
+        <span id="panelTitle" class="panel-title">Traducción</span>
+        <button id="panelCloseBtn" class="icon-btn" title="Cerrar" aria-label="Cerrar">✕</button>
       </div>
-      <div id="meaning" class="meaning"></div>
-      <div id="grammar" class="grammar"></div>
-      <button id="saveBtn" disabled>Guardar en el vocabulario</button>
-      <div id="note" class="note"></div>
-      <hr />
-      <h3>Vocabulario</h3>
-      <ul id="vocabList" class="vocab-list"></ul>
+      <div class="panel-body">
+        <div id="wordContent">
+          <div class="word-head">
+            <h2 id="wordLabel"></h2>
+            <button id="speakBtn" class="round-btn" title="Escuchar pronunciación" disabled>🔊</button>
+          </div>
+          <div id="meaning" class="meaning"></div>
+          <div id="grammar" class="grammar"></div>
+          <button id="saveBtn" class="primary-btn" disabled>Guardar en el vocabulario</button>
+          <div id="note" class="note"></div>
+        </div>
+        <div id="vocabContent" hidden>
+          <ul id="vocabList" class="vocab-list"></ul>
+        </div>
+      </div>
     </aside>
+    <div class="scrim" id="scrim"></div>
   </main>
 
-  <script type="module" src="js/app.js?v=4"></script>
+  <script type="module" src="js/app.js?v=5"></script>
 </body>
 </html>

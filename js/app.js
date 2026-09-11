@@ -133,18 +133,51 @@ function selectBook(index, restoreChapter = false) {
   else chap = 0;
   el.chapterSelect.value = chap;
   renderChapter();
+  closePanel();
   saveState();
 }
 
 // ---- lookup ---------------------------------------------------------------
 let currentKey = "";
 let currentES = "";
+const panel = $("lookupPanel");
+const scrim = $("scrim");
+const wordContent = $("wordContent");
+const vocabContent = $("vocabContent");
+
+function setPanelMode(mode) {
+  if (mode === "vocab") {
+    $("panelTitle").textContent = "Vocabulario";
+    wordContent.hidden = true;
+    vocabContent.hidden = false;
+  } else {
+    $("panelTitle").textContent = "Traducción";
+    vocabContent.hidden = true;
+    wordContent.hidden = false;
+  }
+}
+
+function openPanel(mode) {
+  panel.classList.remove("collapsed");
+  setPanelMode(mode || "word");
+  panel.classList.add("open");
+  scrim.classList.add("show");
+  panel.setAttribute("aria-hidden", "false");
+}
+
+function closePanel() {
+  panel.classList.remove("open");
+  panel.classList.add("collapsed");
+  scrim.classList.remove("show");
+  panel.setAttribute("aria-hidden", "true");
+}
 
 function presentWord(word, ti, token, sentenceInitial) {
   if (!dictionary) return;
   const [meanings, info] = dictionary.resolve(word, { sentenceInitial });
   currentKey = word;
   el.wordLabel.textContent = word;
+  openPanel("word");
   let grammar = "";
   const parts = [];
   if (info.form) parts.push(friendlyForm(info.form));
@@ -180,6 +213,7 @@ function presentWord(word, ti, token, sentenceInitial) {
 
 function presentSelection(segments) {
   if (!segments.length) return;
+  openPanel("word");
   currentKey = segments.map(s => s[0]).join(" ");
   currentES = "";
   el.wordLabel.textContent = currentKey;
@@ -324,7 +358,13 @@ async function speak() {
 // ---- vocabulary -----------------------------------------------------------
 function refreshVocab() {
   el.vocabList.innerHTML = "";
-  if (!state.vocab.length) return;
+  if (!state.vocab.length) {
+    const empty = document.createElement("li");
+    empty.className = "vocab-empty";
+    empty.textContent = "Tu vocabulario está vacío. Selecciona una palabra y guárdala aquí.";
+    el.vocabList.appendChild(empty);
+    return;
+  }
   for (const entry of state.vocab) {
     const li = document.createElement("li");
     const label = document.createElement("span");
@@ -364,20 +404,25 @@ el.chapterSelect.addEventListener("change", (e) => {
     currentChapter = chap;
     renderChapter();
     saveState();
+    closePanel();
   }
 });
 el.prevBtn.addEventListener("click", () => {
+  closePanel();
   if (currentChapter > 0) { currentChapter--; el.chapterSelect.value = currentChapter; renderChapter(); saveState(); }
   else if (currentBookIndex > 0) selectBook(currentBookIndex - 1);
 });
 el.nextBtn.addEventListener("click", () => {
+  closePanel();
   const book = bible[currentBookIndex];
   if (currentChapter < book.chapters.length - 1) { currentChapter++; el.chapterSelect.value = currentChapter; renderChapter(); saveState(); }
   else if (currentBookIndex < bible.length - 1) selectBook(currentBookIndex + 1);
 });
 el.speakBtn.addEventListener("click", speak);
 el.saveBtn.addEventListener("click", saveCurrent);
-el.vocabBtn.addEventListener("click", refreshVocab);
+el.vocabBtn.addEventListener("click", () => { refreshVocab(); openPanel("vocab"); });
+$("panelCloseBtn").addEventListener("click", closePanel);
+scrim.addEventListener("click", closePanel);
 
 // ---- multi-word selection (phrase lookup) ---------------------------------
 let _selectedTimer = null;

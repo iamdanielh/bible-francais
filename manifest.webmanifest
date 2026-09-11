@@ -4,8 +4,8 @@
   "description": "Lee la Biblia en francés y toca cualquier palabra para ver su traducción al español, nota gramatical y pronunciación.",
   "start_url": ".",
   "display": "standalone",
-  "background_color": "#1b1d26",
-  "theme_color": "#1b1d26",
+  "background_color": "#f6f1e7",
+  "theme_color": "#f6f1e7",
   "lang": "es",
   "icons": [
     {
