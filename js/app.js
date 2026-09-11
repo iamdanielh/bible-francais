@@ -258,6 +258,24 @@ function hasFrenchVoice() {
   return _voicesLoaded && !!_frVoice;
 }
 
+const IS_IOS = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+  (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+
+// WebKit on iOS silences media/TTS that isn't tied to a user gesture. The
+// first pointerdown plays a silent sample to unlock the page audio session.
+function unlockIOSAudio() {
+  if (!IS_IOS) return;
+  const a = new Audio();
+  a.src = "data:audio/wav;base64,UklGRigAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQQAAAAAAA==";
+  a.volume = 0;
+  a.play().catch(() => {});
+  if ("speechSynthesis" in window) {
+    try { window.speechSynthesis.cancel(); window.speechSynthesis.resume(); } catch (e) {}
+    cacheVoices();
+  }
+}
+document.addEventListener("pointerdown", unlockIOSAudio, { once: true });
+
 function playGoogle() {
   // Natural French voice via Google TTS (network), played through an <audio>
   // element. This is reliable on every device and sounds natural — preferred
@@ -270,6 +288,7 @@ function playGoogle() {
     const url = "https://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob&tl=fr&q=" +
       encodeURIComponent(currentKey);
     audio.src = url;
+    audio.load();
     audio.onplaying = () => finish(true);
     audio.onended = () => finish(true);
     audio.onerror = () => finish(false);
@@ -281,7 +300,7 @@ function playGoogle() {
 function speakLocal() {
   // Offline fallback: system French voice if the browser has one.
   if (!("speechSynthesis" in window) || !hasFrenchVoice()) return false;
-  window.speechSynthesis.cancel();
+  if (IS_IOS) { try { window.speechSynthesis.cancel(); window.speechSynthesis.resume(); } catch (e) {} }
   const u = new SpeechSynthesisUtterance(currentKey);
   u.lang = "fr-FR";
   if (_frVoice) u.voice = _frVoice;
@@ -292,8 +311,14 @@ function speakLocal() {
 
 async function speak() {
   if (!currentKey) return;
+  // On iOS, TTS outside a user gesture is silenced, so use the gesture-safe
+  // system voice synchronously instead of the (usually rejected) network call.
+  if (IS_IOS && hasFrenchVoice()) { speakLocal(); return; }
   const ok = await playGoogle();
-  if (!ok) speakLocal();
+  if (!ok) {
+    if (IS_IOS) { await new Promise((r) => setTimeout(r, 300)); cacheVoices(); }
+    speakLocal();
+  }
 }
 
 // ---- vocabulary -----------------------------------------------------------
