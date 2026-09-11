@@ -22,7 +22,7 @@ const el = {
   chapterTitle: $("chapterTitle"), verseText: $("verseText"),
   wordLabel: $("wordLabel"), speakBtn: $("speakBtn"), meaning: $("meaning"),
   grammar: $("grammar"), saveBtn: $("saveBtn"), note: $("note"), vocabList: $("vocabList"),
-  ctxWrap: $("ctxWrap"), ctxBtn: $("ctxBtn"), ctxResult: $("ctxResult"),
+  ctxWrap: $("ctxWrap"), ctxResult: $("ctxResult"),
 };
 
 // ---- persistence ----------------------------------------------------------
@@ -33,6 +33,7 @@ const topbarEl = document.querySelector(".topbar");
 let _topbarHidden = false;
 let _lastScrollY = 0;
 let _scrollAccum = 0;
+let _lastScrollT = 0;
 
 function showTopbar() {
   if (!_topbarHidden) return;
@@ -110,21 +111,24 @@ if (readerEl) {
     clearTimeout(_scrollSaveTimer);
     _scrollSaveTimer = setTimeout(saveState, 400);
 
+    const now = performance.now();
     const programmatic = _programmaticScrolls > 0;
     if (programmatic) _programmaticScrolls--;
-
-    // auto-hide the top bar after a little cumulative downward travel, bring it
-    // back as soon as you scroll up (or when reaching the very top)
-    const delta = readerEl.scrollTop - _lastScrollY;
-    _lastScrollY = readerEl.scrollTop;
-    if (!programmatic && delta !== 0) _scrollAccum += delta;
     if (!programmatic) {
+      // A pause between scroll events means a new gesture: start fresh so a
+      // single upward notch brings the bar back instead of needing to undo all
+      // the downward travel (and upstream inertia) still sitting in the tally.
+      if (now - _lastScrollT > 200) _scrollAccum = 0;
+      const delta = readerEl.scrollTop - _lastScrollY;
+      if (delta !== 0) _scrollAccum += delta;
       if (!_topbarHidden) {
-        if (_scrollAccum > 24) hideTopbar();
+        if (_scrollAccum > 16) hideTopbar();
       } else {
-        if (_scrollAccum < -18) showTopbar();
+        if (_scrollAccum < -8) showTopbar();
       }
     }
+    _lastScrollY = readerEl.scrollTop;
+    _lastScrollT = now;
   });
 }
 function flushReadingPosition() {
@@ -358,13 +362,15 @@ function presentWord(word, ti, token, sentenceInitial) {
   currentES = meanings.slice(0, 4).join(" · ");
 }
 
-function presentSelection(segments) {
+function presentSelection(segments, phrase) {
   if (!segments.length) return;
   openPanel("word");
-  showContextTranslation();
-  currentKey = segments.map(s => s[0]).join(" ");
+  currentKey = phrase || segments.map(s => s[0]).join(" ");
   currentES = "";
   el.wordLabel.textContent = currentKey;
+  const hasPhrase = _ctxQuery.split(/\s+/).filter(Boolean).length >= 2;
+  if (hasPhrase) showContextTranslation();
+  else hideContextTranslation();
   const lines = [];
   const meaningsAll = [];
   for (const [span, meanings, info] of segments) {
@@ -412,20 +418,17 @@ let _translateBusy = false;
 function showContextTranslation() {
   el.ctxWrap.hidden = false;
   el.ctxResult.innerHTML = "";
-  el.ctxBtn.disabled = false;
 }
 
 function hideContextTranslation() {
   _ctxQuery = "";
   el.ctxWrap.hidden = true;
   el.ctxResult.innerHTML = "";
-  el.ctxBtn.disabled = true;
 }
 
 async function translateContext() {
   if (!_ctxQuery || _translateBusy) return;
   _translateBusy = true;
-  el.ctxBtn.disabled = true;
   el.ctxResult.innerHTML = "<span class='dim'>Traduciendo…</span>";
   try {
     const body = new URLSearchParams({ q: _ctxQuery.slice(0, 3000), langpair: "fr|es" });
@@ -447,7 +450,6 @@ async function translateContext() {
       "). Revisa tu conexión e inténtalo de nuevo.</span>";
   } finally {
     _translateBusy = false;
-    el.ctxBtn.disabled = false;
   }
 }
 
@@ -618,7 +620,6 @@ el.prevBtn.addEventListener("click", gotoPrevChapter);
 el.nextBtn.addEventListener("click", gotoNextChapter);
 el.speakBtn.addEventListener("click", speak);
 el.saveBtn.addEventListener("click", saveCurrent);
-el.ctxBtn.addEventListener("click", translateContext);
 el.vocabBtn.addEventListener("click", () => { refreshVocab(); openPanel("vocab"); });
 $("panelCloseBtn").addEventListener("click", closePanel);
 scrim.addEventListener("click", closePanel);
@@ -648,7 +649,7 @@ function handleSelection() {
   const cleaned = text.replace(/\s+/g, " ");
   _ctxQuery = cleaned;
   const segments = dictionary.segment(cleaned);
-  if (segments && segments.length) presentSelection(segments);
+  if (segments && segments.length) presentSelection(segments, cleaned);
 }
 
 // ---- custom touch gestures ----------------------------------------------
@@ -745,10 +746,12 @@ function touchSelectEnd() {
   if (!_selActive) return;
   _selActive = false;
   const lo = Math.min(_anchorIdx, _lastIdx), hi = Math.max(_anchorIdx, _lastIdx);
-  const text = _touchWords.slice(lo, hi + 1).map(w => w.dataset.word).join(" ");
-  _ctxQuery = text;
-  const segments = dictionary.segment(text.replace(/\s+/g, " "));
-  if (segments && segments.length) presentSelection(segments);
+  const touched = _touchWords.slice(lo, hi + 1);
+  const spoken = touched.map(w => w.textContent).join(" ").replace(/\s+/g, " ").trim();
+  const clean = touched.map(w => w.dataset.word).join(" ").replace(/\s+/g, " ").trim();
+  _ctxQuery = clean;
+  const segments = dictionary.segment(clean);
+  if (segments && segments.length) presentSelection(segments, spoken);
   else closePanel();
 }
 
