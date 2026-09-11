@@ -299,10 +299,9 @@ function setPanelMode(mode) {
   const vocab = mode === "vocab";
   const study = mode === "study";
   studyContent.hidden = !study;
-  if (study) { $("panelTitle").textContent = "Estudiar"; return; }
-  $("panelTitle").textContent = vocab ? "Vocabulario" : "Traducción";
-  wordContent.hidden = vocab;
-  vocabContent.hidden = !vocab;
+  wordContent.hidden = vocab || study;
+  vocabContent.hidden = !vocab || study;
+  $("panelTitle").textContent = study ? "Estudiar" : (vocab ? "Vocabulario" : "Traducción");
 }
 
 function openPanel(mode) {
@@ -554,14 +553,13 @@ function speakLocal() {
 
 async function speak() {
   if (!currentKey) return;
-  // On iOS, TTS outside a user gesture is silenced, so use the gesture-safe
-  // system voice synchronously instead of the (usually rejected) network call.
-  if (IS_IOS && hasFrenchVoice()) { speakLocal(); return; }
+  // Natural Google voice when there's connectivity; it also works on iOS
+  // because the first pointerdown unlocks the audio session. Fall back to the
+  // system French voice offline or when the network voice is refused.
   const ok = await playGoogle();
-  if (!ok) {
-    if (IS_IOS) { await new Promise((r) => setTimeout(r, 300)); cacheVoices(); }
-    speakLocal();
-  }
+  if (ok) return;
+  if (!hasFrenchVoice()) { await new Promise((r) => setTimeout(r, 300)); cacheVoices(); }
+  speakLocal();
 }
 
 // ---- vocabulary -----------------------------------------------------------
