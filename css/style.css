@@ -9,6 +9,9 @@
   --accent-fg: #ffffff;
   --sel-bg: rgba(79, 110, 247, 0.32);
   --border: #e7e0d1;
+  --ctrl-bg: #ffffff;
+  --ctrl-hover: #fffdf8;
+  --grabber: #ddd6c6;
   --shadow: 0 1px 2px rgba(37, 38, 43, 0.06), 0 1px 6px rgba(37, 38, 43, 0.05);
   --shadow-drawer: 0 -10px 34px rgba(37, 38, 43, 0.22);
   --radius: 14px;
@@ -28,6 +31,9 @@
   --accent-fg: #ffffff;
   --sel-bg: rgba(111, 139, 255, 0.34);
   --border: #2c3140;
+  --ctrl-bg: #262b3a;
+  --ctrl-hover: #2d3345;
+  --grabber: #3d4354;
   --shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
   --shadow-drawer: 0 -10px 34px rgba(0, 0, 0, 0.5);
 }
@@ -93,13 +99,13 @@ select, button {
   padding: 7px 12px;
   border-radius: var(--radius-sm);
   border: 1px solid var(--border);
-  background: #fff;
+  background: var(--ctrl-bg);
   color: var(--fg);
   cursor: pointer;
   box-shadow: var(--shadow);
   transition: background 0.15s, border-color 0.15s, transform 0.06s;
 }
-select:hover, button:hover { background: #fffdf8; border-color: #d8cfba; }
+select:hover, button:hover { background: var(--ctrl-hover); }
 select:active, button:active { transform: translateY(1px); }
 select:focus, button:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
 
@@ -233,7 +239,7 @@ button:disabled {
   width: 44px;
   height: 5px;
   border-radius: 999px;
-  background: #ddd6c6;
+  background: var(--grabber);
   margin: 9px auto 4px;
   flex: none;
 }
@@ -313,7 +319,7 @@ button:disabled {
   font-size: 1rem;
   padding: 4px 8px;
 }
-.vocab-list .del:hover { background: #f4efe4; }
+.vocab-list .del:hover { background: var(--ctrl-hover); }
 
 .vocab-empty {
   color: var(--muted);
