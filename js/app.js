@@ -39,6 +39,33 @@ function saveState() {
   try { localStorage.setItem("biblefr", JSON.stringify(state)); } catch (e) {}
 }
 
+// ---- theme -----------------------------------------------------------------
+const THEME_KEY = "biblefr-theme";
+const THEME_META = document.querySelector('meta[name="theme-color"]');
+
+function systemTheme() {
+  return window.matchMedia && matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+}
+
+function setTheme(t, persist = true) {
+  const dark = t === "dark";
+  document.documentElement.setAttribute("data-theme", dark ? "dark" : "light");
+  const btn = $("themeBtn");
+  if (btn) btn.textContent = dark ? "☀️" : "🌙";
+  if (THEME_META) THEME_META.setAttribute("content", dark ? "#15171f" : "#f6f1e7");
+  if (persist) { try { localStorage.setItem(THEME_KEY, t); } catch (e) {} }
+}
+
+function applyTheme() {
+  setTheme(localStorage.getItem(THEME_KEY) || systemTheme(), false);
+}
+
+$("themeBtn").addEventListener("click", () => {
+  const cur = document.documentElement.getAttribute("data-theme");
+  setTheme(cur === "dark" ? "light" : "dark");
+});
+applyTheme();
+
 // ---- data loading ---------------------------------------------------------
 async function loadData() {
   try {
