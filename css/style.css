@@ -226,6 +226,15 @@ button:disabled {
   box-shadow: 0 0 0 1px var(--accent);
   border-radius: 4px;
 }
+/* Touch devices: disable the native long-press selection. Per-word spans
+   with click handlers make iOS Safari attach selection to the whole block
+   instead of the tapped word; a custom long-press phrase selector replaces
+   it (see app.js). */
+.touch .verse-text {
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
 .verse-text .vnum {
   color: var(--muted);
   font-size: 0.82em;
@@ -242,7 +251,14 @@ button:disabled {
   transition: opacity 0.25s ease;
   z-index: 50;
 }
-.scrim.show { opacity: 1; pointer-events: auto; }
+.scrim.show { opacity: 1; }
+/* Desktop keeps click-outside-to-close. On touch the backdrop is inert and
+   invisible so the reader stays interactive: you can tap another word to
+   translate it or long-press to pick a phrase without the scrim swallowing
+   the gesture (on iOS that made WebKit select the whole block instead). */
+:root:not(.touch) .scrim.show { pointer-events: auto; }
+html.touch .scrim { pointer-events: none; }
+html.touch .scrim.show { opacity: 0; }
 
 .panel {
   position: fixed;

@@ -198,6 +198,7 @@ function closePanel() {
   panel.classList.add("collapsed");
   scrim.classList.remove("show");
   panel.setAttribute("aria-hidden", "true");
+  clearSelectionHighlights();
 }
 
 function presentWord(word, ti, token, sentenceInitial) {
@@ -528,6 +529,155 @@ function handleSelection() {
   const segments = dictionary.segment(cleaned);
   if (segments && segments.length) presentSelection(segments);
 }
+
+// ---- custom touch phrase selection -----------------------------------------
+// Native selection on touch devices (iOS in particular) breaks when the text
+// is split into interactive per-word <span>s: a long-press/undragged selection
+// snaps to "select everything". So on coarse-pointer devices we disable native
+// selection via CSS (.touch .verse-text) and do long-press + drag ourselves.
+const TOUCH_NAV = typeof matchMedia === "function" && matchMedia("(pointer: coarse)").matches;
+if (TOUCH_NAV) document.documentElement.classList.add("touch");
+
+let _touchWords = [];
+let _lpTimer = null;
+let _touchOrigin = { x: 0, y: 0 };
+let _selActive = false;
+let _anchorIdx = -1;
+let _lastIdx = -1;
+let _suppressClick = false;
+
+function clearSelectionHighlights() {
+  for (const w of _touchWords) w.classList.remove("sel");
+}
+
+function paintSelectionRange(a, b) {
+  const lo = Math.min(a, b), hi = Math.max(a, b);
+  for (let i = 0; i < _touchWords.length; i++) {
+    _touchWords[i].classList.toggle("sel", i >= lo && i <= hi);
+  }
+}
+
+function startTouchSelection(wordEl) {
+  if (_selActive) return;
+  closePanel(); // hide an old translation drawer so hit-testing reaches the words
+  _suppressClick = true;
+  _touchWords = [...el.verseText.querySelectorAll(".word")];
+  const idx = _touchWords.indexOf(wordEl);
+  if (idx < 0) return;
+  _anchorIdx = idx;
+  _lastIdx = idx;
+  _selActive = true;
+  paintSelectionRange(idx, idx);
+  document.addEventListener("touchmove", touchSelectMove, { passive: false });
+  document.addEventListener("touchend", touchSelectEnd, { passive: true });
+  document.addEventListener("touchcancel", touchSelectEnd, { passive: true });
+}
+
+function touchSelectMove(e) {
+  if (!_selActive) return;
+  if (e.cancelable) e.preventDefault(); // hold the page still while selecting
+  const hit = document.elementFromPoint(e.touches[0].clientX, e.touches[0].clientY);
+  const wordEl = hit && hit.closest ? hit.closest(".word") : null;
+  if (!wordEl) return;
+  const idx = _touchWords.indexOf(wordEl);
+  if (idx < 0 || idx === _lastIdx) return;
+  _lastIdx = idx;
+  paintSelectionRange(_anchorIdx, idx);
+}
+
+function touchSelectEnd() {
+  document.removeEventListener("touchmove", touchSelectMove);
+  document.removeEventListener("touchend", touchSelectEnd);
+  document.removeEventListener("touchcancel", touchSelectEnd);
+  if (!_selActive) return;
+  _selActive = false;
+  const lo = Math.min(_anchorIdx, _lastIdx), hi = Math.max(_anchorIdx, _lastIdx);
+  const text = _touchWords.slice(lo, hi + 1).map(w => w.dataset.word).join(" ");
+  _ctxQuery = text;
+  const segments = dictionary.segment(text.replace(/\s+/g, " "));
+  if (segments && segments.length) presentSelection(segments);
+}
+
+const touchStartLp = (e) => {
+  if (!TOUCH_NAV || _selActive) return;
+  if (e.touches.length !== 1) return;
+  _suppressClick = false;
+  const wordEl = e.target.closest && e.target.closest(".word");
+  if (!wordEl) return;
+  _touchOrigin = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+  clearTimeout(_lpTimer);
+  _lpTimer = setTimeout(() => startTouchSelection(wordEl), 420);
+};
+const touchMoveLp = (e) => {
+  if (!TOUCH_NAV || _selActive) return;
+  if (e.touches.length !== 1) return;
+  const t = e.touches[0];
+  if (Math.hypot(t.clientX - _touchOrigin.x, t.clientY - _touchOrigin.y) > 12) {
+    clearTimeout(_lpTimer); // user is scrolling, not selecting
+  }
+};
+const touchEndLp = () => {
+  if (!_selActive) clearTimeout(_lpTimer); // quick tap — cancel the pending long-press
+};
+el.verseText.addEventListener("touchstart", touchStartLp, { passive: true });
+el.verseText.addEventListener("touchmove", touchMoveLp, { passive: true });
+el.verseText.addEventListener("touchend", touchEndLp, { passive: true });
+el.verseText.addEventListener("touchcancel", touchEndLp, { passive: true });
+// Suppress the synthetic click iOS fires ~500ms after a long-press; otherwise
+// it would reset the phrase panel to the single tapped word.
+el.verseText.addEventListener("click", (e) => {
+  if (_suppressClick) {
+    e.preventDefault();
+    e.stopPropagation();
+    _suppressClick = false;
+  }
+}, true);
+
+// ---- pull-down to close the lookup drawer ----------------------------------
+(function initDrawerDrag() {
+  const body = panel.querySelector(".panel-body");
+  let startY = 0, dy = 0, lastY = 0, lastT = 0, vy = 0, tracking = false;
+
+  const mayDrag = (e) => {
+    if (e.target.closest && e.target.closest("button, select, a")) return false;
+    if (e.target.closest && e.target.closest(".grabber, .panel-head")) return true;
+    if (e.target.closest && e.target.closest(".vocab-list")) return false;
+    if (body) return body.scrollTop === 0;
+    return true;
+  };
+
+  const onDown = (e) => {
+    if (!panel.classList.contains("open") || e.button > 0 || !mayDrag(e)) return;
+    tracking = true;
+    startY = e.clientY;
+    lastY = e.clientY;
+    lastT = e.timeStamp;
+    dy = 0;
+    vy = 0;
+    panel.style.transition = "none";
+  };
+  const onMove = (e) => {
+    if (!tracking) return;
+    const nowY = e.clientY;
+    dy = Math.max(0, nowY - startY);
+    const nowT = e.timeStamp;
+    vy = (nowY - lastY) / Math.max(1, nowT - lastT);
+    lastY = nowY;
+    lastT = nowT;
+    panel.style.transform = `translateY(${dy}px)`;
+  };
+  const finish = () => {
+    if (!tracking) return;
+    tracking = false;
+    panel.style.transform = "";
+    panel.style.transition = "";
+    if (dy >= 110 || (dy > 60 && vy > 0.55)) closePanel();
+  };
+  panel.addEventListener("pointerdown", onDown);
+  window.addEventListener("pointermove", onMove);
+  window.addEventListener("pointerup", finish);
+  window.addEventListener("pointercancel", finish);
+})();
 
 // ---- init -----------------------------------------------------------------
 async function init() {
