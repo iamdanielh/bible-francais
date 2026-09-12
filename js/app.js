@@ -1066,8 +1066,8 @@ const _aiHistory = [];
 let _aiWasConfigured = false;
 
 function openAISettings() {
-  const details = $("aiSettings");
-  details.open = true;
+  $("aiSetup").hidden = false;
+  $("aiKeyOn").hidden = true;
   const keyEl = $("aiKey");
   try { keyEl.scrollIntoView({ behavior: "smooth", block: "nearest" }); } catch (e) {}
   setTimeout(() => keyEl.focus(), 350);
@@ -1080,12 +1080,21 @@ async function aiAsk() {
   aiBubble("user", q);
   input.value = "";
   if (!aiConfigured()) {
-    const b = aiBubble("assistant", "Aún no hay clave de IA activada. Pega tu clave gratuita de OpenRouter para empezar:");
-    b.innerHTML =
-      'Aún no hay clave de IA activada. Pega tu clave gratuita de OpenRouter para empezar:' +
-      '<button type="button" class="ghost-btn ai-msg-btn" data-aisetup>⚙️ Configurar la IA</button>';
-    openAISettings();
-    return;
+    // Self-heal: adopt the key as it sits in the field even if the input event
+    // never fired on this device (iOS quirks).
+    const raw = $("aiKey").value.trim();
+    if (raw) {
+      state.ai.key = raw;
+      saveState();
+      aiSettingsToUI();
+    } else {
+      const b = aiBubble("assistant", "Aún no hay clave de IA activada. Pega tu clave gratuita de OpenRouter para empezar:");
+      b.innerHTML =
+        'Aún no hay clave de IA activada. Pega tu clave gratuita de OpenRouter para empezar:' +
+        '<button type="button" class="ghost-btn ai-msg-btn" data-aisetup>⚙️ Configurar la IA</button>';
+      openAISettings();
+      return;
+    }
   }
   _aiHistory.push({ role: "user", content: q });
   const ctx = aiContext(currentKey);
@@ -1119,6 +1128,8 @@ function aiSettingsToUI() {
   _aiWasConfigured = configured;
   $("aiKey").value = ai.key || "";
   $("aiModel").value = ai.model || "";
+  $("aiSetup").hidden = configured;
+  $("aiKeyOn").hidden = !configured;
   const tip = $("aiIntroTip");
   if (configured) {
     tip.textContent = "✓ IA activa. Toca cualquier palabra del texto y pregúntale, o escribe tu duda.";
@@ -1129,6 +1140,7 @@ function aiSettingsToUI() {
   if (!ai.key) st = "Sin clave: se usa solo la explicación local";
   else st = "✓ Clave guardada (" + aiKeyKind(ai.key) + ") — ya puedes preguntar";
   $("aiKeyState").textContent = st;
+  $("aiKeyStatus").textContent = st;
 }
 
 // ---- events ---------------------------------------------------------------
@@ -1169,8 +1181,21 @@ $("aiLocalBtn").addEventListener("click", aiShowLocal);
 $("aiInput").addEventListener("keydown", (e) => {
   if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); aiAsk(); }
 });
-$("aiKey").addEventListener("input", () => { state.ai.key = $("aiKey").value.trim(); saveState(); aiSettingsToUI(); });
+$("aiKey").addEventListener("input", aiKeyTyped);
+$("aiKey").addEventListener("change", aiKeyTyped);
 $("aiModel").addEventListener("input", () => { state.ai.model = $("aiModel").value.trim(); saveState(); });
+$("aiModel").addEventListener("change", () => { state.ai.model = $("aiModel").value.trim(); saveState(); });
+$("aiKeySaveBtn").addEventListener("click", () => {
+  const raw = $("aiKey").value.trim();
+  if (!raw) { $("aiKeyState").textContent = "Pega tu clave primero"; $("aiKey").focus(); return; }
+  aiKeyTyped();
+});
+$("aiKeyChangeBtn").addEventListener("click", openAISettings);
+function aiKeyTyped() {
+  state.ai.key = $("aiKey").value.trim();
+  saveState();
+  aiSettingsToUI();
+}
 aiThread.addEventListener("click", (e) => {
   if (e.target.closest && e.target.closest("[data-aisetup]")) openAISettings();
 });

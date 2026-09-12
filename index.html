@@ -7,7 +7,7 @@
   <title>Bible en français — Español</title>
   <link rel="manifest" href="manifest.webmanifest" />
   <link rel="apple-touch-icon" href="icon-180.png" />
-  <link rel="stylesheet" href="css/style.css?v=18" />
+  <link rel="stylesheet" href="css/style.css?v=19" />
 </head>
 <body>
   <header class="topbar">
@@ -100,22 +100,26 @@
               <button id="aiSendBtn" class="primary-btn">Preguntar ✨</button>
             </div>
           </div>
-          <details id="aiSettings" class="ai-settings">
-            <summary>Configurar la IA</summary>
-            <p class="dim">La explicación local funciona siempre y sin cuenta. Para el chat con IA, pega una clave <b>gratuita</b>:
-              <a href="https://openrouter.ai/keys" target="_blank" rel="noopener">OpenRouter</a> (usa un modelo «:free») o
-              <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">Google AI Studio</a> (empieza por «AIza»).
+          <div id="aiSetup" class="ai-setup">
+            <p class="dim">Pega aquí tu clave <b>gratuita</b> de
+              <a href="https://openrouter.ai/keys" target="_blank" rel="noopener">OpenRouter</a>
+              (o de <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">Google AI Studio</a>, empieza por «AIza»).
               Se guarda solo en tu teléfono.</p>
-            <input id="aiKey" type="password" autocomplete="off" placeholder="Clave de API (opcional)" />
+            <input id="aiKey" type="password" autocomplete="off" placeholder="Pega tu clave aquí" />
             <input id="aiModel" autocomplete="off" placeholder="Modelo (opcional)" />
+            <button id="aiKeySaveBtn" class="primary-btn">Activar IA</button>
             <div id="aiKeyState" class="ai-key-state"></div>
-          </details>
+          </div>
+          <div id="aiKeyOn" class="ai-key-on" hidden>
+            <span id="aiKeyStatus" class="ai-key-state"></span>
+            <button id="aiKeyChangeBtn" class="ghost-btn">Cambiar clave</button>
+          </div>
         </div>
       </div>
     </aside>
     <div class="scrim" id="scrim"></div>
   </main>
 
-  <script type="module" src="js/app.js?v=18"></script>
+  <script type="module" src="js/app.js?v=19"></script>
 </body>
 </html>
