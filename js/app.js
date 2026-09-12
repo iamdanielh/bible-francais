@@ -90,6 +90,22 @@ function saveState() {
   try { localStorage.setItem("biblefr", JSON.stringify(state)); } catch (e) {}
 }
 
+// One-tap setup: open the app as https://…/?key=YOUR_KEY and it saves the key
+// to this phone, activates the IA and cleans the URL so the key doesn't linger.
+(function applyURLKey() {
+  if (!location.search) return;
+  let qp;
+  try { qp = new URLSearchParams(location.search); } catch (e) { return; }
+  const key = (qp.get("key") || "").trim();
+  if (!key) return;
+  state.ai = state.ai || { key: "", model: "" };
+  state.ai.key = key;
+  const model = (qp.get("model") || "").trim();
+  if (model) state.ai.model = model;
+  try { localStorage.setItem("biblefr", JSON.stringify(state)); } catch (e) {}
+  try { history.replaceState({}, "", location.pathname + location.hash); } catch (e) {}
+})();
+
 // Reading coordinates live in "bar visible" units: the reader's real scroll
 // position plus the reserved bar height when the bar is currently hidden, so
 // a saved position means the same verse whether the bar shows or not.
