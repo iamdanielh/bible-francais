@@ -482,30 +482,22 @@ function esc(s) {
 }
 
 // ---- pronunciation --------------------------------------------------------
-let _frVoice = null;
-let _voicesLoaded = false;
+const IS_IOS = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+  (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
 
-function cacheVoices() {
-  if (!("speechSynthesis" in window)) return;
-  const voices = window.speechSynthesis.getVoices();
-  if (!voices || !voices.length) return;
-  _voicesLoaded = true;
-  _frVoice = voices.find(v => /^fr/i.test(v.lang)) || null;
-}
+// Voices load asynchronously per instance (especially on iOS). Keep this hook
+// referenced as the ongoing "voices changed" handler; consumers query the live
+// list themselves, so no state needs to be cached here.
+function cacheVoices() {}
 if ("speechSynthesis" in window) {
   cacheVoices();
   window.speechSynthesis.onvoiceschanged = cacheVoices;
 }
 
-function hasFrenchVoice() {
-  return _voicesLoaded && !!_frVoice;
-}
-
-const IS_IOS = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
-  (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
-
 // WebKit on iOS silences media/TTS that isn't tied to a user gesture. The
-// first pointerdown plays a silent sample to unlock the page audio session.
+// first pointerdown unlocks the audio session (silent sample) and primes the
+// speechSynthesis voice list with an inaudible utterance — iOS only exposes
+// its voices after a speak() call that happens inside a user gesture.
 function unlockIOSAudio() {
   if (!IS_IOS) return;
   const a = new Audio();
@@ -513,7 +505,13 @@ function unlockIOSAudio() {
   a.volume = 0;
   a.play().catch(() => {});
   if ("speechSynthesis" in window) {
-    try { window.speechSynthesis.cancel(); window.speechSynthesis.resume(); } catch (e) {}
+    try {
+      window.speechSynthesis.cancel();
+      window.speechSynthesis.resume();
+      const probe = new SpeechSynthesisUtterance("");
+      probe.volume = 0;
+      window.speechSynthesis.speak(probe);
+    } catch (e) {}
     cacheVoices();
   }
 }
@@ -521,23 +519,24 @@ document.addEventListener("pointerdown", unlockIOSAudio, { once: true });
 
 // Natural French voice over the network, played through an <audio> element.
 // Two Google endpoints (same engine, different domains) to dodge request
-// restrictions; each is attempted with a short stall guard. Preferred over
-// system voices, which on some devices produce no sound at all.
+// restrictions. Each attempt has a stall guard so a dead endpoint never leaves
+// the speaker button silent for long. The device voice is the fallback.
 const TTS_URLS = [
   (q) => "https://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob&tl=fr&q=" +
-    encodeURIComponent(q.slice(0, 400)),
+    encodeURIComponent(q.slice(0, 200)),
   (q) => "https://translate.googleapis.com/translate_tts?client=tw-ob&tl=fr&q=" +
-    encodeURIComponent(q.slice(0, 400)),
+    encodeURIComponent(q.slice(0, 200)),
 ];
 let _activeAudio = null;
 
-function playViaAudio(url) {
+function playViaAudio(url, guardMs) {
   return new Promise((resolve) => {
     const audio = new Audio();
     let settled = false;
     const finish = (ok) => {
       if (settled) return;
       settled = true;
+      if (!ok) { try { audio.src = ""; } catch (e) {} } // release the failed element
       if (ok) _activeAudio = audio;
       resolve(ok);
     };
@@ -547,16 +546,18 @@ function playViaAudio(url) {
     audio.onended = () => finish(true);
     audio.onerror = () => finish(false);
     audio.play().catch(() => finish(false));
-    setTimeout(() => finish(false), 6000); // stall guard
+    setTimeout(() => finish(false), guardMs);
   });
 }
 
 function speakLocal() {
-  // Offline / no-network fallback: whatever French voice the device has.
+  // Device voice: dependable on iOS, offline fallback elsewhere. Returns false
+  // when the voice list isn't populated yet so callers can retry/wait.
   if (!("speechSynthesis" in window)) return false;
+  const voices = window.speechSynthesis.getVoices();
+  if (!voices || !voices.length) return false;
   if (_activeAudio) { try { _activeAudio.pause(); _activeAudio = null; } catch (e) {} }
   try { window.speechSynthesis.cancel(); if (IS_IOS) window.speechSynthesis.resume(); } catch (e) {}
-  const voices = window.speechSynthesis.getVoices();
   const frVoice = voices.find((v) => /^fr/i.test(v.lang)) || null;
   const u = new SpeechSynthesisUtterance(currentKey);
   u.lang = "fr-FR";
@@ -566,15 +567,17 @@ function speakLocal() {
   return true;
 }
 
-// iOS voices can arrive late; wait a moment for them so the fallback isn't silent.
+// iOS can fill in its voices a moment after the priming gesture; wait briefly
+// for them so the fallback isn't silent, then hand the hook back to normal.
 function waitForVoices() {
   return new Promise((resolve) => {
     if (typeof speechSynthesis === "undefined") return resolve(false);
+    const restore = () => { try { window.speechSynthesis.onvoiceschanged = cacheVoices; } catch (e) {} };
     try {
-      if (window.speechSynthesis.getVoices().length) { resolve(true); return; }
+      if (window.speechSynthesis.getVoices().length) { restore(); return resolve(true); }
     } catch (e) {}
-    window.speechSynthesis.onvoiceschanged = () => { clearTimeout(timer); resolve(true); };
-    const timer = setTimeout(() => resolve(false), 2500);
+    window.speechSynthesis.onvoiceschanged = () => { clearTimeout(timer); restore(); resolve(true); };
+    const timer = setTimeout(() => { restore(); resolve(false); }, 1500);
   });
 }
 
@@ -582,9 +585,13 @@ async function speak() {
   if (!currentKey) return;
   if (_activeAudio) { try { _activeAudio.pause(); _activeAudio = null; } catch (e) {} }
   const text = currentKey;
-  // Try the natural network voices first; fall back to the device voice.
+  // iOS is the problem case: long network stalls used to leave the button
+  // silent for 10+ seconds, and a big awaited delay breaks TTS gesture rules.
+  // So on iOS we give the natural web voice a short chance and fall back to
+  // the device voice quickly. Elsewhere the web voice gets more time.
+  const guard = IS_IOS ? 2200 : 6000;
   for (const url of TTS_URLS) {
-    if (await playViaAudio(url(text))) return;
+    if (await playViaAudio(url(text), guard)) return;
   }
   await waitForVoices();
   speakLocal();
@@ -723,7 +730,7 @@ function renderStudyCard() {
   $("studyGram").textContent = card.gram || "";
   $("studyMeaning").hidden = true;
   $("studyGram").hidden = !card.gram;
-  $("studyFlip").hidden = false;
+  $("studyHint").hidden = false;
   $("studyControls").hidden = true;
   $("studyProgress").textContent = (_studyIdx + 1) + " / " + _studyDeck.length;
   $("studyTitle").textContent = _studyScope === "chapter" ? "Capítulo" : "Todo";
@@ -744,7 +751,7 @@ function showStudyDone(done) {
   $("studyWord").textContent = "";
   $("studyMeaning").textContent = "";
   $("studyGram").textContent = "";
-  $("studyFlip").hidden = true;
+  $("studyHint").hidden = true;
   $("studyControls").hidden = true;
   $("studyProgress").textContent = "";
   $("studyDoneMsg").textContent = done
@@ -757,7 +764,7 @@ function revealStudy() {
   if ($("studyControls").hidden === false) return; // already revealed
   $("studyMeaning").hidden = false;
   $("studyGram").hidden = !$("studyGram").textContent;
-  $("studyFlip").hidden = true;
+  $("studyHint").hidden = true;
   $("studyControls").hidden = false;
 }
 
@@ -810,7 +817,6 @@ $("scopeAll").addEventListener("click", () => { _vocabScope = "all"; refreshVoca
 $("scopeChapter").addEventListener("click", () => { _vocabScope = "chapter"; refreshVocab(); });
 $("studyBtn").addEventListener("click", () => startStudy(_vocabScope));
 $("studyBack").addEventListener("click", () => { refreshVocab(); openPanel("vocab"); });
-$("studyFlip").addEventListener("click", revealStudy);
 $("studyKnow").addEventListener("click", studyKnow);
 $("studyAgain").addEventListener("click", studyAgain);
 $("studyRestart").addEventListener("click", () => startStudy(_studyScope));
