@@ -305,6 +305,7 @@ function setPanelMode(mode) {
 }
 
 function openPanel(mode) {
+  panel.classList.remove("fullscreen");
   panel.classList.remove("collapsed");
   setPanelMode(mode || "word");
   panel.classList.add("open");
@@ -518,47 +519,74 @@ function unlockIOSAudio() {
 }
 document.addEventListener("pointerdown", unlockIOSAudio, { once: true });
 
-function playGoogle() {
-  // Natural French voice via Google TTS (network), played through an <audio>
-  // element. This is reliable on every device and sounds natural — preferred
-  // over system voices, which on some devices (Chromebooks, Android) are listed
-  // by speechSynthesis but produce no sound.
+// Natural French voice over the network, played through an <audio> element.
+// Two Google endpoints (same engine, different domains) to dodge request
+// restrictions; each is attempted with a short stall guard. Preferred over
+// system voices, which on some devices produce no sound at all.
+const TTS_URLS = [
+  (q) => "https://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob&tl=fr&q=" +
+    encodeURIComponent(q.slice(0, 400)),
+  (q) => "https://translate.googleapis.com/translate_tts?client=tw-ob&tl=fr&q=" +
+    encodeURIComponent(q.slice(0, 400)),
+];
+let _activeAudio = null;
+
+function playViaAudio(url) {
   return new Promise((resolve) => {
     const audio = new Audio();
     let settled = false;
-    const finish = (ok) => { if (!settled) { settled = true; resolve(ok); } };
-    const url = "https://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob&tl=fr&q=" +
-      encodeURIComponent(currentKey);
+    const finish = (ok) => {
+      if (settled) return;
+      settled = true;
+      if (ok) _activeAudio = audio;
+      resolve(ok);
+    };
     audio.src = url;
     audio.load();
     audio.onplaying = () => finish(true);
     audio.onended = () => finish(true);
     audio.onerror = () => finish(false);
     audio.play().catch(() => finish(false));
-    setTimeout(() => finish(false), 15000); // stall guard
+    setTimeout(() => finish(false), 6000); // stall guard
   });
 }
 
 function speakLocal() {
-  // Offline fallback: system French voice if the browser has one.
-  if (!("speechSynthesis" in window) || !hasFrenchVoice()) return false;
-  if (IS_IOS) { try { window.speechSynthesis.cancel(); window.speechSynthesis.resume(); } catch (e) {} }
+  // Offline / no-network fallback: whatever French voice the device has.
+  if (!("speechSynthesis" in window)) return false;
+  if (_activeAudio) { try { _activeAudio.pause(); _activeAudio = null; } catch (e) {} }
+  try { window.speechSynthesis.cancel(); if (IS_IOS) window.speechSynthesis.resume(); } catch (e) {}
+  const voices = window.speechSynthesis.getVoices();
+  const frVoice = voices.find((v) => /^fr/i.test(v.lang)) || null;
   const u = new SpeechSynthesisUtterance(currentKey);
   u.lang = "fr-FR";
-  if (_frVoice) u.voice = _frVoice;
+  if (frVoice) u.voice = frVoice;
   u.rate = 0.9;
   window.speechSynthesis.speak(u);
   return true;
 }
 
+// iOS voices can arrive late; wait a moment for them so the fallback isn't silent.
+function waitForVoices() {
+  return new Promise((resolve) => {
+    if (typeof speechSynthesis === "undefined") return resolve(false);
+    try {
+      if (window.speechSynthesis.getVoices().length) { resolve(true); return; }
+    } catch (e) {}
+    window.speechSynthesis.onvoiceschanged = () => { clearTimeout(timer); resolve(true); };
+    const timer = setTimeout(() => resolve(false), 2500);
+  });
+}
+
 async function speak() {
   if (!currentKey) return;
-  // Natural Google voice when there's connectivity; it also works on iOS
-  // because the first pointerdown unlocks the audio session. Fall back to the
-  // system French voice offline or when the network voice is refused.
-  const ok = await playGoogle();
-  if (ok) return;
-  if (!hasFrenchVoice()) { await new Promise((r) => setTimeout(r, 300)); cacheVoices(); }
+  if (_activeAudio) { try { _activeAudio.pause(); _activeAudio = null; } catch (e) {} }
+  const text = currentKey;
+  // Try the natural network voices first; fall back to the device voice.
+  for (const url of TTS_URLS) {
+    if (await playViaAudio(url(text))) return;
+  }
+  await waitForVoices();
   speakLocal();
 }
 
@@ -648,6 +676,22 @@ function entryMeaning(fr, es) {
   const [meanings] = dictionary.resolve(fr);
   return meanings && meanings.length ? meanings.slice(0, 4).join(" · ") : "";
 }
+function entryGrammar(fr) {
+  if (!dictionary) return "";
+  const [, info] = dictionary.resolve(fr);
+  if (!info) return "";
+  const parts = [];
+  if (info.form) parts.push(friendlyForm(info.form));
+  if (info.infinitive || info.tense) {
+    const note = verbNote(info, false);
+    if (note) parts.push(note);
+  }
+  return parts.join("  ·  ");
+}
+function buildCard(entry) {
+  const fr = entry.fr.trim();
+  return { fr, es: entryMeaning(fr, entry.es), gram: entryGrammar(fr) };
+}
 function shuffle(arr) {
   for (let i = arr.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
@@ -661,8 +705,7 @@ function startStudy(scope) {
   const cards = scope === "chapter"
     ? state.vocab.filter(entryMatchesChapter)
     : state.vocab;
-  _studyDeck = shuffle(cards.filter(e => e.fr && e.fr.trim())
-    .map(e => ({ fr: e.fr.trim(), es: entryMeaning(e.fr, e.es) })));
+  _studyDeck = shuffle(cards.filter(e => e.fr && e.fr.trim()).map(buildCard));
   _studyIdx = 0;
   currentKey = "";
   openPanel("study");
@@ -677,16 +720,30 @@ function renderStudyCard() {
   currentKey = card.fr;
   $("studyWord").textContent = card.fr;
   $("studyMeaning").textContent = card.es || "Sin traducción guardada.";
+  $("studyGram").textContent = card.gram || "";
   $("studyMeaning").hidden = true;
+  $("studyGram").hidden = !card.gram;
   $("studyFlip").hidden = false;
   $("studyControls").hidden = true;
   $("studyProgress").textContent = (_studyIdx + 1) + " / " + _studyDeck.length;
   $("studyTitle").textContent = _studyScope === "chapter" ? "Capítulo" : "Todo";
 }
 
+function studyNext() {
+  if (!_studyDeck.length) return;
+  _studyIdx = (_studyIdx + 1) % _studyDeck.length;
+  renderStudyCard();
+}
+function studyPrev() {
+  if (!_studyDeck.length) return;
+  _studyIdx = (_studyIdx - 1 + _studyDeck.length) % _studyDeck.length;
+  renderStudyCard();
+}
+
 function showStudyDone(done) {
   $("studyWord").textContent = "";
   $("studyMeaning").textContent = "";
+  $("studyGram").textContent = "";
   $("studyFlip").hidden = true;
   $("studyControls").hidden = true;
   $("studyProgress").textContent = "";
@@ -697,7 +754,9 @@ function showStudyDone(done) {
 }
 
 function revealStudy() {
+  if ($("studyControls").hidden === false) return; // already revealed
   $("studyMeaning").hidden = false;
+  $("studyGram").hidden = !$("studyGram").textContent;
   $("studyFlip").hidden = true;
   $("studyControls").hidden = false;
 }
@@ -756,6 +815,27 @@ $("studyKnow").addEventListener("click", studyKnow);
 $("studyAgain").addEventListener("click", studyAgain);
 $("studyRestart").addEventListener("click", () => startStudy(_studyScope));
 $("studySpeak").addEventListener("click", () => { if (currentKey) speak(); });
+$("studyCard").addEventListener("click", revealStudy);
+$("studyCard").addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); revealStudy(); } });
+// Swipe the card side to side to flip between words (vertical drags scroll).
+(function studySwipe() {
+  let sx = 0, sy = 0, st = 0, armed = false;
+  $("studyContent").addEventListener("touchstart", (e) => {
+    if (e.touches.length !== 1) return;
+    const t = e.touches[0];
+    sx = t.clientX; sy = t.clientY; st = e.timeStamp; armed = true;
+  }, { passive: true });
+  $("studyContent").addEventListener("touchend", (e) => {
+    if (!armed) return;
+    armed = false;
+    const t = e.changedTouches[0];
+    const dx = t.clientX - sx, dy = t.clientY - sy;
+    const dt = Math.max(1, e.timeStamp - st);
+    if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 1.5 && Math.abs(dx) / dt > 0.18) {
+      if (dx < 0) studyNext(); else studyPrev();
+    }
+  }, { passive: true });
+})();
 $("panelCloseBtn").addEventListener("click", closePanel);
 scrim.addEventListener("click", closePanel);
 
@@ -1003,15 +1083,15 @@ el.verseText.addEventListener("click", (e) => {
   }
 }, true);
 
-// ---- pull-down to close the lookup drawer ----------------------------------
+// ---- drag the lookup drawer: pull down to close, pull up to go fullscreen ----
 (function initDrawerDrag() {
   const body = panel.querySelector(".panel-body");
-  let startY = 0, dy = 0, lastY = 0, lastT = 0, vy = 0, tracking = false;
+  let startY = 0, raw = 0, lastY = 0, lastT = 0, vy = 0, tracking = false;
 
   const mayDrag = (e) => {
     if (e.target.closest && e.target.closest("button, select, a")) return false;
     if (e.target.closest && e.target.closest(".grabber, .panel-head")) return true;
-    if (e.target.closest && e.target.closest(".vocab-list")) return false;
+    if (e.target.closest && e.target.closest(".vocab-list, .study-card")) return false;
     if (body) return body.scrollTop === 0;
     return true;
   };
@@ -1022,7 +1102,7 @@ el.verseText.addEventListener("click", (e) => {
     startY = e.clientY;
     lastY = e.clientY;
     lastT = e.timeStamp;
-    dy = 0;
+    raw = 0;
     vy = 0;
     panel.style.transition = "none";
     try { panel.setPointerCapture(e.pointerId); } catch (err) { /* not critical */ }
@@ -1030,25 +1110,35 @@ el.verseText.addEventListener("click", (e) => {
   const onMove = (e) => {
     if (!tracking) return;
     const nowY = e.clientY;
-    dy = Math.max(0, nowY - startY);
+    raw = nowY - startY;
     const nowT = e.timeStamp;
     vy = (nowY - lastY) / Math.max(1, nowT - lastT);
     lastY = nowY;
     lastT = nowT;
-    panel.style.transform = `translateY(${dy}px)`;
+    let t = raw;
+    if (!panel.classList.contains("fullscreen")) t = Math.max(t, -140); // pull up previews fullscreen
+    else t = Math.max(t, 0);                                            // pull up keeps it full
+    panel.style.transform = `translateY(${t}px)`;
   };
   const finish = () => {
     if (!tracking) return;
     tracking = false;
     panel.style.transform = "";
     panel.style.transition = "";
-    if (dy >= 110 || (dy > 60 && vy > 0.55)) closePanel();
+    const full = panel.classList.contains("fullscreen");
+    if (!full && raw < -70) { setPanelFullscreen(true); return; }
+    if (!full && (raw >= 110 || (raw > 60 && vy > 0.55))) { closePanel(); return; }
+    if (full && raw > 120) setPanelFullscreen(false);
   };
   panel.addEventListener("pointerdown", onDown);
   window.addEventListener("pointermove", onMove);
   window.addEventListener("pointerup", finish);
   window.addEventListener("pointercancel", finish);
 })();
+
+function setPanelFullscreen(full) {
+  panel.classList.toggle("fullscreen", full);
+}
 
 // ---- init -----------------------------------------------------------------
 async function init() {
