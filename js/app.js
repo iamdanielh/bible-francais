@@ -358,21 +358,16 @@ function presentWord(word, ti, token, sentenceInitial) {
   el.wordLabel.textContent = word;
   openPanel("word");
   let grammar = "";
-  const parts = [];
-  if (info.form) parts.push(friendlyForm(info.form));
-  if (info.infinitive || info.tense) {
-    const note = verbNote(info, true);
-    if (note) parts.push(note);
+  if (meanings && (info.form || info.infinitive || info.tense)) {
+    grammar = plainGloss(info, meanings[0]);
   }
-  grammar = parts.join("  ·  ");
   if (!meanings) {
     if (info.isName) {
       el.meaning.innerHTML = "<span class='dim'>Nombre propio: persona o lugar.</span>";
-      el.grammar.textContent = "nombre propio";
+      el.grammar.textContent = plainGloss(info, "") || "nombre propio";
       el.note.textContent = "Selecciona una palabra del texto para ver su significado.";
       el.saveBtn.disabled = true;
       el.speakBtn.disabled = false;
-      $("aiWordBtn").hidden = false;
       currentES = "";
       return;
     }
@@ -381,7 +376,6 @@ function presentWord(word, ti, token, sentenceInitial) {
     el.note.textContent = "Selecciona una palabra del texto para ver su significado.";
     el.saveBtn.disabled = true;
     el.speakBtn.disabled = true;
-    $("aiWordBtn").hidden = true;
     return;
   }
   el.meaning.innerHTML = "<b>Español:</b>\n" + meanList(meanings.slice(0, 8));
@@ -389,7 +383,6 @@ function presentWord(word, ti, token, sentenceInitial) {
   el.note.textContent = "";
   el.saveBtn.disabled = false;
   el.speakBtn.disabled = false;
-  $("aiWordBtn").hidden = false;
   currentES = meanings.slice(0, 4).join(" · ");
 }
 
@@ -426,7 +419,6 @@ function presentSelection(segments, phrase) {
   el.note.textContent = "";
   el.saveBtn.disabled = false;
   el.speakBtn.disabled = false;
-  $("aiWordBtn").hidden = false;
   currentES = meaningsAll.join(" · ");
   autoContextTranslate();
 }
@@ -873,7 +865,6 @@ function saveCurrent() {
     state.vocab.push({ fr: currentKey, es: currentES || "" });
     saveState();
 refreshVocab();
-  aiSettingsToUI();
     el.note.textContent = "✓ Guardado en el vocabulario.";
   }
 }
@@ -891,23 +882,51 @@ function removeVocab(entry) {
 const DEFAULT_AI_KEY = ["sk-or-v1-", "5206320f", "4649b94a", "0ea19035", "461653a7", "f1e883a0", "84f0a100", "2394d8d4", "c15d0a9f"].join("");
 
 const AI_SYSTEM_PROMPT =
-  "Eres un profesor de francés para estudiantes hispanohablantes que leen la Biblia. " +
-  "Explica la gramática de forma clara, breve y práctica (máximo 160 palabras). " +
-  "Da ejemplos cortos en francés con su traducción al español. Si te dan un texto, " +
-  "céntrate en él. Si te hacen una pregunta general, respóndela igualmente. " +
-  "Responde siempre en español.";
+  "Eres un profesor de francés para hispanohablantes que leen la Biblia. " +
+  "Responde siempre en español sencillo, como un amigo que enseña, sin palabras técnicas " +
+  "(no digas «imperfecto subyacente», di «pasado que describe el ambiente»). " +
+  "Para cada palabra que expliques, da primero su traducción al español y, si aporta algo, " +
+  "una frase sencilla sobre cómo se usa. " +
+  "Da ejemplos cortos en francés con su traducción al español. Máximo 120 palabras.";
 
 function effectiveAIKey() {
   if (state.ai && state.ai.key && state.ai.key.trim()) return state.ai.key.trim();
   return DEFAULT_AI_KEY;
 }
 
-function aiConfigured() {
-  return !!effectiveAIKey();
-}
-
 function aiKeyKind(key) {
   return /^AIza/.test(key.trim()) ? "gemini" : "openrouter";
+}
+
+// Plain-language, non-technical gloss for a word's grammar. Returns "" when
+// there is nothing interesting to say (plain nouns, adjectives...).
+function plainGloss(info, firstMean) {
+  if (!info) return "";
+  const form = info.form ? String(info.form) : "";
+  if (info.isName && (form === "nombre propio" || !form)) {
+    return "Es un nombre propio: una persona o un lugar.";
+  }
+  if (info.infinitive) {
+    let s = "Es el verbo «" + info.infinitive + "»" + (firstMean ? " (" + firstMean + ")" : "") + ".";
+    if (info.tense) {
+      const ft = friendlyTense(info.tense);
+      const base = ft.split(" (")[0].trim();
+      const meaning = ft.match(/\(([^()]+)\)/) && ft.match(/\(([^()]+)\)/)[1];
+      const person = ft.match(/·\s*.*?\(([^()]+)\)\s*$/) && ft.match(/·\s*.*?\(([^()]+)\)\s*$/)[1];
+      let t = " Está en " + base;
+      if (meaning) t += " (" + meaning + ")";
+      if (person) t += ", hablando de " + person;
+      s += t + ".";
+    }
+    if (firstMean) s += " Aquí significa «" + firstMean + "».";
+    return s;
+  }
+  if (form === "nombre propio") return "";
+  if (form) {
+    const f = friendlyForm(form);
+    if (f && f !== form) return f;
+  }
+  return "";
 }
 
 function aiScroll() {
@@ -945,17 +964,12 @@ function localExplain(text) {
   const segs = dictionary.segment(text);
   if (!segs || !segs.length) return "";
   return segs.map(([span, meanings, info]) => {
-    const bits = ["<b>" + esc(span) + "</b>"];
-    if (meanings && meanings.length) bits.push(esc(meanings.slice(0, 3).join(" / ")));
-    if (info) {
-      if (info.form) bits.push(esc(friendlyForm(info.form)));
-      if (info.infinitive || info.tense) {
-        const n = verbNote(info, false);
-        if (n) bits.push(esc(n));
-      }
-      if (info.isName && !info.form) bits.push("nombre propio");
-    }
-    return '<div class="ai-local-line">' + bits.join(" · ") + "</div>";
+    const firstMean = meanings && meanings.length ? meanings[0] : "";
+    const gloss = plainGloss(info, firstMean);
+    return '<div class="ai-local-line"><span class="ai-local-word">' + esc(span) + "</span>" +
+      (firstMean ? " = <b>" + esc(firstMean) + "</b>" : "") +
+      (gloss ? '<div class="ai-local-gloss">' + esc(gloss) + "</div>" : "") +
+      "</div>";
   }).join("");
 }
 
@@ -969,7 +983,7 @@ function aiShowLocal() {
   const div = document.createElement("div");
   div.className = "ai-msg ai-assistant ai-local";
   div.innerHTML =
-    '<div class="ai-local-head">📖 Explicación del diccionario · <b class="ai-local-word">' +
+    '<div class="ai-local-head">📖 Explicación sencilla · <b class="ai-local-word">' +
     esc(q) + "</b></div>" +
     (html || "<span class='dim'>Sin datos para ese texto.</span>");
   aiThread.appendChild(div);
@@ -1089,15 +1103,6 @@ async function streamAI(messages, onDelta) {
 }
 
 const _aiHistory = [];
-let _aiWasConfigured = false;
-
-function openAISettings() {
-  $("aiSetup").hidden = false;
-  $("aiKeyOn").hidden = true;
-  const keyEl = $("aiKey");
-  try { keyEl.scrollIntoView({ behavior: "smooth", block: "nearest" }); } catch (e) {}
-  setTimeout(() => keyEl.focus(), 350);
-}
 
 async function aiAsk() {
   const input = $("aiInput");
@@ -1105,23 +1110,6 @@ async function aiAsk() {
   if (!q) return;
   aiBubble("user", q);
   input.value = "";
-  if (!aiConfigured()) {
-    // Self-heal: adopt the key as it sits in the field even if the input event
-    // never fired on this device (iOS quirks).
-    const raw = $("aiKey").value.trim();
-    if (raw) {
-      state.ai.key = raw;
-      saveState();
-      aiSettingsToUI();
-    } else {
-      const b = aiBubble("assistant", "Aún no hay clave de IA activada. Pega tu clave gratuita de OpenRouter para empezar:");
-      b.innerHTML =
-        'Aún no hay clave de IA activada. Pega tu clave gratuita de OpenRouter para empezar:' +
-        '<button type="button" class="ghost-btn ai-msg-btn" data-aisetup>⚙️ Configurar la IA</button>';
-      openAISettings();
-      return;
-    }
-  }
   _aiHistory.push({ role: "user", content: q });
   const ctx = aiContext(currentKey);
   const system = AI_SYSTEM_PROMPT +
@@ -1140,34 +1128,8 @@ async function aiAsk() {
     _aiHistory.push({ role: "assistant", content: acc });
   } catch (e) {
     bubble.remove();
-    aiBubble("assistant", "No se pudo consultar la IA (" + e.message + "). Comprueba la clave y la conexión, o usa «📖 Local».");
+    aiBubble("assistant", "No pude responder ahora (" + e.message + "). Inténtalo otra vez en un momento.");
   }
-}
-
-function aiSettingsToUI() {
-  const ai = state.ai || (state.ai = { key: "", model: "" });
-  const configured = aiConfigured();
-  const shownKey = ai.key.trim() || DEFAULT_AI_KEY;
-  if (configured && !_aiWasConfigured) {
-    aiThread.innerHTML = "";
-    _aiHistory.length = 0;
-  }
-  _aiWasConfigured = configured;
-  $("aiKey").value = shownKey;
-  $("aiModel").value = ai.model || "";
-  $("aiSetup").hidden = configured;
-  $("aiKeyOn").hidden = !configured;
-  const tip = $("aiIntroTip");
-  if (configured) {
-    tip.textContent = "✓ IA activa. Toca cualquier palabra del texto y pregúntale, o escribe tu duda.";
-  } else {
-    tip.textContent = "Pregunta lo que quieras sobre el francés o pide que te explique el texto que toques.";
-  }
-  let st;
-  if (ai.key.trim()) st = "✓ Clave guardada (" + aiKeyKind(ai.key) + ") — ya puedes preguntar";
-  else st = "✓ IA activa (clave incluida en la app)";
-  $("aiKeyState").textContent = st;
-  $("aiKeyStatus").textContent = st;
 }
 
 // ---- events ---------------------------------------------------------------
@@ -1196,35 +1158,17 @@ $("studyRestart").addEventListener("click", () => startStudy(_studyScope));
 $("studySpeak").addEventListener("click", () => { if (currentKey) speak(); });
 $("studyCard").addEventListener("click", revealStudy);
 $("studyCard").addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); revealStudy(); } });
-$("aiBtn").addEventListener("click", () => { openPanel("ai"); aiSettingsToUI(); setTimeout(() => $("aiInput").focus(), 60); });
-$("aiWordBtn").addEventListener("click", () => {
-  $("aiInput").value = currentKey || "";
+// The AI is always on: prefilled with the word from the panel when you come
+// from a word tap, or blank for general questions.
+$("aiBtn").addEventListener("click", () => {
+  if (!wordContent.hidden && currentKey) $("aiInput").value = currentKey;
   openPanel("ai");
-  aiSettingsToUI();
   setTimeout(() => $("aiInput").focus(), 60);
 });
 $("aiSendBtn").addEventListener("click", aiAsk);
 $("aiLocalBtn").addEventListener("click", aiShowLocal);
 $("aiInput").addEventListener("keydown", (e) => {
   if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); aiAsk(); }
-});
-$("aiKey").addEventListener("input", aiKeyTyped);
-$("aiKey").addEventListener("change", aiKeyTyped);
-$("aiModel").addEventListener("input", () => { state.ai.model = $("aiModel").value.trim(); saveState(); });
-$("aiModel").addEventListener("change", () => { state.ai.model = $("aiModel").value.trim(); saveState(); });
-$("aiKeySaveBtn").addEventListener("click", () => {
-  const raw = $("aiKey").value.trim();
-  if (!raw) { $("aiKeyState").textContent = "Pega tu clave primero"; $("aiKey").focus(); return; }
-  aiKeyTyped();
-});
-$("aiKeyChangeBtn").addEventListener("click", openAISettings);
-function aiKeyTyped() {
-  state.ai.key = $("aiKey").value.trim();
-  saveState();
-  aiSettingsToUI();
-}
-aiThread.addEventListener("click", (e) => {
-  if (e.target.closest && e.target.closest("[data-aisetup]")) openAISettings();
 });
 // Swipe the card side to side to flip between words (vertical drags scroll).
 (function studySwipe() {

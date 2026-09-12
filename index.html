@@ -7,7 +7,7 @@
   <title>Bible en français — Español</title>
   <link rel="manifest" href="manifest.webmanifest" />
   <link rel="apple-touch-icon" href="icon-180.png" />
-  <link rel="stylesheet" href="css/style.css?v=22" />
+  <link rel="stylesheet" href="css/style.css?v=23" />
 </head>
 <body>
   <header class="topbar">
@@ -49,7 +49,6 @@
           <div id="meaning" class="meaning"></div>
           <div id="grammar" class="grammar"></div>
           <button id="saveBtn" class="primary-btn" disabled>Guardar en el vocabulario</button>
-          <button id="aiWordBtn" class="ghost-btn" hidden>✨ Explicar con IA</button>
           <div id="note" class="note"></div>
           <div id="ctxWrap" class="ctx-wrap" hidden>
             <div id="ctxResult" class="ctx-result"></div>
@@ -90,36 +89,23 @@
         </div>
         <div id="aiContent" hidden>
           <div class="ai-intro">
-            <p class="ai-tip" id="aiIntroTip">Pregunta lo que quieras sobre el francés o pide que te explique el texto que toques. Sin clave, se usa la explicación local del diccionario.</p>
+            <p class="ai-tip">Toca una palabra del texto y vendrá aquí, o escribe tu pregunta. La IA responde en español sencillo con su traducción al lado.</p>
           </div>
           <div id="aiThread" class="ai-thread"></div>
           <div class="ai-compose">
-            <textarea id="aiInput" rows="2" placeholder="Ej. ¿Por qué «étaient» es imperfecto? / Explícame esta frase."></textarea>
+            <textarea id="aiInput" rows="2" placeholder="Ej. ¿Por qué «étaient» está en pasado? / Explícame esta frase."></textarea>
             <div class="ai-actions">
               <button id="aiLocalBtn" class="ghost-btn" title="Explicación del diccionario, sin conexión">📖 Local</button>
               <button id="aiSendBtn" class="primary-btn">Preguntar ✨</button>
             </div>
           </div>
-          <div id="aiSetup" class="ai-setup">
-            <p class="dim">Pega aquí tu clave <b>gratuita</b> de
-              <a href="https://openrouter.ai/keys" target="_blank" rel="noopener">OpenRouter</a>
-              (o de <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">Google AI Studio</a>, empieza por «AIza»).
-              Se guarda solo en tu teléfono.</p>
-            <input id="aiKey" type="password" autocomplete="off" placeholder="Pega tu clave aquí" />
-            <input id="aiModel" autocomplete="off" placeholder="Modelo (opcional)" />
-            <button id="aiKeySaveBtn" class="primary-btn">Activar IA</button>
-            <div id="aiKeyState" class="ai-key-state"></div>
-          </div>
-          <div id="aiKeyOn" class="ai-key-on" hidden>
-            <span id="aiKeyStatus" class="ai-key-state"></span>
-            <button id="aiKeyChangeBtn" class="ghost-btn">Cambiar clave</button>
-          </div>
+        </div>
         </div>
       </div>
     </aside>
     <div class="scrim" id="scrim"></div>
   </main>
 
-  <script type="module" src="js/app.js?v=22"></script>
+  <script type="module" src="js/app.js?v=23"></script>
 </body>
 </html>
