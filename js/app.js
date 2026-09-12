@@ -550,51 +550,105 @@ function playViaAudio(url, guardMs) {
   });
 }
 
-function speakLocal() {
-  // Device voice: dependable on iOS, offline fallback elsewhere. Returns false
-  // when the voice list isn't populated yet so callers can retry/wait.
-  if (!("speechSynthesis" in window)) return false;
+function startLocal() {
+  // Device voice. On iOS this must run synchronously from the user gesture:
+  // getVoices() only populates there, and speak() only sounds there. Returns
+  // the utterance (or null if no voices exist yet) so the caller can detect
+  // late silent failures via onstart.
+  if (!("speechSynthesis" in window)) return null;
+  try { window.speechSynthesis.getVoices(); } catch (e) {} // force populate inside the gesture
   const voices = window.speechSynthesis.getVoices();
-  if (!voices || !voices.length) return false;
+  if (!voices || !voices.length) return null;
   if (_activeAudio) { try { _activeAudio.pause(); _activeAudio = null; } catch (e) {} }
   try { window.speechSynthesis.cancel(); if (IS_IOS) window.speechSynthesis.resume(); } catch (e) {}
   const frVoice = voices.find((v) => /^fr/i.test(v.lang)) || null;
   const u = new SpeechSynthesisUtterance(currentKey);
   u.lang = "fr-FR";
-  if (frVoice) u.voice = frVoice;
+  try { if (frVoice) u.voice = frVoice; } catch (e) {} // rare invalid voice object
   u.rate = 0.9;
   window.speechSynthesis.speak(u);
-  return true;
+  // Classic iOS kick: some versions queue the utterance but never start it
+  // until a pause/resume pair is issued right after speak().
+  if (IS_IOS) { try { window.speechSynthesis.pause(); window.speechSynthesis.resume(); } catch (e) {} }
+  return u;
 }
 
-// iOS can fill in its voices a moment after the priming gesture; wait briefly
-// for them so the fallback isn't silent, then hand the hook back to normal.
+// Resolves true when the utterance actually began (onstart), false if it
+// errored or never started within the budget.
+function waitLocalStart(u, ms) {
+  if (!u) return Promise.resolve(false);
+  return new Promise((resolve) => {
+    let done = false;
+    const finish = (ok) => { if (done) return; done = true; resolve(ok); };
+    u.onstart = () => finish(true);
+    u.onend = () => finish(false);
+    u.onerror = () => finish(false);
+    setTimeout(() => finish(false), ms);
+  });
+}
+
+// iOS exposes its voice list only after a speak() inside a gesture; if the
+// sync call found none, poll briefly — it usually appears within a few hundred
+// ms of the first tap. Returns true once an utterance was accepted.
+function primeLocal() {
+  return new Promise((resolve) => {
+    let tries = 0;
+    const attempt = () => {
+      if (startLocal()) { resolve(true); return; }
+      if (++tries >= 5) { resolve(false); return; }
+      setTimeout(attempt, 150);
+    };
+    attempt();
+  });
+}
+
+// iOS voices can fill in a moment after priming; desktop uses this as the
+// offline fallback after the web voice. Brief wait, then speak.
 function waitForVoices() {
   return new Promise((resolve) => {
     if (typeof speechSynthesis === "undefined") return resolve(false);
     const restore = () => { try { window.speechSynthesis.onvoiceschanged = cacheVoices; } catch (e) {} };
     try {
-      if (window.speechSynthesis.getVoices().length) { restore(); return resolve(true); }
+      if (window.speechSynthesis.getVoices().length) { restore(); resolve(true); return; }
     } catch (e) {}
     window.speechSynthesis.onvoiceschanged = () => { clearTimeout(timer); restore(); resolve(true); };
     const timer = setTimeout(() => { restore(); resolve(false); }, 1500);
   });
 }
 
+function stopActiveAudio() {
+  if (_activeAudio) { try { _activeAudio.pause(); _activeAudio = null; } catch (e) {} }
+}
+
 async function speak() {
   if (!currentKey) return;
-  if (_activeAudio) { try { _activeAudio.pause(); _activeAudio = null; } catch (e) {} }
+  stopActiveAudio();
   const text = currentKey;
-  // iOS is the problem case: long network stalls used to leave the button
-  // silent for 10+ seconds, and a big awaited delay breaks TTS gesture rules.
-  // So on iOS we give the natural web voice a short chance and fall back to
-  // the device voice quickly. Elsewhere the web voice gets more time.
-  const guard = IS_IOS ? 2200 : 6000;
+
+  if (IS_IOS) {
+    // On iOS the device voice is the dependable path and must start inside
+    // the tap, so we try it first and synchronously. The web voice is only a
+    // quick last resort (it has been unreliable on this user's iPhone).
+    const u = startLocal();
+    if (u) {
+      if (await waitLocalStart(u, 900)) return; // it actually started ✓
+      try { window.speechSynthesis.cancel(); } catch (e) {}
+    } else if (await primeLocal()) {
+      return;
+    }
+    // Quick single attempt at the natural web voice, then give the device
+    // voice one more chance. (Two endpoints are used only off iOS.)
+    if (await playViaAudio(TTS_URLS[0](text), 1200)) return;
+    await primeLocal();
+    return;
+  }
+
+  // Desktop/Android: the natural web voice is preferred when reachable.
   for (const url of TTS_URLS) {
-    if (await playViaAudio(url(text), guard)) return;
+    if (await playViaAudio(url(text), 6000)) return;
   }
   await waitForVoices();
-  speakLocal();
+  startLocal();
 }
 
 // ---- vocabulary -----------------------------------------------------------
