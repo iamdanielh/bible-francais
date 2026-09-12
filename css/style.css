@@ -347,6 +347,129 @@ html.touch .scrim.show { opacity: 0; }
   overflow-y: auto;
 }
 
+/* AI tutor panel */
+#aiContent[hidden] { display: none; }
+#aiContent {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+.ai-intro { margin-bottom: 2px; }
+.ai-tip {
+  color: var(--text-dim);
+  font-size: 0.85em;
+  line-height: 1.4;
+  margin: 0 0 8px;
+}
+.ai-thread {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  max-height: 34vh;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 2px 0 8px;
+}
+.ai-msg {
+  border-radius: 12px;
+  padding: 8px 10px;
+  font-size: 0.95em;
+  line-height: 1.45;
+  white-space: pre-wrap;
+  word-break: break-word;
+  max-width: 92%;
+  box-sizing: border-box;
+}
+.ai-user {
+  align-self: flex-end;
+  background: var(--accent);
+  color: var(--accent-fg);
+}
+.ai-assistant {
+  align-self: flex-start;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+}
+.ai-local {
+  align-self: stretch;
+  width: 100%;
+  max-width: 100%;
+  background: transparent;
+  border: 1px dashed var(--border);
+}
+.ai-local-head {
+  font-size: 0.85em;
+  color: var(--text-dim);
+  margin-bottom: 4px;
+}
+.ai-local-line { margin: 3px 0; }
+.ai-compose {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding-top: 6px;
+}
+#aiInput {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 8px 10px;
+  font-size: 1rem;
+  font-family: inherit;
+  background: var(--surface2);
+  color: var(--text);
+  resize: none;
+}
+.ai-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.ai-actions .primary-btn { flex: 1; }
+.ai-settings {
+  margin-top: 10px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 8px 10px;
+  font-size: 0.85em;
+}
+.ai-settings summary {
+  cursor: pointer;
+  color: var(--text-dim);
+  font-weight: 600;
+}
+.ai-settings p {
+  color: var(--text-dim);
+  margin: 6px 0;
+  line-height: 1.4;
+}
+.ai-settings input {
+  width: 100%;
+  margin-top: 6px;
+  padding: 6px 8px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--surface2);
+  color: var(--text);
+  font-size: 0.9rem;
+  box-sizing: border-box;
+}
+.ai-key-state {
+  color: var(--text-dim);
+  font-size: 0.85em;
+  margin-top: 6px;
+}
+.panel.fullscreen #aiContent {
+  flex: 1;
+  min-height: 0;
+}
+.panel.fullscreen .ai-thread {
+  max-height: none;
+  flex: 1;
+}
+
 .grabber {
   width: 44px;
   height: 5px;

@@ -12,7 +12,7 @@ const BOOK_ALIASES = {
 
 let bible = [];       // [{name, chapters:[[verseText,...],...]}]
 let dictionary = null;
-let state = { book: 0, chapter: 0, vocab: [], scrollTop: 0 };
+let state = { book: 0, chapter: 0, vocab: [], scrollTop: 0, ai: { key: "", model: "" } };
 
 // ---- DOM refs -------------------------------------------------------------
 const $ = (id) => document.getElementById(id);
@@ -76,6 +76,11 @@ function loadState() {
     if (typeof s.book === "number") state.book = s.book;
     if (typeof s.chapter === "number") state.chapter = s.chapter;
     if (typeof s.scrollTop === "number") state.scrollTop = s.scrollTop;
+    if (s.ai && typeof s.ai === "object") {
+      state.ai = { key: String(s.ai.key || ""), model: String(s.ai.model || "") };
+    } else {
+      state.ai = { key: "", model: "" };
+    }
   } catch (e) { /* ignore */ }
 }
 function saveState() {
@@ -294,14 +299,21 @@ const scrim = $("scrim");
 const wordContent = $("wordContent");
 const vocabContent = $("vocabContent");
 const studyContent = $("studyContent");
+const aiContent = $("aiContent");
+const aiThread = $("aiThread");
 
 function setPanelMode(mode) {
   const vocab = mode === "vocab";
   const study = mode === "study";
+  const ai = mode === "ai";
   studyContent.hidden = !study;
-  wordContent.hidden = vocab || study;
-  vocabContent.hidden = !vocab || study;
-  $("panelTitle").textContent = study ? "Estudiar" : (vocab ? "Vocabulario" : "Traducción");
+  aiContent.hidden = !ai;
+  wordContent.hidden = vocab || study || ai;
+  vocabContent.hidden = !vocab || study || ai;
+  $("panelTitle").textContent = ai ? "IA · Profesor"
+    : study ? "Estudiar"
+    : vocab ? "Vocabulario"
+    : "Traducción";
 }
 
 function openPanel(mode) {
@@ -344,6 +356,7 @@ function presentWord(word, ti, token, sentenceInitial) {
       el.note.textContent = "Selecciona una palabra del texto para ver su significado.";
       el.saveBtn.disabled = true;
       el.speakBtn.disabled = false;
+      $("aiWordBtn").hidden = false;
       currentES = "";
       return;
     }
@@ -352,6 +365,7 @@ function presentWord(word, ti, token, sentenceInitial) {
     el.note.textContent = "Selecciona una palabra del texto para ver su significado.";
     el.saveBtn.disabled = true;
     el.speakBtn.disabled = true;
+    $("aiWordBtn").hidden = true;
     return;
   }
   el.meaning.innerHTML = "<b>Español:</b>\n" + meanList(meanings.slice(0, 8));
@@ -359,6 +373,7 @@ function presentWord(word, ti, token, sentenceInitial) {
   el.note.textContent = "";
   el.saveBtn.disabled = false;
   el.speakBtn.disabled = false;
+  $("aiWordBtn").hidden = false;
   currentES = meanings.slice(0, 4).join(" · ");
 }
 
@@ -395,6 +410,7 @@ function presentSelection(segments, phrase) {
   el.note.textContent = "";
   el.saveBtn.disabled = false;
   el.speakBtn.disabled = false;
+  $("aiWordBtn").hidden = false;
   currentES = meaningsAll.join(" · ");
   autoContextTranslate();
 }
@@ -840,7 +856,8 @@ function saveCurrent() {
   if (!state.vocab.some(e => e.fr === currentKey)) {
     state.vocab.push({ fr: currentKey, es: currentES || "" });
     saveState();
-    refreshVocab();
+refreshVocab();
+  aiSettingsToUI();
     el.note.textContent = "✓ Guardado en el vocabulario.";
   }
 }
@@ -849,6 +866,211 @@ function removeVocab(entry) {
   state.vocab = state.vocab.filter(e => e !== entry);
   saveState();
   refreshVocab();
+}
+
+// ---- AI tutor --------------------------------------------------------------
+const AI_SYSTEM_PROMPT =
+  "Eres un profesor de francés para estudiantes hispanohablantes que leen la Biblia. " +
+  "Explica la gramática de forma clara, breve y práctica (máximo 160 palabras). " +
+  "Da ejemplos cortos en francés con su traducción al español. Si te dan un texto, " +
+  "céntrate en él. Si te hacen una pregunta general, respóndela igualmente. " +
+  "Responde siempre en español.";
+
+function aiConfigured() {
+  return !!(state.ai && state.ai.key && state.ai.key.trim());
+}
+
+function aiKeyKind(key) {
+  return /^AIza/.test(key.trim()) ? "gemini" : "openrouter";
+}
+
+function aiScroll() {
+  aiThread.scrollTop = aiThread.scrollHeight;
+}
+
+function aiBubble(role, text) {
+  const div = document.createElement("div");
+  div.className = "ai-msg ai-" + role;
+  div.textContent = text;
+  aiThread.appendChild(div);
+  aiScroll();
+  return div;
+}
+
+function aiContext(selected) {
+  const book = bible[currentBookIndex];
+  const chapName = book ? book.name + " " + (currentChapter + 1) : "";
+  let verse = "";
+  if (selected && book) {
+    const target = selected.replace(/[’']/g, "'").toLowerCase();
+    const verses = book.chapters[currentChapter] || [];
+    for (let i = 0; i < verses.length; i++) {
+      if (verses[i].toLowerCase().includes(target)) {
+        verse = "[" + (i + 1) + "] " + verses[i];
+        break;
+      }
+    }
+  }
+  return { chapName, verse };
+}
+
+function localExplain(text) {
+  if (!dictionary || !text) return "";
+  const segs = dictionary.segment(text);
+  if (!segs || !segs.length) return "";
+  return segs.map(([span, meanings, info]) => {
+    const bits = ["<b>" + esc(span) + "</b>"];
+    if (meanings && meanings.length) bits.push(esc(meanings.slice(0, 3).join(" / ")));
+    if (info) {
+      if (info.form) bits.push(esc(friendlyForm(info.form)));
+      if (info.infinitive || info.tense) {
+        const n = verbNote(info, false);
+        if (n) bits.push(esc(n));
+      }
+      if (info.isName && !info.form) bits.push("nombre propio");
+    }
+    return '<div class="ai-local-line">' + bits.join(" · ") + "</div>";
+  }).join("");
+}
+
+function aiShowLocal() {
+  const q = ($("aiInput").value.trim()) || currentKey || "";
+  if (!q) {
+    aiBubble("assistant", "Toca una palabra del texto o escribe algo para explicártelo.");
+    return;
+  }
+  const html = localExplain(q);
+  const div = document.createElement("div");
+  div.className = "ai-msg ai-assistant ai-local";
+  div.innerHTML =
+    '<div class="ai-local-head">📖 Explicación del diccionario · <b class="ai-local-word">' +
+    esc(q) + "</b></div>" +
+    (html || "<span class='dim'>Sin datos para ese texto.</span>");
+  aiThread.appendChild(div);
+  aiScroll();
+}
+
+async function streamOpenRouter(messages, model, key, onDelta) {
+  const resp = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Authorization: "Bearer " + key },
+    body: JSON.stringify({ model, messages, stream: true }),
+  });
+  if (!resp.ok || !resp.body) throw new Error("OpenRouter HTTP " + resp.status);
+  const reader = resp.body.getReader();
+  const dec = new TextDecoder();
+  let buf = "";
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    buf += dec.decode(value, { stream: true });
+    let idx;
+    while ((idx = buf.indexOf("\n")) !== -1) {
+      const line = buf.slice(0, idx).trim();
+      buf = buf.slice(idx + 1);
+      if (!line.startsWith("data:")) continue;
+      const data = line.slice(5).trim();
+      if (data === "[DONE]") return;
+      try {
+        const j = JSON.parse(data);
+        const d = j.choices && j.choices[0] && j.choices[0].delta && j.choices[0].delta.content;
+        if (d) onDelta(d);
+      } catch (e) { /* partial chunk */ }
+    }
+  }
+}
+
+async function streamGemini(messages, model, key, onDelta) {
+  const url = "https://generativelanguage.googleapis.com/v1beta/models/" +
+    encodeURIComponent(model) + ":streamGenerateContent?alt=sse&key=" + encodeURIComponent(key);
+  const system = messages.find(m => m.role === "system");
+  const contents = messages
+    .filter(m => m.role !== "system")
+    .map(m => ({ role: m.role === "assistant" ? "model" : "user", parts: [{ text: m.content }] }));
+  const body = system ? { contents, systemInstruction: { parts: [{ text: system.content }] } } : { contents };
+  const resp = await fetch(url, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+  if (!resp.ok || !resp.body) {
+    let t = "";
+    try { t = (await resp.text()).slice(0, 140); } catch (e) {}
+    throw new Error("Gemini HTTP " + resp.status + " " + t);
+  }
+  const reader = resp.body.getReader();
+  const dec = new TextDecoder();
+  let buf = "";
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    buf += dec.decode(value, { stream: true });
+    let idx;
+    while ((idx = buf.indexOf("\n")) !== -1) {
+      const line = buf.slice(0, idx).trim();
+      buf = buf.slice(idx + 1);
+      if (!line || line === "[DONE]" || !line.startsWith("data:")) continue;
+      try {
+        const j = JSON.parse(line.slice(5).trim());
+        const parts = j.candidates && j.candidates[0] && j.candidates[0].content && j.candidates[0].content.parts;
+        if (parts) for (const p of parts) if (p && p.text) onDelta(p.text);
+      } catch (e) { /* partial chunk */ }
+    }
+  }
+}
+
+async function streamAI(messages, onDelta) {
+  const key = state.ai.key.trim();
+  const model = (state.ai.model || "").trim();
+  if (aiKeyKind(key) === "gemini") {
+    await streamGemini(messages, model || "gemini-2.5-flash", key, onDelta);
+  } else {
+    await streamOpenRouter(messages, model || "meta-llama/llama-3.3-70b-instruct:free", key, onDelta);
+  }
+}
+
+const _aiHistory = [];
+
+async function aiAsk() {
+  const input = $("aiInput");
+  const q = input.value.trim();
+  if (!q) return;
+  aiBubble("user", q);
+  input.value = "";
+  if (!aiConfigured()) {
+    aiBubble("assistant", "Aún no hay clave de IA guardada. Usa «📖 Local» para la explicación del diccionario (gratis y sin conexión), o abre «Configurar la IA» y pega una clave gratuita de OpenRouter o Google AI Studio.");
+    return;
+  }
+  _aiHistory.push({ role: "user", content: q });
+  const ctx = aiContext(currentKey);
+  const system = AI_SYSTEM_PROMPT +
+    (ctx.chapName ? "\nContexto: libro " + ctx.chapName + "." : "") +
+    (ctx.verse ? "\nVersículo de referencia: " + ctx.verse : "");
+  const messages = [{ role: "system", content: system }].concat(_aiHistory);
+  const bubble = aiBubble("assistant", "…");
+  let acc = "";
+  try {
+    await streamAI(messages, d => {
+      if (acc === "" && bubble.textContent === "…") bubble.textContent = "";
+      acc += d;
+      bubble.textContent = acc;
+      aiScroll();
+    });
+    _aiHistory.push({ role: "assistant", content: acc });
+  } catch (e) {
+    bubble.remove();
+    aiBubble("assistant", "No se pudo consultar la IA (" + e.message + "). Comprueba la clave y la conexión, o usa «📖 Local».");
+  }
+}
+
+function aiSettingsToUI() {
+  const ai = state.ai || (state.ai = { key: "", model: "" });
+  $("aiKey").value = ai.key || "";
+  $("aiModel").value = ai.model || "";
+  let st;
+  if (!ai.key) st = "Sin clave: se usa solo la explicación local.";
+  else st = "Clave guardada (" + aiKeyKind(ai.key) + "). El modelo por defecto sirve; puedes cambiarlo aquí.";
+  $("aiKeyState").textContent = st;
 }
 
 // ---- events ---------------------------------------------------------------
@@ -877,6 +1099,20 @@ $("studyRestart").addEventListener("click", () => startStudy(_studyScope));
 $("studySpeak").addEventListener("click", () => { if (currentKey) speak(); });
 $("studyCard").addEventListener("click", revealStudy);
 $("studyCard").addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); revealStudy(); } });
+$("aiBtn").addEventListener("click", () => { openPanel("ai"); aiSettingsToUI(); setTimeout(() => $("aiInput").focus(), 60); });
+$("aiWordBtn").addEventListener("click", () => {
+  $("aiInput").value = currentKey || "";
+  openPanel("ai");
+  aiSettingsToUI();
+  setTimeout(() => $("aiInput").focus(), 60);
+});
+$("aiSendBtn").addEventListener("click", aiAsk);
+$("aiLocalBtn").addEventListener("click", aiShowLocal);
+$("aiInput").addEventListener("keydown", (e) => {
+  if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); aiAsk(); }
+});
+$("aiKey").addEventListener("change", () => { state.ai.key = $("aiKey").value.trim(); saveState(); aiSettingsToUI(); });
+$("aiModel").addEventListener("change", () => { state.ai.model = $("aiModel").value.trim(); saveState(); });
 // Swipe the card side to side to flip between words (vertical drags scroll).
 (function studySwipe() {
   let sx = 0, sy = 0, st = 0, armed = false;
@@ -1149,7 +1385,7 @@ el.verseText.addEventListener("click", (e) => {
   let startY = 0, raw = 0, lastY = 0, lastT = 0, vy = 0, tracking = false;
 
   const mayDrag = (e) => {
-    if (e.target.closest && e.target.closest("button, select, a")) return false;
+    if (e.target.closest && e.target.closest("button, select, a, input, textarea, summary, details")) return false;
     if (e.target.closest && e.target.closest(".grabber, .panel-head")) return true;
     if (e.target.closest && e.target.closest(".vocab-list, .study-card")) return false;
     if (body) return body.scrollTop === 0;

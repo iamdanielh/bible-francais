@@ -7,7 +7,7 @@
   <title>Bible en français — Español</title>
   <link rel="manifest" href="manifest.webmanifest" />
   <link rel="apple-touch-icon" href="icon-180.png" />
-  <link rel="stylesheet" href="css/style.css?v=15" />
+  <link rel="stylesheet" href="css/style.css?v=16" />
 </head>
 <body>
   <header class="topbar">
@@ -22,6 +22,7 @@
       <button id="nextBtn" title="Capítulo siguiente">›</button>
       <button id="vocabBtn" title="Ver vocabulario">⭐</button>
       <button id="themeBtn" title="Cambiar tema">🌙</button>
+      <button id="aiBtn" title="Preguntar a la IA">✨</button>
     </div>
   </header>
 
@@ -48,6 +49,7 @@
           <div id="meaning" class="meaning"></div>
           <div id="grammar" class="grammar"></div>
           <button id="saveBtn" class="primary-btn" disabled>Guardar en el vocabulario</button>
+          <button id="aiWordBtn" class="ghost-btn" hidden>✨ Explicar con IA</button>
           <div id="note" class="note"></div>
           <div id="ctxWrap" class="ctx-wrap" hidden>
             <div id="ctxResult" class="ctx-result"></div>
@@ -86,11 +88,34 @@
             <button id="studyRestart" class="primary-btn">Empezar otra vez</button>
           </div>
         </div>
+        <div id="aiContent" hidden>
+          <div class="ai-intro">
+            <p class="ai-tip">Pregunta lo que quieras sobre el francés o pide que te explique el texto que toques. Sin clave, se usa la explicación local del diccionario.</p>
+          </div>
+          <div id="aiThread" class="ai-thread"></div>
+          <div class="ai-compose">
+            <textarea id="aiInput" rows="2" placeholder="Ej. ¿Por qué «étaient» es imperfecto? / Explícame esta frase."></textarea>
+            <div class="ai-actions">
+              <button id="aiLocalBtn" class="ghost-btn" title="Explicación del diccionario, sin conexión">📖 Local</button>
+              <button id="aiSendBtn" class="primary-btn">Preguntar ✨</button>
+            </div>
+          </div>
+          <details id="aiSettings" class="ai-settings">
+            <summary>Configurar la IA</summary>
+            <p class="dim">La explicación local funciona siempre y sin cuenta. Para el chat con IA, pega una clave <b>gratuita</b>:
+              <a href="https://openrouter.ai/keys" target="_blank" rel="noopener">OpenRouter</a> (usa un modelo «:free») o
+              <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">Google AI Studio</a> (empieza por «AIza»).
+              Se guarda solo en tu teléfono.</p>
+            <input id="aiKey" type="password" autocomplete="off" placeholder="Clave de API (opcional)" />
+            <input id="aiModel" autocomplete="off" placeholder="Modelo (opcional)" />
+            <div id="aiKeyState" class="ai-key-state"></div>
+          </details>
+        </div>
       </div>
     </aside>
     <div class="scrim" id="scrim"></div>
   </main>
 
-  <script type="module" src="js/app.js?v=15"></script>
+  <script type="module" src="js/app.js?v=16"></script>
 </body>
 </html>
