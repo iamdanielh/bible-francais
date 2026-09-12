@@ -1063,6 +1063,15 @@ async function streamAI(messages, onDelta) {
 }
 
 const _aiHistory = [];
+let _aiWasConfigured = false;
+
+function openAISettings() {
+  const details = $("aiSettings");
+  details.open = true;
+  const keyEl = $("aiKey");
+  try { keyEl.scrollIntoView({ behavior: "smooth", block: "nearest" }); } catch (e) {}
+  setTimeout(() => keyEl.focus(), 350);
+}
 
 async function aiAsk() {
   const input = $("aiInput");
@@ -1071,7 +1080,11 @@ async function aiAsk() {
   aiBubble("user", q);
   input.value = "";
   if (!aiConfigured()) {
-    aiBubble("assistant", "Aún no hay clave de IA guardada. Usa «📖 Local» para la explicación del diccionario (gratis y sin conexión), o abre «Configurar la IA» y pega una clave gratuita de OpenRouter o Google AI Studio.");
+    const b = aiBubble("assistant", "Aún no hay clave de IA activada. Pega tu clave gratuita de OpenRouter para empezar:");
+    b.innerHTML =
+      'Aún no hay clave de IA activada. Pega tu clave gratuita de OpenRouter para empezar:' +
+      '<button type="button" class="ghost-btn ai-msg-btn" data-aisetup>⚙️ Configurar la IA</button>';
+    openAISettings();
     return;
   }
   _aiHistory.push({ role: "user", content: q });
@@ -1098,11 +1111,23 @@ async function aiAsk() {
 
 function aiSettingsToUI() {
   const ai = state.ai || (state.ai = { key: "", model: "" });
+  const configured = !!ai.key;
+  if (configured && !_aiWasConfigured) {
+    aiThread.innerHTML = "";
+    _aiHistory.length = 0;
+  }
+  _aiWasConfigured = configured;
   $("aiKey").value = ai.key || "";
   $("aiModel").value = ai.model || "";
+  const tip = $("aiIntroTip");
+  if (configured) {
+    tip.textContent = "✓ IA activa. Toca cualquier palabra del texto y pregúntale, o escribe tu duda.";
+  } else {
+    tip.textContent = "Pregunta lo que quieras sobre el francés o pide que te explique el texto que toques. Sin clave, se usa la explicación local del diccionario.";
+  }
   let st;
-  if (!ai.key) st = "Sin clave: se usa solo la explicación local.";
-  else st = "Clave guardada (" + aiKeyKind(ai.key) + "). El modelo por defecto sirve; puedes cambiarlo aquí.";
+  if (!ai.key) st = "Sin clave: se usa solo la explicación local";
+  else st = "✓ Clave guardada (" + aiKeyKind(ai.key) + ") — ya puedes preguntar";
   $("aiKeyState").textContent = st;
 }
 
@@ -1144,8 +1169,11 @@ $("aiLocalBtn").addEventListener("click", aiShowLocal);
 $("aiInput").addEventListener("keydown", (e) => {
   if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); aiAsk(); }
 });
-$("aiKey").addEventListener("change", () => { state.ai.key = $("aiKey").value.trim(); saveState(); aiSettingsToUI(); });
-$("aiModel").addEventListener("change", () => { state.ai.model = $("aiModel").value.trim(); saveState(); });
+$("aiKey").addEventListener("input", () => { state.ai.key = $("aiKey").value.trim(); saveState(); aiSettingsToUI(); });
+$("aiModel").addEventListener("input", () => { state.ai.model = $("aiModel").value.trim(); saveState(); });
+aiThread.addEventListener("click", (e) => {
+  if (e.target.closest && e.target.closest("[data-aisetup]")) openAISettings();
+});
 // Swipe the card side to side to flip between words (vertical drags scroll).
 (function studySwipe() {
   let sx = 0, sy = 0, st = 0, armed = false;
