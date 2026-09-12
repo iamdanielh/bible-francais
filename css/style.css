@@ -200,9 +200,6 @@ button:disabled {
   scrollbar-width: none;
 }
 .reader::-webkit-scrollbar { display: none; width: 0; height: 0; }
-body.topbar-hidden .reader {
-  padding-top: 24px;
-}
 
 #chapterTitle {
   font-family: var(--serif);
@@ -331,7 +328,7 @@ html.touch .scrim.show { opacity: 0; }
   min-height: 0;
 }
 .panel.fullscreen .word-head { margin-top: 6px; }
-.panel.fullscreen .word-head h2 { font-size: 1.5rem; }
+.panel.fullscreen .word-title-row h2 { font-size: 1.5rem; }
 .panel.fullscreen #speakBtn { width: 44px; height: 44px; font-size: 1.3rem; }
 .panel.fullscreen .meaning {
   font-size: 1.05rem;
@@ -418,6 +415,12 @@ html.touch .scrim.show { opacity: 0; }
   margin-top: 2px;
   line-height: 1.4;
 }
+.ai-local-ctx {
+  color: var(--muted);
+  font-size: 0.85em;
+  font-style: italic;
+  margin-top: 2px;
+}
 .ai-compose {
   display: flex;
   flex-direction: column;
@@ -488,17 +491,27 @@ html.touch .scrim.show { opacity: 0; }
 
 .word-head {
   display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+.word-title-row {
+  display: flex;
   align-items: center;
   gap: 10px;
-  margin-bottom: 6px;
 }
-.word-head h2 {
+.word-title-row h2 {
   font-family: var(--serif);
   font-size: 1.55rem;
   margin: 0;
   word-break: break-word;
 }
-#speakBtn { margin-left: auto; }
+.word-title-row #speakBtn { margin-left: auto; }
+.word-actions {
+  display: flex;
+  gap: 8px;
+}
+.word-actions .ghost-btn { flex: 1; }
 
 .meaning { white-space: pre-line; line-height: 1.55; margin-bottom: 8px; }
 .grammar {
@@ -622,7 +635,6 @@ html.touch .scrim.show { opacity: 0; }
   .reader {
     padding: calc(var(--topbar-h, 88px) + 32px) 28px 32px;
   }
-  body.topbar-hidden .reader { padding-top: 32px; }
 
   .panel {
     position: static;

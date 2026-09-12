@@ -7,7 +7,7 @@
   <title>Bible en français — Español</title>
   <link rel="manifest" href="manifest.webmanifest" />
   <link rel="apple-touch-icon" href="icon-180.png" />
-  <link rel="stylesheet" href="css/style.css?v=23" />
+  <link rel="stylesheet" href="css/style.css?v=24" />
 </head>
 <body>
   <header class="topbar">
@@ -43,16 +43,22 @@
       <div class="panel-body">
         <div id="wordContent">
           <div class="word-head">
-            <h2 id="wordLabel"></h2>
-            <button id="speakBtn" class="round-btn" title="Escuchar pronunciación" disabled>🔊</button>
+            <div class="word-title-row">
+              <h2 id="wordLabel"></h2>
+              <button id="speakBtn" class="round-btn" title="Escuchar pronunciación" disabled>🔊</button>
+            </div>
+            <div class="word-actions">
+              <button id="ctxBtn" class="ghost-btn" title="Traducción en línea de esta palabra o frase">🌐 Traducción</button>
+              <button id="wordAiBtn" class="ghost-btn" title="Preguntáselo a la IA">✨ IA</button>
+            </div>
+          </div>
+          <div id="ctxWrap" class="ctx-wrap" hidden>
+            <div id="ctxResult" class="ctx-result"></div>
           </div>
           <div id="meaning" class="meaning"></div>
           <div id="grammar" class="grammar"></div>
           <button id="saveBtn" class="primary-btn" disabled>Guardar en el vocabulario</button>
           <div id="note" class="note"></div>
-          <div id="ctxWrap" class="ctx-wrap" hidden>
-            <div id="ctxResult" class="ctx-result"></div>
-          </div>
         </div>
         <div id="vocabContent" hidden>
           <div class="vocab-scope">
@@ -106,6 +112,6 @@
     <div class="scrim" id="scrim"></div>
   </main>
 
-  <script type="module" src="js/app.js?v=23"></script>
+  <script type="module" src="js/app.js?v=24"></script>
 </body>
 </html>

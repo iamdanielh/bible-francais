@@ -49,20 +49,10 @@ function hideTopbar() {
   _lastScrollY = readerEl ? readerEl.scrollTop : 0;
   _scrollAccum = 0;
 }
-// Toggle the bar's reserved space but re-scroll so the same verse stays at the
-// same place on screen — hiding grows the viewport instead of nudging the text.
+// The bar is position:fixed and the reader keeps a constant top padding, so
+// toggling it is a true overlay: the Bible text never moves on screen.
 function compensateTopbar(hidden) {
-  if (!readerEl) return;
-  const padBefore = parseFloat(getComputedStyle(readerEl).paddingTop);
   document.body.classList.toggle("topbar-hidden", hidden);
-  const padAfter = parseFloat(getComputedStyle(readerEl).paddingTop);
-  const d = padAfter - padBefore;
-  if (d) {
-    setReaderScroll(Math.min(
-      Math.max(0, readerEl.scrollTop + d),
-      readerEl.scrollHeight - readerEl.clientHeight
-    ));
-  }
 }
 function syncTopbarHeight() {
   if (topbarEl) document.documentElement.style.setProperty("--topbar-h", topbarEl.offsetHeight + "px");
@@ -106,12 +96,12 @@ function saveState() {
   try { history.replaceState({}, "", location.pathname + location.hash); } catch (e) {}
 })();
 
-// Reading coordinates live in "bar visible" units: the reader's real scroll
-// position plus the reserved bar height when the bar is currently hidden, so
-// a saved position means the same verse whether the bar shows or not.
+// The reader's real scroll position. (The bar used to reserve/release space,
+// which needed a unit offset; with the constant-padding overlay the raw value
+// is the canonical one.)
 function canonicalScrollTop() {
   if (!readerEl) return 0;
-  return readerEl.scrollTop + (_topbarHidden && topbarEl ? topbarEl.offsetHeight : 0);
+  return readerEl.scrollTop;
 }
 
 // Remember where the reader is scrolled to, so reopening resumes at the same
@@ -574,6 +564,22 @@ function playViaAudio(url, guardMs) {
   });
 }
 
+// iOS exposes the voice chosen in Settings (Accessibility → Spoken Content →
+// Voices) as the language default. Overriding it with the first item from the
+// getVoices() list can pick a low-quality asset voice even when a better one
+// (e.g. "Audrey") is configured. So on iOS: use "Audrey" when present,
+// otherwise defer to the system default. Off iOS, pick any decent French voice
+// while avoiding the cheap/robotic asset voices.
+const BAD_VOICES = /novella|alva|digital|milena|xiao|leejae|zira|haruka/i;
+function pickFrVoice(voices) {
+  const fr = (voices || []).filter((v) => /^fr/i.test(v.lang));
+  if (!fr.length) return null;
+  const audrey = fr.find((v) => /audrey/i.test(v.name));
+  if (audrey) return audrey;
+  if (IS_IOS) return null; // let the OS-chosen default voice win
+  return fr.find((v) => !BAD_VOICES.test(v.name)) || fr[0];
+}
+
 function startLocal() {
   // Device voice. On iOS this must run synchronously from the user gesture:
   // getVoices() only populates there, and speak() only sounds there. Returns
@@ -585,7 +591,7 @@ function startLocal() {
   if (!voices || !voices.length) return null;
   if (_activeAudio) { try { _activeAudio.pause(); _activeAudio = null; } catch (e) {} }
   try { window.speechSynthesis.cancel(); if (IS_IOS) window.speechSynthesis.resume(); } catch (e) {}
-  const frVoice = voices.find((v) => /^fr/i.test(v.lang)) || null;
+  const frVoice = pickFrVoice(voices);
   const u = new SpeechSynthesisUtterance(currentKey);
   u.lang = "fr-FR";
   try { if (frVoice) u.voice = frVoice; } catch (e) {} // rare invalid voice object
@@ -900,6 +906,18 @@ function aiKeyKind(key) {
 
 // Plain-language, non-technical gloss for a word's grammar. Returns "" when
 // there is nothing interesting to say (plain nouns, adjectives...).
+// The conjugation patterns teach the endings a learner needs to form the tense
+// with any regular verb; irregular verbs share these endings on their stems.
+const TENSE_CONJ = {
+  "présent": "Para conjugar el presente: yo -e, tú -es, él -e, nosotros -ons, vosotros -ez, ellos -ent (en -er); o -is, -is, -it, -issons, -issez, -issent (en -ir).",
+  "imparfait": "Para conjugar este pasado: yo -ais, tú -ais, él -ait, nosotros -ions, vosotros -iez, ellos -aient (vale para casi todos los verbos).",
+  "futur": "Para conjugar el futuro: yo -ai, tú -as, él -a, nosotros -ons, vosotros -ez, ellos -ont.",
+  "passé simple": "Para conjugar este pasado (verbos en -er): yo -ai, tú -as, él -a, nosotros -âmes, vosotros -âtes, ellos -èrent.",
+  "subjonctif": "Para conjugar el subjuntivo: que yo -e, que tú -es, que él -e, que nosotros -ions, que vosotros -iez, que ellos -ent.",
+  "impératif": "Para conjugar el imperativo: tú -e (o -s), nosotros -ons, vosotros -ez.",
+  "participe présent": "El participio presente se forma con la raíz + «-ant» (como «-ando» en español).",
+  "participe passé": "El participio pasado se forma con la raíz + «-é» / «-i» / «-u» (como «-ado / -ido»).",
+};
 function plainGloss(info, firstMean) {
   if (!info) return "";
   const form = info.form ? String(info.form) : "";
@@ -912,11 +930,16 @@ function plainGloss(info, firstMean) {
       const ft = friendlyTense(info.tense);
       const base = ft.split(" (")[0].trim();
       const meaning = ft.match(/\(([^()]+)\)/) && ft.match(/\(([^()]+)\)/)[1];
-      const person = ft.match(/·\s*.*?\(([^()]+)\)\s*$/) && ft.match(/·\s*.*?\(([^()]+)\)\s*$/)[1];
+      const person = (ft.match(/·\s*.*?\(([^()]+)\)\s*$/) || [])[1] || "";
       let t = " Está en " + base;
       if (meaning) t += " (" + meaning + ")";
       if (person) t += ", hablando de " + person;
       s += t + ".";
+      // Teach the pattern so the learner can conjugate the same tense themself
+      // with any verb (the endings are regular within each tense/group).
+      const tstr = String(info.tense).trim().toLowerCase();
+      const conj = Object.keys(TENSE_CONJ).find((k) => tstr.startsWith(k));
+      if (conj) s += " " + TENSE_CONJ[conj];
     }
     if (firstMean) s += " Aquí significa «" + firstMean + "».";
     return s;
@@ -964,12 +987,18 @@ function localExplain(text) {
   const segs = dictionary.segment(text);
   if (!segs || !segs.length) return "";
   return segs.map(([span, meanings, info]) => {
-    const firstMean = meanings && meanings.length ? meanings[0] : "";
-    const gloss = plainGloss(info, firstMean);
-    return '<div class="ai-local-line"><span class="ai-local-word">' + esc(span) + "</span>" +
-      (firstMean ? " = <b>" + esc(firstMean) + "</b>" : "") +
-      (gloss ? '<div class="ai-local-gloss">' + esc(gloss) + "</div>" : "") +
-      "</div>";
+    const ms = (meanings || []).slice(0, 4);
+    const gloss = plainGloss(info, ms[0] || "");
+    let line = '<div class="ai-local-line"><span class="ai-local-word">' + esc(span) + "</span>";
+    if (ms.length) {
+      line += " = " + ms.map((m, i) => (ms.length > 1 ? (i + 1) + ") " : "") + esc(m)).join(" · ");
+    }
+    if (gloss) line += '<div class="ai-local-gloss">' + esc(gloss) + "</div>";
+    if (ms.length > 1) {
+      line += '<div class="ai-local-ctx">Tiene varios significados; el sentido exacto lo da la frase que lo rodea (prueba 🌐 Traducción).</div>';
+    }
+    line += "</div>";
+    return line;
   }).join("");
 }
 
@@ -1164,6 +1193,20 @@ $("aiBtn").addEventListener("click", () => {
   if (!wordContent.hidden && currentKey) $("aiInput").value = currentKey;
   openPanel("ai");
   setTimeout(() => $("aiInput").focus(), 60);
+});
+$("wordAiBtn").addEventListener("click", () => {
+  $("aiInput").value = currentKey || "";
+  openPanel("ai");
+  setTimeout(() => $("aiInput").focus(), 60);
+});
+// Online translation right where the word lives: translate the tapped word or
+// the selected phrase on demand.
+$("ctxBtn").addEventListener("click", () => {
+  if (!currentKey) return;
+  _ctxQuery = currentKey;
+  el.ctxWrap.hidden = false;
+  el.ctxResult.innerHTML = "";
+  translateContext();
 });
 $("aiSendBtn").addEventListener("click", aiAsk);
 $("aiLocalBtn").addEventListener("click", aiShowLocal);
