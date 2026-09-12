@@ -956,7 +956,11 @@ async function streamOpenRouter(messages, model, key, onDelta) {
     headers: { "Content-Type": "application/json", Authorization: "Bearer " + key },
     body: JSON.stringify({ model, messages, stream: true }),
   });
-  if (!resp.ok || !resp.body) throw new Error("OpenRouter HTTP " + resp.status);
+  if (!resp.ok || !resp.body) {
+    let detail = "";
+    try { detail = (await resp.text()).slice(0, 120); } catch (e) {}
+    throw new Error(model + " HTTP " + resp.status + " " + detail);
+  }
   const reader = resp.body.getReader();
   const dec = new TextDecoder();
   let buf = "";
@@ -1019,14 +1023,43 @@ async function streamGemini(messages, model, key, onDelta) {
   }
 }
 
+// Free OpenRouter models, newest-first. The list changes, so if the current
+// pick is rate-limited (429) or retires (404), try the next one automatically.
+const AI_FREE_FALLBACKS = [
+  "nvidia/nemotron-3-super-120b-a12b:free",
+  "nvidia/nemotron-3.5-lightning:free",
+  "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free",
+  "google/gemma-4-31b-it:free",
+  "liquid/lfm-2.5-2.6b:free",
+];
+
+function isRetryable(e) {
+  return /(429|403|404|5\d\d|limit|quota|unavailable|terminated|actively|overloaded)/i.test(e.message);
+}
+
 async function streamAI(messages, onDelta) {
   const key = state.ai.key.trim();
-  const model = (state.ai.model || "").trim();
+  const chosen = (state.ai.model || "").trim();
   if (aiKeyKind(key) === "gemini") {
-    await streamGemini(messages, model || "gemini-2.5-flash", key, onDelta);
-  } else {
-    await streamOpenRouter(messages, model || "meta-llama/llama-3.3-70b-instruct:free", key, onDelta);
+    const model = chosen ? chosen.replace(/:free$/i, "") : "gemini-2.5-flash";
+    await streamGemini(messages, model, key, onDelta);
+    return;
   }
+  const models = [chosen, ...AI_FREE_FALLBACKS].filter(Boolean);
+  const seen = new Set();
+  let lastErr = null;
+  for (const model of models) {
+    if (seen.has(model)) continue;
+    seen.add(model);
+    try {
+      await streamOpenRouter(messages, model, key, onDelta);
+      return;
+    } catch (e) {
+      lastErr = e;
+      if (!chosen && !isRetryable(e)) break;
+    }
+  }
+  throw lastErr || new Error("sin modelo disponible");
 }
 
 const _aiHistory = [];
