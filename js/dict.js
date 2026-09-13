@@ -9385,6 +9385,10 @@ class Dictionary {
       if (!pI || pI.infinitive === undefined) continue;
       if (!/(participe passé|participle|past participle)/.test(String(pI.tense))) continue;
       const aWord = out[j][0];
+      const reflPrev = j > 0 && /^(?:s['’]|se|me|m['’]|te|t['’])$/i.test(out[j - 1][0]);
+      const reflexive = reflPrev || /^s['’]|^se\b|^me\b|^te\b|^m['’]|^t['’]/i.test(aWord);
+      const es0 = esInfinitive(pI.infinitive, pM || aM);
+      const esInf = es0 && (reflexive && !es0.endsWith("se") ? es0 + "se" : es0);
       out[j] = [
         aWord + " " + pWord,
         pM || aM,
@@ -9394,7 +9398,9 @@ class Dictionary {
             aux: aWord,
             auxPerson: _esCells(aI.tense),
             tenseKey: _esTenseKey(label, _AUX_TENSE),
-            femAgree: /(?:^|\s)f\.(?: pl)?/.test(String(pI.tense))
+            femAgree: /(?:^|\s)f\.(?: pl)?/.test(String(pI.tense)),
+            reflexive,
+            esInf
           }
         })
       ];
@@ -9826,6 +9832,89 @@ const _ES_INF = {
 // que el español no usa) se descartan cuando aparecen en "(de X)".
 const _ES_FRAUD_RX = /(ou|ai|oi|eu|au|eau|ph|gn|ç|œ|qu|ch|é|è|ê|ë|î|ï|û|ù|ö|ü|à|â)/i;
 
+// Infinitivos españoles válidos (núcleo de diccionario + verbos conocidos). Se
+// usa para la derivación inversa: una glosa conjugada («hablo», «amaba») se
+// vuelve a su infinitivo comprobando qué verbo conocido produce esa forma.
+const _ES_VERBS_TEXT = [
+  "abandonar abastecer abordar abrazar abrevar abrir abrumar absolver abusar acampar acceder acechar aceptar acercar aclamar acoger acompañar acondicionar acosar acostar",
+  "actuar acumular acusar adivinar admirar admitir adorar adornar adquirir advertir afilar afirmar afligir afrontar agitar agotar agradecer agrandar ahorrar alabar",
+  "albergar alcanzar alegar alegrar alejar alertar alimentar aliviar allanar almacenar alojar amamantar amar amasar amenazar amontonar amotinar animar aniquilar anular",
+  "anunciar apaciguar apagar aparecer apartar aplastar aplaudir aplicar apodar apostar apoyar apreciar aprender apresurar apretar aprobar aprovechar arar armar arrancar",
+  "arrastrar arreglar arriesgar asaltar asar asediar asegurar aser asesinar asir asistir asociar asombrar asustar atacar atar aterrorizar atormentar atraer atrapar",
+  "atravesar atribuir aumentar autorizar avanzar avituallar ayudar ayunar azotar añadir bailar bajar balancear barrer bastar bautizar bañar beber bendecir blandir",
+  "blanquear bloquear bordar bordear borrar brillar brotar bullir buscar caer calcular calentar calmar calumniar cambiar caminar cansar cantar capturar cargar",
+  "casar castigar causar cavar cazar ceder celebrar censar cerrar cesar chorrear circular circuncidar citar clavar codiciar coger colgar colocar combatir",
+  "comenzar comer cometer comparar compartir componer comprar comprender comprometer comunicar concernir concluir condenar conducir confeccionar confesar confiar confirmar conformar conllevar",
+  "conocer conquistar consagrar conservar considerar consistir consolar consolidar conspirar constatar constituir construir consultar consumir contar contemplar contener contentar continuar contribuir",
+  "controlar convencer convenir convocar corregir correr corresponder corromper cortar cosechar costar crear crecer creer criticar cubrir cuchichear cuidar cultivar cumplir",
+  "cónfer damar dar deber decepcionar decidir decir declarar decorar defender degollar dejar demoler demostrar denunciar depender deportar depositar derramar derribar",
+  "desafiar desagradar desalojar desanimar desaparecer desarraigar desarrollar desatar desbordar descargar descender descifrar descubrir descuidar desear desembarazar desencadenar deshonrar designar desmontar",
+  "desobedecer despachar despertar desplegar despojar desposeer despreciar destapar desterrar destinar destrozar destruir desviar detallar detener determinar detestar devastar devolver devorar",
+  "dirigir discernir discutir disfrazar disimular disminuir dispersar disponer disputar distinguir distribuir divagar divertir dividir doblar domar dominar dormir dudar durar",
+  "ejecutar ejercer elaborar elegir elevar eliminar embarcar embriagar emprender empujar encadenar encantar encender encerrar encontrar enderezar enganchar engañar engullir enriquecer",
+  "enseñar enterrar entonar entrar entregar entretener entristecer enumerar enviar envidiar envolver equipar erigir errar escandalizar escapar esconder escribir escuchar esculpir",
+  "esparcir esperar espiar espigar espumar esquilar establecer estallar estimar estirar estudiar evaporar evitar evocar exaltar examinar excitar exclamar excluir exigir",
+  "existir explicar explorar explotar exponer expresar extender exterminar extraviar fabricar facilitar falsear faltar favorecer felicitar festejar figurar fijar firmar florecer",
+  "flotar fluir formar fortificar forzar fracasar franquear frecuentar fumar fundar ganar garantizar gemir germinar girar glorificar gobernar golpear gozar grabar",
+  "gritar guardar guiar habitar hablar hacer halagar heredar herir hervir hinchar honrar huir humillar hurtar ignorar igualar iluminar imaginar imitar",
+  "impedir implantar implorar imponer importar impresionar incendiar incitar inclinar indemnizar indicar indignar infligir influenciar informar injertar inquietar inscribir insistir inspeccionar",
+  "inspirar instalar instruir insultar intentar intercambiar interpelar interpretar interrogar interrumpir intervenir intimidar inundar invadir invitar invocar irritar jugar jurar justificar",
+  "juzgar lamentar lamer lanzar lavar leer levantar liberar limpiar llamar llegar llenar llevar llorar localizar lograr luchar lugar láser maldecir",
+  "maltratar manchar mandar manejar manifestar mantener maquir marcar masacrar matar medir meditar mejorar mencionar mendigar mentir merecer mezclar mirar modificar",
+  "mojar moldear molestar morar morder morir mostrar mover movilizar multiplicar murmurar nacer nadar navegar ner nombrar notar obedecer obligar observar",
+  "obtener ocupar odiar ofrecer olvidar oponer oprimir orar ordenar organizar osar otorgar pagar paralizar parecer participar partir pasar pasear pecar",
+  "pedir pelar penetrar pensar percibir perder perdonar perecer perforar perfumar permanecer permitir perpetuar perseguir persuadir pertenecer perturbar pesar pisar pisotear",
+  "placer plantar poblar poder poner poseer practicar preceder precipitar predecir predicar preferir preocupar preparar prescribir presentar preservar presidir prestar pretender",
+  "prever privar probar proceder proclamar producir profanar profetizar progresar prolongar prometer promulgar pronunciar proponer proporcionar prosperar prostituir proteger protestar provenir",
+  "provocar proyectar publicar pudrir purificar quebrar quemar querer quitar ramonear rascar rasgar reaccionar reagrupar realizar rebosar rechazar recibir recitar reclamar",
+  "recoger recomendar recompensar reconciliar reconocer reconstruir recordar recorrer recortar recuperar recurrir reducir reembolsar reemplazar reenviar reflexionar refrescar regar regañar registrar",
+  "reinar remontar remover renovar renunciar reparar repartir repetir replantar replicar reposar reprender representar reprochar rescatar reservar residir resistir resonar respetar",
+  "respirar responder restablecer restaurar restituir resucitar retener retirar retomar retroceder reunir revelar reventar revestir revivir reñir ridiculizar rociar rodar rodear",
+  "roer romper rugir saber sacar saciar sacrificar sacudir salir saltar saludar salvar sanar santificar saquear satisfacer secar secundar segar seguir",
+  "seir sembrar sentar sentir separar ser servir significar simbolizar situar sobrevenir sobrevivir socorrer sofocar soltar someter sonar soplar soportar sorprender",
+  "sostener soñar subir sublevar subsistir suceder sucumbir sufrir sumergir suministrar superar suplicar suponer suprimir suscitar suspirar tallar tapar tardar tejer",
+  "temblar temer tender tener terminar testificar tirar tomar trabajar traer tragar traicionar transformar transmitir transportar traspasar trastornar tratar trazar trepar",
+  "triturar triunfar tropezar unir usar vaciar valer velar vender vendimiar vengar venir ver verificar verter vestir viajar vigilar violar vivir",
+  "volar volver vomitar"
+].join(" ");
+// Residuos de la fuente original (no son verbos españoles).
+const _ES_VERBS_JUNK = new Set(["ner", "aser", "seir", "cónfer", "láser", "damar", "lugar", "maquir", "mejorarla"]);
+const _ES_KNOWN_VERBS = new Set(String(_ES_VERBS_TEXT).split(" ").filter((v) => !_ES_VERBS_JUNK.has(v)));
+for (const k of Object.keys(_ES_IRR)) _ES_KNOWN_VERBS.add(k);
+for (const k of Object.keys(_ES_FAM)) _ES_KNOWN_VERBS.add(k);
+for (const k of Object.keys(_ES_ROOTS)) _ES_KNOWN_VERBS.add(k);
+for (const k in _ES_INF) _ES_KNOWN_VERBS.add(_ES_INF[k]);
+
+// Derive la tabla forma → infinitivo (perezosa): «hablo» → hablar, «amaba» →
+// amar, «siento» → sentar...
+let _ES_FORMS_TABLE = null;
+function _esFormsTable() {
+  if (_ES_FORMS_TABLE) return _ES_FORMS_TABLE;
+  const table = new Map();
+  const tenses = ["pr", "imp", "fu", "cd", "sj", "ps", "ge", "pp"];
+  for (const verb of _ES_KNOWN_VERBS) {
+    if (verb.endsWith("se")) continue;
+    for (const t of tenses) {
+      for (let c = 0; c < 6; c++) {
+        const form = _esForm(verb, t, c);
+        if (form && !table.has(form)) table.set(form, verb);
+      }
+    }
+  }
+  _ES_FORMS_TABLE = table;
+  return table;
+}
+
+// «hablo» → hablar, «hablaba» → hablar, «siento» → sentar…
+function _esBackderive(tok) {
+  const t = String(tok || "").toLowerCase().trim();
+  if (!t) return null;
+  const v = _esFormsTable().get(t);
+  if (v) return v;
+  if (t.endsWith("se")) return _esFormsTable().get(t.slice(0, -2)) || null;
+  return null;
+}
+
 function _swapVowel(stem, from, to) {
   const idx = stem.lastIndexOf(from);
   if (idx < 0) return stem;
@@ -10080,6 +10169,7 @@ function esConjugado(esInf, frenchTense, cells) {
   const key = _esTenseKey(frenchTense, _SIMPLE_ES_TENSE);
   if (!key) return [];
   const cs = cells && cells.length ? cells : (key === "ip" ? [1] : key === "ge" || key === "pp" ? [0] : _esCells(frenchTense));
+  if (!cs.length) cs.push(1);
   const forms = [];
   for (const c of cs) {
     const f = _esForm(esInf, key, c);
@@ -10115,7 +10205,7 @@ function esInfinitive(frInf, glosses) {
   if (_ES_INF[fr]) return _ES_INF[fr];
   const list = Array.isArray(glosses) ? glosses : [];
   for (const g of list) {
-    for (const part of String(g).split(/\s*[|]\s*/)) {
+    for (const part of String(g).split(/\s*(?:\/|\|)\s*/)) {
       const p = part.trim();
       const exact = p.match(/^([a-záéíóúüñà-ú]+(?:se|ar|er|ir))$/i);
       if (exact) return exact[1];
@@ -10125,6 +10215,15 @@ function esInfinitive(frInf, glosses) {
       if (eq && !_ES_FRAUD_RX.test(eq[1])) return eq[1];
       const any = p.match(/\([^)]*(\b[a-záéíóúüñ]+se)\b[^)]*\)/);
       if (any && !_ES_FRAUD_RX.test(any[1])) return any[1];
+    }
+  }
+  // Último recurso: la glosa es una forma conjugada («hablo», «amaba», «siento»);
+  // se vuelve a su infinitivo comprobando qué verbo conocido produce esa forma.
+  for (const g of list) {
+    for (const tok of String(g).toLowerCase().split(/[^a-záéíóúüñ]+/i)) {
+      if (tok.length < 3 || /(se|ar|er|ir)$/i.test(tok)) continue;
+      const back = _esBackderive(tok);
+      if (back) return back;
     }
   }
   return null;

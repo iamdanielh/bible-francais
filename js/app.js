@@ -394,7 +394,7 @@ function presentSelection(segments, phrase) {
       const details = [];
       if (info.form) details.push(esc(friendlyForm(info.form)));
       if (info.infinitive || info.tense) {
-        const note = verbNote(info, false);
+        const note = verbNote(info, false, meanings);
         if (note) details.push(esc(note));
       }
       if (details.length) line += ` <span class='dim'>(${details.join(", ")})</span>`;
@@ -467,7 +467,7 @@ async function translateContext() {
   }
 }
 
-function verbNote(info, withMeaning) {
+function verbNote(info, withMeaning, glosses) {
   const parts = [];
   const inf = info.infinitive;
   if (inf) {
@@ -482,6 +482,15 @@ function verbNote(info, withMeaning) {
     }
   }
   if (info.tense) parts.push(friendlyTense(info.tense));
+  // Forma española — igual que en plainGloss.
+  const glossesGiven = (info.compound && info.compound.esInf)
+    ? []
+    : (Array.isArray(glosses) && glosses.length ? glosses : []);
+  const es = (info.compound && info.compound.esInf) || esInfinitive(inf, glossesGiven);
+  const esp = info.compound
+    ? esCompuesto(es, info.tense, info.compound.auxPerson)
+    : esConjugado(es, info.tense);
+  if (esp && esp.length) parts.push("esp: «" + esp.join(" o ") + "»");
   return parts.join(" · ");
 }
 
@@ -769,12 +778,12 @@ function entryMeaning(fr, es) {
 }
 function entryGrammar(fr) {
   if (!dictionary) return "";
-  const [, info] = dictionary.resolve(fr);
+  const [meanings, info] = dictionary.resolve(fr);
   if (!info) return "";
   const parts = [];
   if (info.form) parts.push(friendlyForm(info.form));
   if (info.infinitive || info.tense) {
-    const note = verbNote(info, false);
+    const note = verbNote(info, false, meanings);
     if (note) parts.push(note);
   }
   return parts.join("  ·  ");
@@ -976,7 +985,7 @@ function plainGloss(info, firstMean, glosses) {
     if (firstMean) s += " Aquí significa «" + firstMean + "».";
     // Forma española: conjugada (tiempo simple) o compuesta («haber» + participio).
     const glossesGiven = Array.isArray(glosses) && glosses.length ? glosses : (firstMean ? [firstMean] : []);
-    const es = esInfinitive(info.infinitive, glossesGiven);
+    const es = (info.compound && info.compound.esInf) || esInfinitive(info.infinitive, glossesGiven);
     const esp = info.compound
       ? esCompuesto(es, info.tense, info.compound.auxPerson)
       : esConjugado(es, info.tense);
