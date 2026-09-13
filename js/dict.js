@@ -7548,6 +7548,9 @@ const _VERB_IRREGULAR = {
   "aura": ["avoir", "futur 3sg"], "eut": ["avoir", "passé simple 3sg"],
   "ait": ["avoir", "subjonctif 3sg"], "aient": ["avoir", "subjonctif 3pl"],
   "fit": ["faire", "passé simple 3sg"], "faisait": ["faire", "imparfait 3sg"],
+  "fais": ["faire", "présent 1sg/2sg"], "fait": ["faire", "participe passé / présent 3sg"],
+  "faite": ["faire", "participe passé f."], "font": ["faire", "présent 3pl"],
+  "feras": ["faire", "futur 2sg"], "pûmes": ["pouvoir", "passé simple 1pl"],
   "faisons": ["faire", "présent 1pl"], "faites": ["faire", "présent 2pl"],
   "fera": ["faire", "futur 3sg"], "fasse": ["faire", "subjonctif 3sg"],
   "faisant": ["faire", "participe présent"],
@@ -7749,7 +7752,8 @@ const _VERB_IRREGULAR = {
   "réservera": ["réserver", "futur 3sg"],
   "destiné": ["destiner", "participe passé"], "destinée": ["destiner", "participe passé f."],
   // --- fourth batch ---
-  "vas": ["aller", "présent 2sg"],
+  "vas": ["aller", "présent 2sg"], "vais": ["aller", "présent 1sg"],
+  "va": ["aller", "présent 3sg / impératif 2sg"],
   "serait": ["être", "conditionnel 3sg"], "étiez": ["être", "imparfait 2pl"],
   "étions": ["être", "imparfait 1pl"], "étais": ["être", "imparfait 1sg/2sg"],
   "aurait": ["avoir", "conditionnel 3sg"], "auraient": ["avoir", "conditionnel 3pl"],
@@ -8499,11 +8503,18 @@ function verbInfinitive(word) {
     const m = new RegExp(re).exec(w);
     if (m) {
       const base = w.slice(0, m.index);
-      if (base) out.push([base + "er", tense]);
-      // orthographic -ger/-cer verbs: "mangea" is mang+e+a, so base "mange"
-      // -> real stem "mang" -> "manger"; "lança" -> stem "lanc" -> "lancer".
-      if (/ge$/.test(base)) out.push([base.slice(0, -1) + "er", tense]);
-      if (/ç$/.test(base)) out.push([base.slice(0, -1) + "er", tense]);
+      if (!base) continue;
+      // orthographic -ger/-cer verbs: "mangea" = mang+e+a, so real stem "mang"
+      // -> "manger"; "lança" -> "lanc" -> "lancer". Try the correctly spelled
+      // root first so the reported infinitive is canonical (lançer vs lancer);
+      // both normalize to the same dictionary key anyway.
+      if (/ge$/.test(base) || /ç$/.test(base)) {
+        // "mangea" -> stem "mang" -> "manger"; "lança" -> stem "lanc" -> "lancer".
+        out.push([base.slice(0, -1) + (/ç$/.test(base) ? "cer" : "er"), tense]);
+        out.push([base + "er", tense]);
+      } else {
+        out.push([base + "er", tense]);
+      }
     }
   }
   // third-group guesses for forms the -er rule shapes from wrong stems
@@ -9005,6 +9016,39 @@ class Dictionary {
     const m = elide.exec(word);
     if (m) candidates.push(word.slice(m[0].length));
     for (const cand of candidates) {
+      // Known irregular verb forms must beat the generic noun path: e.g.
+      // «vais», «êtes», «sommes», «peux» would otherwise fall through to a
+      // singular noun (été/verano, somme/suma, peu/poco) or a wrong -er stem.
+      // L'élision check both the raw surface ("l'avait") and the stripped
+      // form ("avait") so elided verb forms resolve to their real verb.
+      for (const morph of new Set([cand, cand.replace(/^[ldqnsjcmt][’']/i, "")])) {
+      const known = this._knownVerbForm(morph);
+      if (known) {
+        const [inf, tense] = known;
+        const vmeanings = this.lookup(inf);
+        if (vmeanings) {
+          info.infinitive = inf;
+          info.tense = tense || "";
+          info.group = this._verbGroup(cand, inf);
+          const exact = this.lookup(cand);
+          if (!exact) return [vmeanings, info];
+          // Exact homographs (est/a/été/produit...) keep their noun senses,
+          // but when the dictionary entry is pure disambiguation dross or a
+          // useless self-gloss, the verb meaning is the real one (ira -> "irá",
+          // font -> "hacen", sort -> "sale"). Disambiguations are signaled by
+          // "desambiguación", a self-gloss, or a trailing proper-noun
+          // parenthetical like "(Friburgo)" — real verb glosses are phrased as
+          // lowercase "(de verbo...)".
+          const low = cand.toLowerCase();
+          const unhelpful = exact.every((m) =>
+            /desambiguaci/i.test(m) ||
+            m.toLowerCase() === low ||
+            /[^(]+\(([A-ZÁÉÍÓÚÀÈÌÒÙÂÊÎÔÛÄËÏÖÜÇÑ][^()]*)\)$/.test(m));
+          if (unhelpful) return [vmeanings, info];
+          return [this._preferCurated(exact, cand), info];
+        }
+      }
+      }
       const res = this._tryDirect(cand, info);
       if (res) {
         this._enrichVerb(cand, info);
@@ -9071,6 +9115,20 @@ class Dictionary {
     return null;
   }
 
+  _knownVerbForm(cand) {
+    return _VERB_IRREGULAR[cand.toLowerCase().replace(/[’‘]/g, "'")] || null;
+  }
+
+  // Curated overlay glosses are hand-picked and usually the intended primary
+  // meaning for a word (e.g. «a» = «ha / tiene»); surface them before raw
+  // dictionary breadth (letter disambiguations, rare senses).
+  _preferCurated(meanings, cand) {
+    const curated = _CURATED[normalize(cand)];
+    if (!curated) return meanings;
+    const rest = meanings.filter((m) => m !== curated);
+    return [curated, ...rest];
+  }
+
   _verbGroup(cand, inf) {
     if (/er$/.test(inf) && !/oir$/.test(inf) && !_IRR_ER_VERBS.has(inf)) return "er";
     if (/ir$/.test(inf) && cand.includes("iss")) return "ir2";
@@ -9079,7 +9137,14 @@ class Dictionary {
 
   _enrichVerb(cand, info) {
     if (info.infinitive || info.form) return;
+    // Curated overlay words (me, se, ne, mais, chez...) are already resolved
+    // correctly; a blind -er stem guess would degrade them (me -> mer "sea").
+    const key = normalize(cand);
+    if (_CURATED[key] || _EXTRA_WORDS[key]) return;
     for (const [inf, tense] of verbInfinitive(cand)) {
+      // -er rules derive "me" -> "m"+"er" -> "mer": only trust stems long
+      // enough to be a real verb root.
+      if (inf.replace(/er$|ir$|re$|oir$/, "").length < 2) continue;
       if (this.lookup(inf)) {
         info.infinitive = inf;
         info.tense = tense || "";
