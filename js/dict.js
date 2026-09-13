@@ -8518,7 +8518,10 @@ const _IRR_ER_VERBS = new Set(["aller", "envoyer", "renvoyer"]);
 function verbInfinitive(word) {
   const f = word.toLowerCase().replace(/[’‘]/g, "'");
   if (_VERB_IRREGULAR[f]) {
-    return [_VERB_IRREGULAR[f].slice()];
+    // memory-form verbs (take, va, fut, soit...) carry no derivable ending, so
+    // the tuple is [inf, tense, "", flags] with the irregular marker.
+    const e = _VERB_IRREGULAR[f];
+    return [[e[0], e[1], "", { irregular: true }]];
   }
   const w = _stripElisions(f);
   const out = [];
@@ -8530,17 +8533,16 @@ function verbInfinitive(word) {
     if (m) {
       const base = w.slice(0, m.index);
       if (!base) continue;
-      // orthographic -ger/-cer verbs: "mangea" = mang+e+a, so real stem "mang"
-      // -> "manger"; "lança" -> "lanc" -> "lancer". Try the correctly spelled
-      // root first so the reported infinitive is canonical (lançer vs lancer);
-      // both normalize to the same dictionary key anyway.
-      if (/ge$/.test(base) || /ç$/.test(base)) {
-        // "mangea" -> stem "mang" -> "manger"; "lança" -> stem "lanc" -> "lancer".
-        out.push([base.slice(0, -1) + (/ç$/.test(base) ? "cer" : "er"), tense]);
-        out.push([base + "er", tense]);
-      } else {
-        out.push([base + "er", tense]);
+      // orthographic -ger: "mangea" -> base "mange" -> real stem "mang",
+      // infinitive "manger", but the word spells the stem "mange-", so the
+      // ending shown on the gloss is the part after it ("-a", "-ait").
+      if (/ge$/.test(base)) {
+        out.push([base.slice(0, -1) + "er", tense, w.slice(base.length)]);
+        continue;
       }
+      // orthographic -cer: "lança" -> canonical stem "lanc", infinitive
+      // "lancer" (the cedille is just the spelling of "c" before -a).
+      out.push([base.replace(/ç$/, "c") + "er", tense, w.slice(base.length)]);
     }
   }
   // third-group guesses for forms the -er rule shapes from wrong stems
@@ -8548,17 +8550,18 @@ function verbInfinitive(word) {
   // suffix still tells us the tense (rendait is imparfait even for rendre),
   // so carry the matched -er rule's label instead of the generic "3e groupe".
   const erBase = out.length ? out[0][0].slice(0, -2) : null;
+  const erEnding = out.length ? out[0][2] || "" : "";
   if (erBase && erBase.length > 3) {
-    out.push([erBase + "ir", out[0][1]]);
-    out.push([erBase + "re", out[0][1]]);
+    out.push([erBase + "ir", out[0][1], erEnding]);
+    out.push([erBase + "re", out[0][1], erEnding]);
   }
   // present participles in -ant (donnant -> donner, contenant -> contenir,
   // servant -> servir): the stem takes -er or -ir depending on the group.
   if (/ant$/.test(w)) {
     const base = w.slice(0, -3);
     if (base.length > 2) {
-      out.push([base + "er", "participe présent"]);
-      out.push([base + "ir", "participe présent"]);
+      out.push([base + "er", "participe présent", "ant"]);
+      out.push([base + "ir", "participe présent", "ant"]);
     }
   }
   // -ir verbs
@@ -8566,7 +8569,7 @@ function verbInfinitive(word) {
     const m = new RegExp(re).exec(w);
     if (m) {
       const base = w.slice(0, m.index);
-      if (base) out.push([base + "ir", tense]);
+      if (base) out.push([base + "ir", tense, m[0]]);
     }
   }
   // 3rd-group -ire verbs (lire, conduire, cuire, traduire): the present stem
@@ -8575,12 +8578,12 @@ function verbInfinitive(word) {
   for (const [suffix, tense, cut] of [["isons", "présent 1pl", 5], ["isez", "présent 2pl", 4], ["isent", "présent 3pl", 5]]) {
     if (w.endsWith(suffix)) {
       const base = w.slice(0, -cut);
-      if (base.length >= 1) out.push([base + "ire", tense]);
+      if (base.length >= 1) out.push([base + "ire", tense, suffix]);
     }
   }
   // -re verbs: past participles in -u (attendu -> attendre, rendu -> rendre, ...)
   if (/u$/.test(w) && w.length > 3) {
-    out.push([w.slice(0, -1) + "re", "participe passé"]);
+    out.push([w.slice(0, -1) + "re", "participe passé", "u"]);
   }
   return out;
 }
@@ -8597,6 +8600,12 @@ const _TENSE_FR = {
   "conditionnel clitique": "condicional (con un pronombre unido al verbo)",
   "subjonctif": "subjuntivo (deseo, duda o emoción)",
   "impératif": "imperativo (una orden)",
+  "passé composé": "pretérito perfecto compuesto (una acción ya terminada: «ha hablado»)",
+  "plus-que-parfait": "pretérito pluscuamperfecto (una acción que ya había acabado: «había hablado»)",
+  "passé antérieur": "pasado anterior (una acción que terminó justo antes de otra: «hubo hablado»)",
+  "futur antérieur": "futuro compuesto (una acción que ya habrá terminado: «habrá hablado»)",
+  "conditionnel passé": "condicional compuesto (lo que habría ocurrido: «habría hablado»)",
+  "subjonctif passé": "subjuntivo compuesto (deseo o duda sobre algo ya hecho: «haya hablado»)",
   "verbe 3e groupe ?": "un verbo del 3.er grupo (irregular)"
 };
 
@@ -9141,6 +9150,7 @@ class Dictionary {
           info.infinitive = inf;
           info.tense = tense || "";
           info.group = this._verbGroup(cand, inf);
+          info.irregular = true;
           const exact = this.lookup(cand);
           if (!exact) return [vmeanings, info];
           // Exact homographs (est/a/été/produit...) keep their noun senses,
@@ -9165,12 +9175,17 @@ class Dictionary {
         this._enrichVerb(cand, info);
         return res;
       }
-      for (const [inf, tense] of verbInfinitive(cand)) {
+      for (const [inf, tense, ending, flags] of verbInfinitive(cand)) {
         const meanings = this.lookup(inf);
         if (meanings) {
           info.infinitive = inf;
           info.tense = tense || "";
           info.group = this._verbGroup(cand, inf);
+          if (flags && flags.irregular) info.irregular = true;
+          if (ending) {
+            info.stem = cand.slice(0, -ending.length);
+            info.ending = ending;
+          }
           return [meanings, info];
         }
       }
@@ -9344,8 +9359,797 @@ class Dictionary {
         i += 1;
       }
     }
+    // Tiempos compuestos: «a parlé», «avait mangé», «est venu»… se unen en una
+    // sola unidad «a parlé» con la etiqueta del tiempo compuesto; el participio
+    // consumido se elimina de la lista (sigue disponible por palabra en el lector).
+    for (let j = 0; j < out.length - 1; j++) {
+      const [, aM, aI] = out[j];
+      if (!aI || !_AUX_INF.has(aI.infinitive)) continue;
+      const label = _compoundLabel(aI.tense);
+      if (!label) continue;
+      let k = j + 1;
+      while (k < out.length && _NEG_TOKENS.has(out[k][0])) k++;
+      if (k >= out.length) continue;
+      const [pWord, pM0] = out[k];
+      let pI = out[k][2];
+      let pM = pM0;
+      if (!pI || pI.infinitive === undefined) {
+        // Participios regulares en -er («a parlé») que también son nombres:
+        // se reapuntan como participio solo dentro del tiempo compuesto.
+        const der = verbInfinitive(pWord).find(([, tp]) => /participe|participle/.test(String(tp)));
+        if (der && this.lookup(der[0])) {
+          pI = { infinitive: der[0], tense: der[1], group: this._verbGroup(pWord, der[0]) };
+          pM = this.lookup(der[0]);
+        }
+      }
+      if (!pI || pI.infinitive === undefined) continue;
+      if (!/(participe passé|participle|past participle)/.test(String(pI.tense))) continue;
+      const aWord = out[j][0];
+      out[j] = [
+        aWord + " " + pWord,
+        pM || aM,
+        Object.assign({}, pI, {
+          tense: label,
+          compound: {
+            aux: aWord,
+            auxPerson: _esCells(aI.tense),
+            tenseKey: _esTenseKey(label, _AUX_TENSE),
+            femAgree: /(?:^|\s)f\.(?: pl)?/.test(String(pI.tense))
+          }
+        })
+      ];
+      out.splice(k, 1);
+    }
     return out;
   }
 }
 
-export { Dictionary, normalize, friendlyTense, friendlyForm };
+// ---------------------------------------------------------------------------
+// Conjugación española -------------------------------------------------------
+// Dado el infinitivo español de un verbo (o su variante reflexiva en -se) y
+// el tiempo/persona del francés, produce la forma conjugada en español. Los
+// irregulares se guardan por raíz con sus celdas completas; las familias
+// (mantener→tener, disponer→poner...) se derivan con prefijo + forma.
+const _ES_PRON = ["me", "te", "se", "nos", "se", "se"];
+
+const _ES_END = {
+  ar: {
+    pr: ["o", "as", "a", "amos", "áis", "an"],
+    imp: ["aba", "abas", "aba", "ábamos", "abais", "aban"],
+    ps: ["é", "aste", "ó", "amos", "asteis", "aron"],
+    fu: ["é", "ás", "á", "emos", "éis", "án"],
+    cd: ["ía", "ías", "ía", "íamos", "íais", "ían"],
+    sj: ["e", "es", "e", "emos", "éis", "en"],
+    ge: "ando", pp: "ado", ipd: "ad"
+  },
+  er: {
+    pr: ["o", "es", "e", "emos", "éis", "en"],
+    imp: ["ía", "ías", "ía", "íamos", "íais", "ían"],
+    ps: ["í", "iste", "ió", "imos", "isteis", "ieron"],
+    fu: ["é", "ás", "á", "emos", "éis", "án"],
+    cd: ["ía", "ías", "ía", "íamos", "íais", "ían"],
+    sj: ["a", "as", "a", "amos", "áis", "an"],
+    ge: "iendo", pp: "ido", ipd: "ed"
+  },
+  ir: {
+    pr: ["o", "es", "e", "imos", "ís", "en"],
+    imp: ["ía", "ías", "ía", "íamos", "íais", "ían"],
+    ps: ["í", "iste", "ió", "imos", "isteis", "ieron"],
+    fu: ["é", "ás", "á", "emos", "éis", "án"],
+    cd: ["ía", "ías", "ía", "íamos", "íais", "ían"],
+    sj: ["a", "as", "a", "amos", "áis", "an"],
+    ge: "iendo", pp: "ido", ipd: "id"
+  }
+};
+
+// Verbo regular español -> patrón de diptongo/aféresis sobre la vocal final
+// del tema. Las celdas marcadas son la 1.ª, 2.ª, 3.ª sg y 3.ª pl del presente
+// y del subjuntivo; en los verbos en -ir se cambia también el pretérito
+// (3.ª sg/pl) y el gerundio.
+const _ES_ROOTS = {
+  // e → ie
+  "cerrar": "e-ie", "comenzar": "e-ie", "empezar": "e-ie", "pensar": "e-ie",
+  "negar": "e-ie", "sentar": "e-ie", "sentarse": "e-ie", "despertar": "e-ie",
+  "despertarse": "e-ie", "apretar": "e-ie", "quebrar": "e-ie", "enterrar": "e-ie",
+  "cegar": "e-ie", "gobernar": "e-ie", "helar": "e-ie", "encerrar": "e-ie",
+  "entender": "e-ie", "defender": "e-ie", "perder": "e-ie", "atender": "e-ie",
+  "tender": "e-ie", "contender": "e-ie", "encender": "e-ie", "extender": "e-ie",
+  "descender": "e-ie", "ascender": "e-ie",
+  // o → ue
+  "encontrar": "o-ue", "contar": "o-ue", "recordar": "o-ue", "mostrar": "o-ue",
+  "probar": "o-ue", "costar": "o-ue", "soñar": "o-ue", "acostar": "o-ue",
+  "acostarse": "o-ue", "acordar": "o-ue", "colgar": "o-ue", "rogar": "o-ue",
+  "poblar": "o-ue", "comprobar": "o-ue", "volar": "o-ue", "volcar": "o-ue",
+  "mover": "o-ue", "morder": "o-ue", "remover": "o-ue", "soltar": "o-ue",
+  "consolar": "o-ue", "tronar": "o-ue", "forzar": "o-ue", "esforzar": "o-ue",
+  "esforzarse": "o-ue", "volver": "o-ue", "dormir": "ir-o-ue",
+  // u → ue
+  "jugar": "u-ue",
+  // en -ir: e → i
+  "pedir": "ir-e-i", "servir": "ir-e-i", "repetir": "ir-e-i", "vestir": "ir-e-i",
+  "vestirse": "ir-e-i", "conseguir": "ir-e-i", "corregir": "ir-e-i",
+  "elegir": "ir-e-i", "despedir": "ir-e-i", "despedirse": "ir-e-i", "impedir": "ir-e-i",
+  "medir": "ir-e-i", "proseguir": "ir-e-i", "ceñir": "ir-e-i",
+  // en -ir: e → ie (y e → i en pretérito y gerundio)
+  "sentir": "ir-e-ie-i", "sentirse": "ir-e-ie-i", "mentir": "ir-e-ie-i",
+  "arrepentirse": "ir-e-ie-i", "preferir": "ir-e-ie-i", "advertir": "ir-e-ie-i",
+  "convertir": "ir-e-ie-i", "convertirse": "ir-e-ie-i", "divertir": "ir-e-ie-i",
+  "divertirse": "ir-e-ie-i", "requerir": "ir-e-ie-i", "referir": "ir-e-ie-i",
+  "sugerir": "ir-e-ie-i", "herir": "ir-e-ie-i", "inferir": "ir-e-ie-i",
+  "ingerir": "ir-e-ie-i", "concernir": "ir-e-ie-i"
+};
+
+const _ES_ROOT_PAT = {
+  "e-ie": { p: "e", r: "ie", pr: [0, 1, 2, 5], sj: [0, 1, 2, 5], sjv: null, ps: [], psV: null },
+  "o-ue": { p: "o", r: "ue", pr: [0, 1, 2, 5], sj: [0, 1, 2, 5], sjv: null, ps: [], psV: null },
+  "u-ue": { p: "u", r: "ue", pr: [0, 1, 2, 5], sj: [0, 1, 2, 5], sjv: null, ps: [], psV: null },
+  "ir-e-i": { p: "e", r: "i", pr: [0, 1, 2, 5], sj: [0, 1, 2, 3, 4, 5], sjv: "i", ps: [2, 5], psV: "i" },
+  "ir-e-ie-i": { p: "e", r: "ie", pr: [0, 1, 2, 5], sj: [0, 1, 2, 5], sjv: "i", ps: [2, 5], psV: "i" },
+  "ir-o-ue": { p: "o", r: "ue", pr: [0, 1, 2, 5], sj: [0, 1, 2, 5], sjv: "u", ps: [2, 5], psV: "u" }
+};
+
+// Irregulares (raíces). pr/sj/ps/ip pueden ser listas de 6 formas; ps puede ser
+// un tema único (tuve-type) o una lista; fu/cd son temas a los que se añade la
+// terminación correspondiente.
+const _ES_IRR = {
+  ser: {
+    pr: ["soy", "eres", "es", "somos", "sois", "son"],
+    imp: ["era", "eras", "era", "éramos", "erais", "eran"],
+    ps: ["fui", "fuiste", "fue", "fuimos", "fuisteis", "fueron"],
+    fu: "ser", cd: "ser",
+    sj: ["sea", "seas", "sea", "seamos", "seáis", "sean"],
+    ip: [null, "sé", "sea", "seamos", "sed", "sean"],
+    ge: "siendo", pp: "sido"
+  },
+  estar: {
+    pr: ["estoy", "estás", "está", "estamos", "estáis", "están"],
+    imp: ["estaba", "estabas", "estaba", "estábamos", "estabais", "estaban"],
+    ps: ["estuve", "estuviste", "estuvo", "estuvimos", "estuvisteis", "estuvieron"],
+    fu: "estar", cd: "estar",
+    sj: ["esté", "estés", "esté", "estemos", "estéis", "estén"],
+    ip: [null, "está", "esté", "estemos", "estad", "estén"],
+    ge: "estando", pp: "estado"
+  },
+  haber: {
+    pr: ["he", "has", "ha", "hemos", "habéis", "han"],
+    imp: ["había", "habías", "había", "habíamos", "habíais", "habían"],
+    ps: ["hube", "hubiste", "hubo", "hubimos", "hubisteis", "hubieron"],
+    fu: "habr", cd: "habr",
+    sj: ["haya", "hayas", "haya", "hayamos", "hayáis", "hayan"],
+    ip: [null, "he", "haya", "hayamos", "habed", "hayan"],
+    ge: "habiendo", pp: "habido"
+  },
+  ir: {
+    pr: ["voy", "vas", "va", "vamos", "vais", "van"],
+    imp: ["iba", "ibas", "iba", "íbamos", "ibais", "iban"],
+    ps: ["fui", "fuiste", "fue", "fuimos", "fuisteis", "fueron"],
+    fu: "ir", cd: "ir",
+    sj: ["vaya", "vayas", "vaya", "vayamos", "vayáis", "vayan"],
+    ip: [null, "ve", "vaya", "vayamos", "id", "vayan"],
+    ge: "yendo", pp: "ido"
+  },
+  dar: {
+    pr: ["doy", "das", "da", "damos", "dais", "dan"],
+    imp: ["daba", "dabas", "daba", "dábamos", "dabais", "daban"],
+    ps: ["di", "diste", "dio", "dimos", "disteis", "dieron"],
+    fu: "dar", cd: "dar",
+    sj: ["dé", "des", "dé", "demos", "deis", "den"],
+    ip: [null, "da", "dé", "demos", "dad", "den"],
+    ge: "dando", pp: "dado"
+  },
+  tener: {
+    pr: ["tengo", "tienes", "tiene", "tenemos", "tenéis", "tienen"],
+    imp: ["tenía", "tenías", "tenía", "teníamos", "teníais", "tenían"],
+    ps: "tuv", fu: "tendr", cd: "tendr",
+    sj: ["tenga", "tengas", "tenga", "tengamos", "tengáis", "tengan"],
+    ip: [null, "ten", "tenga", "tengamos", "tened", "tengan"],
+    ge: "teniendo", pp: "tenido"
+  },
+  venir: {
+    pr: ["vengo", "vienes", "viene", "venimos", "venís", "vienen"],
+    imp: ["venía", "venías", "venía", "veníamos", "veníais", "venían"],
+    ps: "vin", fu: "vendr", cd: "vendr",
+    sj: ["venga", "vengas", "venga", "vengamos", "vengáis", "vengan"],
+    ip: [null, "ven", "venga", "vengamos", "venid", "vengan"],
+    ge: "viniendo", pp: "venido"
+  },
+  poner: {
+    pr: ["pongo", "pones", "pone", "ponemos", "ponéis", "ponen"],
+    imp: ["ponía", "ponías", "ponía", "poníamos", "poníais", "ponían"],
+    ps: "pus", fu: "pondr", cd: "pondr",
+    sj: ["ponga", "pongas", "ponga", "pongamos", "pongáis", "pongan"],
+    ip: [null, "pon", "ponga", "pongamos", "poned", "pongan"],
+    ge: "poniendo", pp: "puesto"
+  },
+  decir: {
+    pr: ["digo", "dices", "dice", "decimos", "decís", "dicen"],
+    imp: ["decía", "decías", "decía", "decíamos", "decíais", "decían"],
+    ps: "dij", fu: "dir", cd: "dir",
+    sj: ["diga", "digas", "diga", "digamos", "digáis", "digan"],
+    ip: [null, "di", "diga", "digamos", "decid", "digan"],
+    ge: "diciendo", pp: "dicho"
+  },
+  hacer: {
+    pr: ["hago", "haces", "hace", "hacemos", "hacéis", "hacen"],
+    imp: ["hacía", "hacías", "hacía", "hacíamos", "hacíais", "hacían"],
+    ps: ["hice", "hiciste", "hizo", "hicimos", "hicisteis", "hicieron"],
+    fu: "har", cd: "har",
+    sj: ["haga", "hagas", "haga", "hagamos", "hagáis", "hagan"],
+    ip: [null, "haz", "haga", "hagamos", "haced", "hagan"],
+    ge: "haciendo", pp: "hecho"
+  },
+  ver: {
+    pr: ["veo", "ves", "ve", "vemos", "veis", "ven"],
+    imp: ["veía", "veías", "veía", "veíamos", "veíais", "veían"],
+    ps: ["vi", "viste", "vio", "vimos", "visteis", "vieron"],
+    fu: "ver", cd: "ver",
+    sj: ["vea", "veas", "vea", "veamos", "veáis", "vean"],
+    ip: [null, "ve", "vea", "veamos", "ved", "vean"],
+    ge: "viendo", pp: "visto"
+  },
+  traer: {
+    pr: ["traigo", "traes", "trae", "traemos", "traéis", "traen"],
+    imp: ["traía", "traías", "traía", "traíamos", "traíais", "traían"],
+    ps: "traj", fu: "traer", cd: "traer",
+    sj: ["traiga", "traigas", "traiga", "traigamos", "traigáis", "traigan"],
+    ip: [null, "trae", "traiga", "traigamos", "traed", "traigan"],
+    ge: "trayendo", pp: "traído"
+  },
+  saber: {
+    pr: ["sé", "sabes", "sabe", "sabemos", "sabéis", "saben"],
+    imp: ["sabía", "sabías", "sabía", "sabíamos", "sabíais", "sabían"],
+    ps: "sup", fu: "sabr", cd: "sabr",
+    sj: ["sepa", "sepas", "sepa", "sepamos", "sepáis", "sepan"],
+    ip: [null, "sabe", "sepa", "sepamos", "sabed", "sepan"],
+    ge: "sabiendo", pp: "sabido"
+  },
+  poder: {
+    pr: ["puedo", "puedes", "puede", "podemos", "podéis", "pueden"],
+    imp: ["podía", "podías", "podía", "podíamos", "podíais", "podían"],
+    ps: "pud", fu: "podr", cd: "podr",
+    sj: ["pueda", "puedas", "pueda", "podamos", "podáis", "puedan"],
+    ip: [null, "puede", "pueda", "podamos", "poded", "puedan"],
+    ge: "pudiendo", pp: "podido"
+  },
+  querer: {
+    pr: ["quiero", "quieres", "quiere", "queremos", "queréis", "quieren"],
+    imp: ["quería", "querías", "quería", "queríamos", "queríais", "querían"],
+    ps: "quis", fu: "querr", cd: "querr",
+    sj: ["quiera", "quieras", "quiera", "queramos", "queráis", "quieran"],
+    ip: [null, "quiere", "quiera", "queramos", "quered", "quieran"],
+    ge: "queriendo", pp: "querido"
+  },
+  morir: {
+    pr: ["muero", "mueres", "muere", "morimos", "morís", "mueren"],
+    imp: ["moría", "morías", "moría", "moríamos", "moríais", "morían"],
+    ps: ["morí", "moriste", "murió", "morimos", "moristeis", "murieron"],
+    fu: "morir", cd: "morir",
+    sj: ["muera", "mueras", "muera", "muramos", "muráis", "mueran"],
+    ip: [null, "muere", "muera", "muramos", "morid", "mueran"],
+    ge: "muriendo", pp: "muerto"
+  },
+  cocer: {
+    pr: ["cuezo", "cueces", "cuece", "cocemos", "cocéis", "cuecen"],
+    imp: ["cocía", "cocías", "cocía", "cocíamos", "cocíais", "cocían"],
+    ps: ["cocí", "cociste", "coció", "cocimos", "cocisteis", "cocieron"],
+    fu: "cocer", cd: "cocer",
+    sj: ["cueza", "cuezas", "cueza", "cozamos", "cozáis", "cuezan"],
+    ip: [null, "cuece", "cueza", "cozamos", "coced", "cuezan"],
+    ge: "cociendo", pp: "cocido"
+  },
+  torcer: {
+    pr: ["tuerzo", "tuerces", "tuerce", "torcemos", "torcéis", "tuercen"],
+    imp: ["torcía", "torcías", "torcía", "torcíamos", "torcíais", "torcían"],
+    ps: ["torcí", "torciste", "torció", "torcimos", "torcisteis", "torcieron"],
+    fu: "torcer", cd: "torcer",
+    sj: ["tuerca", "tuercas", "tuerca", "torzamos", "torzáis", "tuercan"],
+    ip: [null, "tuerce", "tuerca", "torzamos", "torced", "tuerzan"],
+    ge: "torciendo", pp: "torcido"
+  },
+  salir: {
+    pr: ["salgo", "sales", "sale", "salimos", "salís", "salen"],
+    imp: ["salía", "salías", "salía", "salíamos", "salíais", "salían"],
+    ps: "sal", fu: "saldr", cd: "saldr",
+    sj: ["salga", "salgas", "salga", "salgamos", "salgáis", "salgan"],
+    ip: [null, "sal", "salga", "salgamos", "salid", "salgan"],
+    ge: "saliendo", pp: "salido"
+  },
+  oír: {
+    pr: ["oigo", "oyes", "oye", "oímos", "oís", "oyen"],
+    imp: ["oía", "oías", "oía", "oíamos", "oíais", "oían"],
+    ps: ["oí", "oíste", "oyó", "oímos", "oísteis", "oyeron"],
+    fu: "oír", cd: "oír",
+    sj: ["oiga", "oigas", "oiga", "oigamos", "oigáis", "oigan"],
+    ip: [null, "oye", "oiga", "oigamos", "oíd", "oigan"],
+    ge: "oyendo", pp: "oído"
+  },
+  reír: {
+    pr: ["río", "ríes", "ríe", "reímos", "reís", "ríen"],
+    imp: ["reía", "reías", "reía", "reíamos", "reíais", "reían"],
+    ps: ["reí", "reíste", "rió", "reímos", "reísteis", "rieron"],
+    fu: "reír", cd: "reír",
+    sj: ["ría", "rías", "ría", "riáis", "rían"],
+    ip: [null, "ríe", "ría", "riamos", "reíd", "rían"],
+    ge: "riendo", pp: "reído"
+  },
+  caer: {
+    pr: ["caigo", "caes", "cae", "caemos", "caéis", "caen"],
+    imp: ["caía", "caías", "caía", "caíamos", "caíais", "caían"],
+    ps: ["caí", "caíste", "cayó", "caímos", "caísteis", "cayeron"],
+    fu: "caer", cd: "caer",
+    sj: ["caiga", "caigas", "caiga", "caigamos", "caigáis", "caigan"],
+    ip: [null, "cae", "caiga", "caigamos", "caed", "caigan"],
+    ge: "cayendo", pp: "caído"
+  },
+  andar: {
+    pr: ["ando", "andas", "anda", "andamos", "andáis", "andan"],
+    imp: ["andaba", "andabas", "andaba", "andábamos", "andabais", "andaban"],
+    ps: "anduv", fu: "andar", cd: "andar",
+    sj: ["ande", "andes", "ande", "andemos", "andéis", "anden"],
+    ip: [null, "anda", "ande", "andemos", "andad", "anden"],
+    ge: "andando", pp: "andado"
+  },
+  seguir: {
+    pr: ["sigo", "sigues", "sigue", "seguimos", "seguís", "siguen"],
+    imp: ["seguía", "seguías", "seguía", "seguíamos", "seguíais", "seguían"],
+    ps: ["seguí", "seguiste", "siguió", "seguimos", "seguisteis", "siguieron"],
+    fu: "seguir", cd: "seguir",
+    sj: ["siga", "sigas", "siga", "sigamos", "sigáis", "sigan"],
+    ip: [null, "sigue", "siga", "sigamos", "seguid", "sigan"],
+    ge: "siguiendo", pp: "seguido"
+  },
+  conseguir: {
+    pr: ["consigo", "consigues", "consigue", "conseguimos", "conseguís", "consiguen"],
+    imp: ["conseguía", "conseguías", "conseguía", "conseguíamos", "conseguíais", "conseguían"],
+    ps: ["conseguí", "conseguiste", "consiguió", "conseguimos", "conseguisteis", "consiguieron"],
+    fu: "conseguir", cd: "conseguir",
+    sj: ["consiga", "consigas", "consiga", "consigamos", "consigáis", "consigan"],
+    ip: [null, "consigue", "consiga", "consigamos", "conseguid", "consigan"],
+    ge: "consiguiendo", pp: "conseguido"
+  },
+  perseguir: {
+    pr: ["persigo", "persigues", "persigue", "perseguimos", "perseguís", "persiguen"],
+    imp: ["perseguía", "perseguías", "perseguía", "perseguíamos", "perseguíais", "perseguían"],
+    ps: ["perseguí", "perseguiste", "persiguió", "perseguimos", "perseguisteis", "persiguieron"],
+    fu: "perseguir", cd: "perseguir",
+    sj: ["persiga", "persigas", "persiga", "persigamos", "persigáis", "persigan"],
+    ip: [null, "persigue", "persiga", "persigamos", "perseguid", "persigan"],
+    ge: "persiguiendo", pp: "perseguido"
+  },
+  proseguir: {
+    pr: ["prosigo", "prosigues", "prosigue", "proseguimos", "proseguís", "prosiguen"],
+    imp: ["proseguía", "proseguías", "proseguía", "proseguíamos", "proseguíais", "proseguían"],
+    ps: ["proseguí", "proseguiste", "prosiguió", "proseguimos", "proseguisteis", "prosiguieron"],
+    fu: "proseguir", cd: "proseguir",
+    sj: ["prosiga", "prosigas", "prosiga", "prosigamos", "prosigáis", "prosigan"],
+    ip: [null, "prosigue", "prosiga", "prosigamos", "proseguid", "prosigan"],
+    ge: "prosiguiendo", pp: "proseguido"
+  },
+  adquirir: {
+    pr: ["adquiero", "adquieres", "adquiere", "adquirimos", "adquirís", "adquieren"],
+    imp: ["adquiría", "adquirías", "adquiría", "adquiríamos", "adquiríais", "adquirían"],
+    ps: ["adquirí", "adquiriste", "adquirió", "adquirimos", "adquiristeis", "adquirieron"],
+    fu: "adquirir", cd: "adquirir",
+    sj: ["adquiera", "adquieras", "adquiera", "adquiramos", "adquiráis", "adquieran"],
+    ip: [null, "adquiere", "adquiera", "adquiramos", "adquirid", "adquieran"],
+    ge: "adquiriendo", pp: "adquirido"
+  },
+  bendecir: {
+    pr: ["bendigo", "bendices", "bendice", "bendecimos", "bendecís", "bendicen"],
+    imp: ["bendecía", "bendecías", "bendecía", "bendecíamos", "bendecíais", "bendecían"],
+    ps: ["bendije", "bendijiste", "bendijo", "bendijimos", "bendijisteis", "bendijeron"],
+    fu: "bendecir", cd: "bendecir",
+    sj: ["bendiga", "bendigas", "bendiga", "bendigamos", "bendigáis", "bendigan"],
+    ip: [null, "bendice", "bendiga", "bendigamos", "bendecid", "bendigan"],
+    ge: "bendiciendo", pp: "bendecido"
+  },
+  maldecir: {
+    pr: ["maldigo", "maldices", "maldice", "maldecimos", "maldecís", "maldicen"],
+    imp: ["maldecía", "maldecías", "maldecía", "maldecíamos", "maldecíais", "maldecían"],
+    ps: ["maldije", "maldijiste", "maldijo", "maldijimos", "maldijisteis", "maldijeron"],
+    fu: "maldecir", cd: "maldecir",
+    sj: ["maldiga", "maldigas", "maldiga", "maldigamos", "maldigáis", "maldigan"],
+    ip: [null, "maldice", "maldiga", "maldigamos", "maldecid", "maldigan"],
+    ge: "maldiciendo", pp: "maldecido"
+  },
+  predecir: {
+    pr: ["predigo", "predices", "predice", "predecimos", "predecís", "predicen"],
+    imp: ["predecía", "predecías", "predecía", "predecíamos", "predecíais", "predecían"],
+    ps: ["predije", "predijiste", "predijo", "predijimos", "predijisteis", "predijeron"],
+    fu: "predecir", cd: "predecir",
+    sj: ["prediga", "predigas", "prediga", "predigamos", "predigáis", "predigan"],
+    ip: [null, "predice", "prediga", "predigamos", "predecid", "predigan"],
+    ge: "prediciendo", pp: "predicho"
+  },
+  contradecir: {
+    pr: ["contradigo", "contradices", "contradice", "contradecimos", "contradecís", "contradicen"],
+    imp: ["contradecía", "contradecías", "contradecía", "contradecíamos", "contradecíais", "contradecían"],
+    ps: ["contradije", "contradijiste", "contradijo", "contradijimos", "contradijisteis", "contradijeron"],
+    fu: "contradecir", cd: "contradecir",
+    sj: ["contradiga", "contradigas", "contradiga", "contradigamos", "contradigáis", "contradigan"],
+    ip: [null, "contradice", "contradiga", "contradigamos", "contradecid", "contradigan"],
+    ge: "contradiciendo", pp: "contradicho"
+  },
+  satisfacer: {
+    pr: ["satisfago", "satisfaces", "satisface", "satisfacemos", "satisfacéis", "satisfacen"],
+    imp: ["satisfacía", "satisfacías", "satisfacía", "satisfacíamos", "satisfacíais", "satisfacían"],
+    ps: ["satisfice", "satisfaciste", "satisfizo", "satisficimos", "satisfacisteis", "satisficieron"],
+    fu: "satisfacer", cd: "satisfacer",
+    sj: ["satisfaga", "satisfagas", "satisfaga", "satisfagamos", "satisfagáis", "satisfagan"],
+    ip: [null, "satisface", "satisfaga", "satisfagamos", "satisfaced", "satisfagan"],
+    ge: "satisfaciendo", pp: "satisfecho"
+  }
+};
+
+// Familias: verbo derivado -> raíz irregular (prefijo + forma completa).
+const _ES_FAM = {
+  "mantener": "tener", "contener": "tener", "detener": "tener", "retener": "tener",
+  "entretener": "tener", "sostener": "tener", "obtener": "tener",
+  "convenir": "venir", "devenir": "venir", "intervenir": "venir", "provenir": "venir",
+  "advenir": "venir", "revenir": "venir", "sobrevenir": "venir",
+  "disponer": "poner", "componer": "poner", "imponer": "poner", "proponer": "poner",
+  "suponer": "poner", "oponer": "poner", "exponer": "poner", "descomponer": "poner",
+  "recomponer": "poner", "preponer": "poner",
+  "rehacer": "hacer", "deshacer": "hacer",
+  "atraer": "traer", "distraer": "traer", "extraer": "traer", "sustraer": "traer"
+};
+
+// Participios irregulares de otro modo, por verbo.
+const _ES_PP_IRR = {
+  "proveer": "provisto", "freír": "frito", "romper": "roto", "imprimir": "impreso",
+  "escribir": "escrito", "abrir": "abierto", "cubrir": "cubierto"
+};
+
+// Infinitivos españoles no derivables de las acepciones del diccionario.
+const _ES_INF = {
+  "avoir": "haber", "être": "ser", "aller": "ir", "devenir": "hacerse",
+  "entendre": "oír", "ressortir": "salir", "revenir": "volver",
+  "rougir": "sonrojarse", "cuire": "cocer", "vaincre": "vencer",
+  "coudre": "coser", "confondre": "confundir", "sourire": "sonreír",
+  "rire": "reír", "croire": "creer", "mourir": "morir", "taire": "callar",
+  "fuir": "huir", "suivre": "seguir", "pouvoir": "poder", "savoir": "saber",
+  "vouloir": "querer", "devoir": "deber", "faire": "hacer", "dire": "decir",
+  "venir": "venir", "voir": "ver", "prendre": "tomar", "mettre": "poner",
+  "donner": "dar", "connaître": "conocer", "rendre": "devolver",
+  "attendre": "esperar", "perdre": "perder", "sortir": "salir",
+  "écrire": "escribir", "lire": "leer", "traduire": "traducir",
+  "conduire": "conducir", "produire": "producir", "réduire": "reducir",
+  "détruire": "destruir", "construire": "construir", "appeler": "llamar",
+  "envoyer": "enviar", "contredire": "contradecir", "satisfaire": "satisfacer",
+  "reconnaître": "reconocer", "paraître": "parecer", "apparaître": "aparecer",
+  "disparaître": "desaparecer", "souvenir": "recordar", "pourvoir": "proveer",
+  "grouiller": "hormiguear", "ressembler": "parecerse", "rester": "quedarse",
+  "emporter": "llevarse", "remettre": "poner", "admirer": "admirar"
+};
+
+// Detección ortográfica: palabras claramente no españolas (diptongos y letras
+// que el español no usa) se descartan cuando aparecen en "(de X)".
+const _ES_FRAUD_RX = /(ou|ai|oi|eu|au|eau|ph|gn|ç|œ|qu|ch|é|è|ê|ë|î|ï|û|ù|ö|ü|à|â)/i;
+
+function _swapVowel(stem, from, to) {
+  const idx = stem.lastIndexOf(from);
+  if (idx < 0) return stem;
+  return stem.slice(0, idx) + to + stem.slice(idx + 1);
+}
+
+function _esCells(tense) {
+  const cells = { "1sg": 0, "2sg": 1, "3sg": 2, "1pl": 3, "2pl": 4, "3pl": 5, "1": 0, "2": 1, "3": 2 };
+  const out = [];
+  let m;
+  const rx = /1\s*\/\s*2\s*\/\s*3|\d\s*\/\s*\d?\s*[sp][gl]?|1sg|2sg|3sg|1pl|2pl|3pl/g;
+  const strv = String(tense || "");
+  while ((m = rx.exec(strv))) {
+    for (const p of m[0].split("/")) {
+      const c = cells[p.trim()];
+      if (c !== undefined && !out.includes(c)) out.push(c);
+    }
+  }
+  return out.sort((a, b) => a - b);
+}
+
+// Etiqueta de tiempo francés -> clave interna de conjunción española.
+const _SIMPLE_ES_TENSE = [
+  ["participe présent", "ge"],
+  ["participe passé f. pl", "pp"], ["participe passé f.", "pp"],
+  ["participe passé pl", "pp"], ["participe passé", "pp"],
+  ["participle f. pl", "pp"], ["participle f. sg", "pp"],
+  ["participle m. pl", "pp"], ["participle", "pp"],
+  ["past participle", "pp"], ["participe pl", "pp"], ["participe", "pp"],
+  ["passé simple", "ps"], ["subjonctif", "sj"], ["impératif", "ip"],
+  ["imparfait", "imp"], ["conditionnel", "cd"], ["futur", "fu"],
+  ["présent", "pr"]
+];
+
+function _esTenseKey(label, table) {
+  const L = String(label || "").trim().toLowerCase();
+  for (const [k, v] of table) {
+    if (L === k || L.startsWith(k + " ")) return v;
+  }
+  return null;
+}
+
+function _esPP(esInf) {
+  const base = esInf.endsWith("se") ? esInf.slice(0, -2) : esInf;
+  if (_ES_IRR[base] && _ES_IRR[base].pp) return _ES_IRR[base].pp;
+  if (_ES_PP_IRR[base]) return _ES_PP_IRR[base];
+  if (base.endsWith("uir")) return base.slice(0, -2) + "ido";
+  if (base.endsWith("eer")) return base.slice(0, -2) + "ído";
+  if (base.endsWith("ar")) return base.slice(0, -2) + "ado";
+  if (base.endsWith("er")) return base.slice(0, -2) + "ido";
+  if (base.endsWith("ir")) return base.slice(0, -2) + "ido";
+  return "";
+}
+
+// Terminaciones del pretérito irregular; los temas en -j (dije, traje)
+// toman -eron en la 3.ª del plural.
+function _esPSEndings(stem) {
+  return ["e", "iste", "o", "imos", "isteis", stem.endsWith("j") ? "eron" : "ieron"];
+}
+
+function _esIrrForm(irr, t, i) {
+  if (t === "ge") return irr.ge;
+  if (t === "pp") return irr.pp;
+  if (t === "fu") return irr.fu + ["é", "ás", "á", "emos", "éis", "án"][i];
+  if (t === "cd") return irr.cd + ["ía", "ías", "ía", "íamos", "íais", "ían"][i];
+  const a = irr[t];
+  if (Array.isArray(a)) return a[i] || "";
+  if (t === "ps" && typeof a === "string") {
+    return a + _esPSEndings(a)[i];
+  }
+  return "";
+}
+
+function _esRegForm(esInf, base, t, i) {
+  const cls = base.endsWith("ar") ? "ar" : base.endsWith("er") ? "er" : "ir";
+  const stem = base.slice(0, -2);
+  const pattern = _ES_ROOT_PAT[_ES_ROOTS[base] || _ES_ROOTS[esInf]];
+  if (/(?:acer|ecer|ocer|ucir)$/.test(base)) return _esZcoForm(base, cls, stem, t, i);
+  if (/(?:eer)$/.test(base)) return _esEerForm(base, stem, t, i);
+  if (/(?:uir)$/.test(base) && !/(?:guir|quir)$/.test(base)) return _esUirForm(base, stem, t, i);
+  if (t === "ge") {
+    let s = stem;
+    if (pattern && pattern.ps.length && pattern.psV) s = _swapVowel(stem, pattern.p, pattern.psV);
+    return s + (cls === "ar" ? "ando" : "iendo");
+  }
+  if (t === "pp") return _esPP(esInf);
+  if (t === "fu") return base + _ES_END[cls].fu[i];
+  if (t === "cd") return base + _ES_END[cls].cd[i];
+  if (t === "ip") {
+    if (i === 0) return "";
+    if (i === 1) return _esRegForm(esInf, base, "pr", 2);
+    if (i === 4) return stem + _ES_END[cls].ipd;
+    return _esRegForm(esInf, base, "sj", i);
+  }
+  let s = stem;
+  if (t === "pr" && pattern && pattern.pr.includes(i)) {
+    s = _swapVowel(stem, pattern.p, pattern.r);
+  } else if (t === "sj") {
+    if (pattern && pattern.sj.includes(i)) {
+      s = _swapVowel(stem, pattern.p, pattern.r);
+    } else if (pattern && pattern.sjv) {
+      s = _swapVowel(stem, pattern.p, pattern.sjv);
+    }
+  } else if (t === "ps" && pattern && pattern.ps.length && pattern.ps.includes(i)) {
+    s = _swapVowel(stem, pattern.p, pattern.psV || pattern.r);
+  }
+  // Ortografía: -car/-gar/-zar ante e (pretérito 1.ª sg y subjuntivo),
+  // -ger/-gir (g se muda a j y se mantiene ante todas las vocales).
+  if (t === "ps" && i === 0 && cls === "ar") {
+    if (base.endsWith("car")) return s.slice(0, -1) + "qué";
+    if (base.endsWith("gar")) return s.slice(0, -1) + "gué";
+    if (base.endsWith("zar")) return s.slice(0, -1) + "cé";
+  }
+  if (t === "pr" && i === 0) {
+    if (base.endsWith("ger") || base.endsWith("gir")) s = s.slice(0, -1) + "j";
+  }
+  if (t === "sj") {
+    if (base.endsWith("car")) s = s.slice(0, -1) + "qu";
+    else if (base.endsWith("gar")) s = s.slice(0, -1) + "gu";
+    else if (base.endsWith("zar")) s = s.slice(0, -1) + "c";
+    else if (base.endsWith("ger") || base.endsWith("gir")) s = s.slice(0, -1) + "j";
+  }
+  return s + _ES_END[cls][t][i];
+}
+
+// Verbos en -cer/-cir (aparecer, conocer, producir...): -zco en la 1.ª sg.
+function _esZcoForm(base, cls, stem, t, i) {
+  const zch = stem.slice(0, -1) + "zc";
+  if (t === "pr") {
+    if (i === 0) return stem.slice(0, -1) + "zco";
+    return stem + _ES_END[cls].pr[i];
+  }
+  if (t === "sj") return zch + _ES_END[cls].sj[i];
+  if (t === "ps") {
+    if (base.endsWith("ducir")) { const p = stem.slice(0, -1) + "j"; return p + _esPSEndings(p)[i]; }
+    return stem + _ES_END[cls].ps[i];
+  }
+  if (t === "ge") return stem + (cls === "ar" ? "ando" : "iendo");
+  if (t === "pp") return _esPP(base);
+  if (t === "ip") {
+    if (i === 0) return "";
+    if (i === 1) return stem + _ES_END[cls].pr[2];
+    if (i === 4) return stem + _ES_END[cls].ipd;
+    return zch + _ES_END[cls].sj[i];
+  }
+  if (t === "fu") return base + _ES_END[cls].fu[i];
+  if (t === "cd") return base + _ES_END[cls].cd[i];
+  if (t === "imp") return stem + _ES_END[cls].imp[i];
+  return "";
+}
+
+// Verbos en -uir (construir, huir, destruir...): y cuando le sigue vocal.
+function _esUirForm(base, stem, t, i) {
+  const endings = _ES_END.ir;
+  const Y = [0, 1, 2, 5];
+  if (t === "pr") {
+    if (Y.includes(i)) return stem + "y" + endings.pr[i];
+    return stem + endings.pr[i];
+  }
+  if (t === "sj") return stem + "y" + endings.sj[i];
+  if (t === "ps") {
+    if (i === 2) return stem + "yó";
+    if (i === 5) return stem + "yeron";
+    return stem + endings.ps[i];
+  }
+  if (t === "ge") return stem + "yendo";
+  if (t === "pp") return _esPP(base);
+  if (t === "ip") {
+    if (i === 0) return "";
+    if (i === 1) return stem + "y" + endings.pr[2];
+    if (i === 4) return stem + "id";
+    if (i === 2 || i === 3 || i === 5) return stem + "y" + endings.sj[i];
+    return "";
+  }
+  if (t === "imp") return stem + endings.imp[i];
+  if (t === "fu") return base + endings.fu[i];
+  if (t === "cd") return base + endings.cd[i];
+  return "";
+}
+
+// Verbos en -eer (leer, creer, proveer...): el participio y el pretérito
+// conservan los acentos y la y del hiato.
+function _esEerForm(base, stem, t, i) {
+  const endings = _ES_END.er;
+  if (t === "pr") return stem + endings.pr[i];
+  if (t === "sj") return stem + endings.sj[i];
+  if (t === "imp") return stem + endings.imp[i];
+  if (t === "ps") {
+    if (i === 2 || i === 5) return stem + "y" + (i === 2 ? "ó" : "eron");
+    return stem + ["í", "íste", "", "ímos", "ísteis", ""][i];
+  }
+  if (t === "ge") return stem + "yendo";
+  if (t === "pp") return _esPP(base);
+  if (t === "ip") {
+    if (i === 0) return "";
+    if (i === 1) return stem + endings.pr[2];
+    if (i === 4) return stem + "ed";
+    return stem + endings.sj[i];
+  }
+  if (t === "fu") return base + endings.fu[i];
+  if (t === "cd") return base + endings.cd[i];
+  return "";
+}
+
+function _esFamForm(root, prefix, t, i) {
+  const irr = _ES_IRR[root];
+  if (t === "pp") return prefix + irr.pp;
+  if (t === "ge") return prefix + irr.ge;
+  if (t === "fu") return (prefix + irr.fu) + ["é", "ás", "á", "emos", "éis", "án"][i];
+  if (t === "cd") return (prefix + irr.cd) + ["ía", "ías", "ía", "íamos", "íais", "ían"][i];
+  if (t === "ip") return prefix + (irr.pr[2] || "");
+  const a = irr[t];
+  if (Array.isArray(a)) return prefix + (a[i] || a[0]);
+  if (typeof a === "string") { const s = prefix + a; return s + _esPSEndings(s)[i]; }
+  return "";
+}
+
+function _esSonReirForm(prefix, t, i) {
+  if (t === "pr") return ["sonrío", "sonríes", "sonríe", "sonreímos", "sonreís", "sonríen"][i];
+  if (t === "imp") return ["sonreía", "sonreías", "sonreía", "sonreíamos", "sonreíais", "sonreían"][i];
+  if (t === "ps") return ["sonreí", "sonreíste", "sonrió", "sonreímos", "sonreísteis", "sonrieron"][i];
+  if (t === "sj") return ["sonría", "sonrías", "sonría", "sonriamos", "sonriáis", "sonrían"][i];
+  if (t === "ip") return [null, "sonríe", "sonría", "sonriamos", "sonreíd", "sonrían"][i] || "";
+  if (t === "fu") return "sonreír" + ["é", "ás", "á", "emos", "éis", "án"][i];
+  if (t === "cd") return "sonreír" + ["ía", "ías", "ía", "íamos", "íais", "ían"][i];
+  if (t === "ge") return "sonriendo";
+  if (t === "pp") return "sonreído";
+  return "";
+}
+
+function _esForm(esInf, t, i) {
+  const reflexive = esInf.endsWith("se");
+  let base = reflexive ? esInf.slice(0, -2) : esInf;
+  let form = "";
+  if (base === "sonreír") {
+    form = _esSonReirForm("", t, i);
+  } else if (_ES_FAM[base]) {
+    const root = _ES_FAM[base];
+    const prefix = base.slice(0, base.length - root.length);
+    form = _esFamForm(root, prefix, t, i);
+  } else if (_ES_IRR[base]) {
+    form = _esIrrForm(_ES_IRR[base], t, i);
+  } else {
+    form = _esRegForm(esInf, base, t, i);
+  }
+  if (!form) return "";
+  return reflexive ? _ES_PRON[i] + " " + form : form;
+}
+
+function esConjugado(esInf, frenchTense, cells) {
+  if (!esInf) return [];
+  const key = _esTenseKey(frenchTense, _SIMPLE_ES_TENSE);
+  if (!key) return [];
+  const cs = cells && cells.length ? cells : (key === "ip" ? [1] : key === "ge" || key === "pp" ? [0] : _esCells(frenchTense));
+  const forms = [];
+  for (const c of cs) {
+    const f = _esForm(esInf, key, c);
+    if (f) forms.push(f);
+  }
+  return forms;
+}
+
+const _AUX_TENSE = [
+  ["passé composé", "pr"], ["plus-que-parfait", "imp"],
+  ["passé antérieur", "ps"], ["futur antérieur", "fu"],
+  ["conditionnel passé", "cd"], ["subjonctif passé", "sj"]
+];
+
+function esCompuesto(esInf, label, cells) {
+  if (!esInf) return [];
+  const auxT = _esTenseKey(label, _AUX_TENSE);
+  if (!auxT) return [];
+  const pp = _esPP(esInf);
+  const reflexive = esInf.endsWith("se");
+  const cs = cells && cells.length ? cells : _esCells(label);
+  if (!cs.length) cs.push(0);
+  const forms = [];
+  for (const c of cs) {
+    const aux = _esForm("haber", auxT, c);
+    if (aux) forms.push((reflexive ? "se " : "") + aux + " " + pp);
+  }
+  return forms;
+}
+
+function esInfinitive(frInf, glosses) {
+  const fr = String(frInf || "").toLowerCase();
+  if (_ES_INF[fr]) return _ES_INF[fr];
+  const list = Array.isArray(glosses) ? glosses : [];
+  for (const g of list) {
+    for (const part of String(g).split(/\s*[|]\s*/)) {
+      const p = part.trim();
+      const exact = p.match(/^([a-záéíóúüñà-ú]+(?:se|ar|er|ir))$/i);
+      if (exact) return exact[1];
+      const der = p.match(/\(de\s+([a-záéíóúüñ]+(?:ar|er|ir))\)/i);
+      if (der && !_ES_FRAUD_RX.test(der[1])) return der[1];
+      const eq = p.match(/=\s*([a-záéíóúüñ]+se)\b/i);
+      if (eq && !_ES_FRAUD_RX.test(eq[1])) return eq[1];
+      const any = p.match(/\([^)]*(\b[a-záéíóúüñ]+se)\b[^)]*\)/);
+      if (any && !_ES_FRAUD_RX.test(any[1])) return any[1];
+    }
+  }
+  return null;
+}
+
+// Etiquetas para los tiempos compuestos del francés.
+const _COMPOUND_TENSE_LABEL = {
+  "présent": "passé composé",
+  "imparfait": "plus-que-parfait",
+  "passé simple": "passé antérieur",
+  "futur": "futur antérieur",
+  "conditionnel": "conditionnel passé",
+  "subjonctif": "subjonctif passé"
+};
+const _AUX_INF = new Set(["avoir", "être"]);
+const _NEG_TOKENS = new Set(["pas", "point", "plus", "jamais", "guère", "rien", "personne", "déjà", "encore", "bien", "mal", "même", "beaucoup", "peu", "tant", "trop", "autant"]);
+
+// Etiqueta compuesta correspondiente a una etiqueta simple («présent 3sg» →
+// «passé composé 3sg»), conservando el sufijo de persona.
+function _compoundLabel(tense) {
+  const L = String(tense || "").trim();
+  for (const k in _COMPOUND_TENSE_LABEL) {
+    if (L === k || L.startsWith(k + " ")) return _COMPOUND_TENSE_LABEL[k] + L.slice(k.length);
+  }
+  return null;
+}
+
+export { Dictionary, normalize, friendlyTense, friendlyForm, esInfinitive, esConjugado, esCompuesto };

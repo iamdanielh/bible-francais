@@ -1,4 +1,4 @@
-import { Dictionary, friendlyTense, friendlyForm } from "./dict.js";
+import { Dictionary, friendlyTense, friendlyForm, esInfinitive, esConjugado, esCompuesto } from "./dict.js";
 
 const BOOK_ALIASES = {
   "Évangile selon Matthieu": "Matthieu",
@@ -349,7 +349,7 @@ function presentWord(word, ti, token, sentenceInitial) {
   openPanel("word");
   let grammar = "";
   if (meanings && (info.form || info.infinitive || info.tense)) {
-    grammar = plainGloss(info, meanings[0]);
+    grammar = plainGloss(info, meanings[0], meanings);
   }
   if (!meanings) {
     if (info.isName) {
@@ -937,7 +937,7 @@ const PERSON_DE = {
   "3sg/1sg": "mí / él / ella",
   "2sg/1sg": "mí / ti"
 };
-function plainGloss(info, firstMean) {
+function plainGloss(info, firstMean, glosses) {
   if (!info) return "";
   const form = info.form ? String(info.form) : "";
   if (info.isName && (form === "nombre propio" || !form)) {
@@ -974,6 +974,19 @@ function plainGloss(info, firstMean) {
       }
     }
     if (firstMean) s += " Aquí significa «" + firstMean + "».";
+    // Forma española: conjugada (tiempo simple) o compuesta («haber» + participio).
+    const glossesGiven = Array.isArray(glosses) && glosses.length ? glosses : (firstMean ? [firstMean] : []);
+    const es = esInfinitive(info.infinitive, glossesGiven);
+    const esp = info.compound
+      ? esCompuesto(es, info.tense, info.compound.auxPerson)
+      : esConjugado(es, info.tense);
+    if (esp && esp.length) {
+      s += " En español: «" + esp.join(" o ") + "».";
+    }
+    // Morfología del verbo regular en -er (tema + terminación).
+    if (!info.compound && info.stem && info.group === "er" && info.ending) {
+      s += " Se forma «" + info.stem + "-» + «-" + info.ending + "».";
+    }
     return s;
   }
   if (form === "nombre propio") return "";
@@ -1020,7 +1033,7 @@ function localExplain(text) {
   if (!segs || !segs.length) return "";
   return segs.map(([span, meanings, info]) => {
     const ms = (meanings || []).slice(0, 4);
-    const gloss = plainGloss(info, ms[0] || "");
+    const gloss = plainGloss(info, ms[0] || "", ms);
     let line = '<div class="ai-local-line"><span class="ai-local-word">' + esc(span) + "</span>";
     if (ms.length) {
       line += " = " + ms.map((m, i) => (ms.length > 1 ? (i + 1) + ") " : "") + esc(m)).join(" · ");
