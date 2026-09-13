@@ -8483,6 +8483,8 @@ function _stripElisions(word) {
   return word.replace(/[’']/g, "");
 }
 
+const _IRR_ER_VERBS = new Set(["aller", "envoyer", "renvoyer"]);
+
 function verbInfinitive(word) {
   const f = word.toLowerCase().replace(/[’‘]/g, "'");
   if (_VERB_IRREGULAR[f]) {
@@ -8540,9 +8542,14 @@ const _TENSE_FR = {
   "présent": "presente (algo que ocurre ahora)",
   "imparfait": "pasado incompleto (describía hábitos o acciones en curso)",
   "passé simple": "pasado simple (una acción concreta y terminada)",
+  "passé simple (archaïque)": "pasado simple (una forma antigua que a veces aparece en la Biblia)",
   "futur": "futuro (ocurrirá)",
+  "futur inversion": "futuro (con el verbo invertido, típico de preguntas)",
+  "conditionnel": "condicional (lo que ocurriría si hiciera falta)",
+  "conditionnel clitique": "condicional (con un pronombre unido al verbo)",
   "subjonctif": "subjuntivo (deseo, duda o emoción)",
-  "impératif": "imperativo (una orden)"
+  "impératif": "imperativo (una orden)",
+  "verbe 3e groupe ?": "un verbo del 3.er grupo (irregular)"
 };
 
 const _PARTICIPLE_FR = {
@@ -8550,10 +8557,15 @@ const _PARTICIPLE_FR = {
   "participe": "participio",
   "participle": "participio",
   "participe passé": "participio pasado («-ado / -ido»)",
+  "participe passé pl": "participio pasado, plural («-ados / -adas»)",
+  "participe passé f.": "participio pasado, femenino singular («-ada»)",
+  "participe passé f. pl": "participio pasado, femenino plural («-adas»)",
+  "participe pl": "participio, plural («-ados / -adas»)",
   "participle f. sg": "participio pasado, femenino singular («-ada»)",
   "participle m. pl": "participio pasado, masculino plural («-ados»)",
   "participle f. pl": "participio pasado, femenino plural («-adas»)",
   "participe présent": "participio presente («-ando / -iendo»)",
+  "participe présent f.": "participio presente, femenino («-ando / -iendo»)",
   "participle présent": "participio presente («-ando / -iendo»)"
 };
 
@@ -8564,19 +8576,24 @@ const _PERSON_FR = {
   "1pl": "1.ª persona del plural (nosotros / nosotras)",
   "2pl": "2.ª persona del plural (ustedes)",
   "3pl": "3.ª persona del plural (ellos / ellas)",
-  "1/2sg": "1.ª o 2.ª persona del singular (yo / tú)"
+  "1/2sg": "1.ª o 2.ª persona del singular (yo / tú)",
+  "1/3sg": "1.ª o 3.ª persona del singular (yo / él / ella)",
+  "1sg/2sg": "1.ª o 2.ª persona del singular (yo / tú)",
+  "1sg/3sg": "1.ª o 3.ª persona del singular (yo / él / ella)",
+  "3sg/1sg": "1.ª o 3.ª persona del singular (yo / él / ella)",
+  "2sg/1sg": "1.ª o 2.ª persona del singular (yo / tú)"
 };
 
 function friendlyTense(label) {
   if (!label) return "";
   label = String(label).trim();
-  let person = "";
-  const m = label.match(/\b(1\/2sg|1sg|2sg|3sg|1pl|2pl|3pl)\b/);
-  if (m) {
-    person = _PERSON_FR[m[1]] || m[1];
-    label = label.slice(0, m.index) + label.slice(m.index + m[0].length);
-  }
-  label = label.trim().replace(/^[,;\·\/\s]+|[,;\·\/\s]+$/g, "");
+  const persons = [];
+  label = label.replace(/\b(1\s*\/\s*3sg|1\s*\/\s*2sg|1sg\s*\/\s*2sg|1sg\s*\/\s*3sg|3sg\s*\/\s*1sg|2sg\s*\/\s*1sg|1sg|2sg|3sg|1pl|2pl|3pl)\b/g, (tok) => {
+    const key = tok.replace(/\s+/g, "");
+    persons.push(_PERSON_FR[key] || tok);
+    return "";
+  });
+  label = label.replace(/\s+/g, " ").trim().replace(/^[,;\·\/\s]+|[,;\·\/\s]+$/g, "");
   const names = [];
   for (const part of label.split("/")) {
     const p = part.trim();
@@ -8587,7 +8604,7 @@ function friendlyTense(label) {
     else names.push(p);
   }
   let text = names.length ? names.join(" o ") : label;
-  if (person) text = text ? `${text} · ${person}` : person;
+  if (persons.length) text = text ? `${text} · ${[...new Set(persons)].join(" o ")}` : [...new Set(persons)].join(" o ");
   return text;
 }
 
@@ -8989,12 +9006,16 @@ class Dictionary {
     if (m) candidates.push(word.slice(m[0].length));
     for (const cand of candidates) {
       const res = this._tryDirect(cand, info);
-      if (res) return res;
+      if (res) {
+        this._enrichVerb(cand, info);
+        return res;
+      }
       for (const [inf, tense] of verbInfinitive(cand)) {
         const meanings = this.lookup(inf);
         if (meanings) {
           info.infinitive = inf;
           info.tense = tense || "";
+          info.group = this._verbGroup(cand, inf);
           return [meanings, info];
         }
       }
@@ -9048,6 +9069,24 @@ class Dictionary {
       }
     }
     return null;
+  }
+
+  _verbGroup(cand, inf) {
+    if (/er$/.test(inf) && !/oir$/.test(inf) && !_IRR_ER_VERBS.has(inf)) return "er";
+    if (/ir$/.test(inf) && cand.includes("iss")) return "ir2";
+    return null;
+  }
+
+  _enrichVerb(cand, info) {
+    if (info.infinitive || info.form) return;
+    for (const [inf, tense] of verbInfinitive(cand)) {
+      if (this.lookup(inf)) {
+        info.infinitive = inf;
+        info.tense = tense || "";
+        info.group = this._verbGroup(cand, inf);
+        return;
+      }
+    }
   }
 
   // Adverbs in -ment are formed from an adjective base:

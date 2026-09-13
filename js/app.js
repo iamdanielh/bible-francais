@@ -906,17 +906,36 @@ function aiKeyKind(key) {
 
 // Plain-language, non-technical gloss for a word's grammar. Returns "" when
 // there is nothing interesting to say (plain nouns, adjectives...).
-// The conjugation patterns teach the endings a learner needs to form the tense
-// with any regular verb; irregular verbs share these endings on their stems.
+// Group-specific patterns (present, subjonctif, impératif, passé simple) are
+// only taught for the verb group that actually follows them; -er for first
+// group, -ir with "-iss-" for second group. The other tenses share the same
+// endings across nearly all verbs, so those patterns are universal.
 const TENSE_CONJ = {
-  "présent": "Para conjugar el presente: yo -e, tú -es, él -e, nosotros -ons, vosotros -ez, ellos -ent (en -er); o -is, -is, -it, -issons, -issez, -issent (en -ir).",
+  "présent": "Para conjugar el presente (verbos en -er): yo -e, tú -es, él -e, nosotros -ons, vosotros -ez, ellos -ent.",
+  "présent-ir": "Para conjugar el presente (verbos en -ir como «finir»): yo -is, tú -is, él -it, nosotros -issons, vosotros -issez, ellos -issent.",
   "imparfait": "Para conjugar este pasado: yo -ais, tú -ais, él -ait, nosotros -ions, vosotros -iez, ellos -aient (vale para casi todos los verbos).",
   "futur": "Para conjugar el futuro: yo -ai, tú -as, él -a, nosotros -ons, vosotros -ez, ellos -ont.",
+  "conditionnel": "Para conjugar el condicional: yo -ais, tú -ais, él -ait, nosotros -ions, vosotros -iez, ellos -aient.",
   "passé simple": "Para conjugar este pasado (verbos en -er): yo -ai, tú -as, él -a, nosotros -âmes, vosotros -âtes, ellos -èrent.",
-  "subjonctif": "Para conjugar el subjuntivo: que yo -e, que tú -es, que él -e, que nosotros -ions, que vosotros -iez, que ellos -ent.",
-  "impératif": "Para conjugar el imperativo: tú -e (o -s), nosotros -ons, vosotros -ez.",
-  "participe présent": "El participio presente se forma con la raíz + «-ant» (como «-ando» en español).",
-  "participe passé": "El participio pasado se forma con la raíz + «-é» / «-i» / «-u» (como «-ado / -ido»).",
+  "subjonctif": "Para conjugar el subjuntivo (verbos en -er): que yo -e, que tú -es, que él -e, que nosotros -ions, que vosotros -iez, que ellos -ent.",
+  "impératif": "Para conjugar el imperativo (verbos en -er): tú -e, nosotros -ons, vosotros -ez.",
+  "participe présent": "El participio presente termina en «-ant» (como «-ando» en español).",
+  "participe passé": "El participio pasado termina en «-é», «-i» o «-u» (como «-ado / -ido»).",
+};
+const TENSE_CONJ_GROUPED = new Set(["présent", "subjonctif", "impératif", "passé simple"]);
+const PERSON_DE = {
+  "1sg": "mí",
+  "2sg": "ti",
+  "3sg": "él / ella",
+  "1pl": "nosotros",
+  "2pl": "ustedes",
+  "3pl": "ellos / ellas",
+  "1/2sg": "mí / ti",
+  "1/3sg": "mí / él / ella",
+  "1sg/2sg": "mí / ti",
+  "1sg/3sg": "mí / él / ella",
+  "3sg/1sg": "mí / él / ella",
+  "2sg/1sg": "mí / ti"
 };
 function plainGloss(info, firstMean) {
   if (!info) return "";
@@ -927,19 +946,32 @@ function plainGloss(info, firstMean) {
   if (info.infinitive) {
     let s = "Es el verbo «" + info.infinitive + "»" + (firstMean ? " (" + firstMean + ")" : "") + ".";
     if (info.tense) {
-      const ft = friendlyTense(info.tense);
-      const base = ft.split(" (")[0].trim();
-      const meaning = ft.match(/\(([^()]+)\)/) && ft.match(/\(([^()]+)\)/)[1];
-      const person = (ft.match(/·\s*.*?\(([^()]+)\)\s*$/) || [])[1] || "";
-      let t = " Está en " + base;
-      if (meaning) t += " (" + meaning + ")";
-      if (person) t += ", hablando de " + person;
-      s += t + ".";
-      // Teach the pattern so the learner can conjugate the same tense themself
-      // with any verb (the endings are regular within each tense/group).
       const tstr = String(info.tense).trim().toLowerCase();
-      const conj = Object.keys(TENSE_CONJ).find((k) => tstr.startsWith(k));
-      if (conj) s += " " + TENSE_CONJ[conj];
+      if (tstr.startsWith("verbe 3e groupe")) {
+        s += " Es un verbo del 3.er grupo (irregular), así que su forma se aprende de memoria.";
+      } else {
+        const ft = friendlyTense(info.tense);
+        const base = ft.split(" (")[0].trim();
+        const meaning = ft.match(/\(([^()]+)\)/) && ft.match(/\(([^()]+)\)/)[1];
+        const persons = [...new Set(
+          (String(info.tense).match(/\b(1\s*\/\s*3sg|1\s*\/\s*2sg|1sg\s*\/\s*2sg|1sg\s*\/\s*3sg|3sg\s*\/\s*1sg|2sg\s*\/\s*1sg|1sg|2sg|3sg|1pl|2pl|3pl)\b/g) || [])
+            .map((k) => PERSON_DE[k.replace(/\s+/g, "")] || k)
+        )];
+        let t = " Está en " + base;
+        if (meaning) t += " (" + meaning + ")";
+        if (persons.length) t += ", hablando de " + persons.join(" o ");
+        s += t + ".";
+        // Teach the pattern so the learner can conjugate the same tense themself.
+        // Group-specific patterns only when the verb group actually follows them.
+        const conj = Object.keys(TENSE_CONJ).find((k) => tstr.startsWith(k));
+        if (conj) {
+          if (!TENSE_CONJ_GROUPED.has(conj) || info.group === "er" ||
+              (conj === "présent" && info.group === "ir2")) {
+            const key = conj === "présent" && info.group === "ir2" ? "présent-ir" : conj;
+            s += " " + TENSE_CONJ[key];
+          }
+        }
+      }
     }
     if (firstMean) s += " Aquí significa «" + firstMean + "».";
     return s;
