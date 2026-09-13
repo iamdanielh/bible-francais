@@ -72,7 +72,26 @@ const _CURATED = {
   "famille": "familia", "ami": "amigo", "ennemi": "enemigo",
   "yeux": "ojos", "main": "mano", "pied": "pie", "tête": "cabeza",
   "bouche": "boca", "oreille": "oreja", "montagne": "montaña",
-  "porte": "puerta", "peuple": "pueblo", "chose": "cosa"
+  "porte": "puerta", "peuple": "pueblo", "chose": "cosa",
+  "pièces": "piezas", "entrée": "entrada", "fumée": "humo"
+};
+
+// Accented words whose meaning differs from their accent-stripped twin
+// (où ≠ ou, dès ≠ des, là ≠ la...). normalize() folds the accent away, so
+// these live in a separate index consulted only when the query word itself
+// carries an accent; a French reader tapping "où" gets "donde", never "o / u".
+const _ACCENT_CURATED = {
+  "à": "a / en",
+  "où": "donde",
+  "là": "allí / ahí",
+  "dès": "desde",
+  "très": "muy",
+  "tête": "cabeza",
+  "pièces": "piezas",
+  "sûr": "seguro", "sûs": "sabido", "sût": "supiera (de savoir)",
+  "dû": "debido", "dûs": "debidos", "dût": "debiera (de devoir)",
+  "crû": "crecido (de croître)",
+  "sacré": "sagrado", "sacrée": "sagrada", "sacrés": "sagrados", "sacrées": "sagradas",
 };
 
 // Common French verb infinitives -> Spanish (port of _COMMON_VERBS).
@@ -153,7 +172,8 @@ const _COMMON_VERBS = {
   "commettre": "cometer", "offrir": "ofrecer", "passer": "pasar",
   "annoncer": "anunciar", "tuer": "matar", "obtenir": "obtener / conseguir",
   "attaquer": "atacar", "accorder": "otorgar / conceder",
-  "conduire": "conducir / guiar", "agir": "actuar",
+  "conduire": "conducir / guiar",
+  "traduire": "traducir", "agir": "actuar",
   "affirmer": "afirmar", "situer": "situar / ubicar",
   "signifier": "significar", "consulter": "consultar",
   "accomplir": "cumplir / realizar", "livrer": "entregar",
@@ -495,6 +515,8 @@ const _EXTRA_WORDS = {
   "ça": "eso", "voilà": "he aquí", "voici": "he aquí",
   "deux": "dos", "trois": "tres", "quatre": "cuatro", "cinq": "cinco",
   "lui-même": "él mismo", "elle-même": "ella misma", "eux-mêmes": "ellos mismos",
+  "moi-même": "yo mismo", "toi-même": "tú mismo", "soi-même": "sí mismo",
+  "nous-mêmes": "nosotros mismos", "vous-mêmes": "ustedes mismos",
   "au-dessus": "por encima / arriba", "au-dessous": "por debajo / abajo",
   "au-dedans": "dentro", "au-dehors": "fuera", "dessous": "debajo",
   "dessus": "encima", "autour": "alrededor", "ensemble": "juntos / conjunto",
@@ -7556,6 +7578,7 @@ const _VERB_IRREGULAR = {
   "faisant": ["faire", "participe présent"],
   "alla": ["aller", "passé simple 3sg"], "allait": ["aller", "imparfait 3sg"],
   "ira": ["aller", "futur 3sg"], "vont": ["aller", "présent 3pl"],
+  "allons": ["aller", "présent 1pl"],
   "vint": ["venir", "passé simple 3sg"], "viendra": ["venir", "futur 3sg"],
   "vient": ["venir", "présent 3sg"], "venait": ["venir", "imparfait 3sg"],
   "venez": ["venir", "présent 2pl"], "devenez": ["devenir", "présent 2pl"],
@@ -7571,7 +7594,9 @@ const _VERB_IRREGULAR = {
   "pouvait": ["pouvoir", "imparfait 3sg"], "pourra": ["pouvoir", "futur 3sg"],
   "prit": ["prendre", "passé simple 3sg"], "pris": ["prendre", "participe"],
   "prend": ["prendre", "présent 3sg"], "prennent": ["prendre", "présent 3pl"],
+  "prends": ["prendre", "présent 1sg/2sg"],
   "met": ["mettre", "présent 3sg"], "mit": ["mettre", "passé simple 3sg"],
+  "mets": ["mettre", "présent 1sg/2sg"], "mettez": ["mettre", "présent 2pl"],
   "mettra": ["mettre", "futur 3sg"], "mis": ["mettre", "participe"],
   "croit": ["croire", "présent 3sg"], "croira": ["croire", "futur 3sg"],
   "sait": ["savoir", "présent 3sg"], "savait": ["savoir", "imparfait 3sg"],
@@ -7690,6 +7715,7 @@ const _VERB_IRREGULAR = {
   "faut": ["falloir", "présent 3sg"], "faudra": ["falloir", "futur 3sg"],
   "faudrait": ["falloir", "conditionnel 3sg"],
   "devez": ["devoir", "présent 2pl"], "dois": ["devoir", "présent 1sg/2sg"],
+  "devons": ["devoir", "présent 1pl"],
   "devraient": ["devoir", "conditionnel 3pl"], "devrions": ["devoir", "conditionnel 1pl"],
   "doit": ["devoir", "présent 3sg"],
   "peuvent": ["pouvoir", "présent 3pl"], "pourrez": ["pouvoir", "futur 2pl"],
@@ -8518,11 +8544,13 @@ function verbInfinitive(word) {
     }
   }
   // third-group guesses for forms the -er rule shapes from wrong stems
-  // (rendait -> rendre, atendait -> attendre, sortent -> sortir, ...)
+  // (rendait -> rendre, atendait -> attendre, sortent -> sortir, ...). The
+  // suffix still tells us the tense (rendait is imparfait even for rendre),
+  // so carry the matched -er rule's label instead of the generic "3e groupe".
   const erBase = out.length ? out[0][0].slice(0, -2) : null;
   if (erBase && erBase.length > 3) {
-    out.push([erBase + "ir", "verbe 3e groupe ?"]);
-    out.push([erBase + "re", "verbe 3e groupe ?"]);
+    out.push([erBase + "ir", out[0][1]]);
+    out.push([erBase + "re", out[0][1]]);
   }
   // present participles in -ant (donnant -> donner, contenant -> contenir,
   // servant -> servir): the stem takes -er or -ir depending on the group.
@@ -8539,6 +8567,15 @@ function verbInfinitive(word) {
     if (m) {
       const base = w.slice(0, m.index);
       if (base) out.push([base + "ir", tense]);
+    }
+  }
+  // 3rd-group -ire verbs (lire, conduire, cuire, traduire): the present stem
+  // ends in -is- (lisez, conduisons, cuisent) without the -iss- infix of the
+  // 2nd group; the "ire" infinitive is reached through those stems.
+  for (const [suffix, tense, cut] of [["isons", "présent 1pl", 5], ["isez", "présent 2pl", 4], ["isent", "présent 3pl", 5]]) {
+    if (w.endsWith(suffix)) {
+      const base = w.slice(0, -cut);
+      if (base.length >= 1) out.push([base + "ire", tense]);
     }
   }
   // -re verbs: past participles in -u (attendu -> attendre, rendu -> rendre, ...)
@@ -8724,6 +8761,7 @@ const _PHRASES = {
   "en ce jour-là": "aquel día",
   "en ces jours-là": "en aquellos días",
   "ce jour-là": "aquel día",
+  "jour-là": "ese día",
   "au lever du jour": "al amanecer",
   "à la tombée du jour": "al anochecer",
   "au lever du soleil": "a la salida del sol",
@@ -8939,9 +8977,73 @@ const _PHRASES = {
   "pour les siècles des siècles": "por los siglos de los siglos",
   "arc-en-ciel": "arco iris",
   "messie": "Mesías",
+  // interrogative / demonstrative and kinship idioms
+  "est-ce que": "¿…?",
+  "est-ce": "¿es…?",
+  "n'est-ce pas": "¿no es cierto?",
+  "n'est-ce": "¿no es cierto?",
+  "qu'est-ce que": "¿qué…?",
+  "qu'est-ce": "¿qué?",
+  "qu'est-ce qui": "¿qué…?",
+  "ce qu'il": "lo que",
+  "ce qui": "lo que",
+  "celui-ci": "éste",
+  "celui-là": "ése / aquél",
+  "celle-ci": "ésta",
+  "celle-là": "ésa / aquélla",
+  "ceux-ci": "éstos",
+  "ceux-là": "ésos / aquéllos",
+  "celles-ci": "éstas",
+  "celles-là": "ésas / aquéllas",
+  "beau-père": "suegro", "bel-ami": "buen amigo",
+  "belle-mère": "suegra", "belle-fille": "nuera", "beau-fils": "yerno",
+  "beau-frère": "cuñado", "belle-sœur": "cuñada", "belle-soeur": "cuñada",
+  "grand-père": "abuelo", "grand-mère": "abuela",
+  "grand-parents": "abuelos", "grands-parents": "abuelos",
+  "grand-prêtre": "sumo sacerdote", "grand-prêtres": "sumos sacerdotes",
+  "grand-prêtres": "sumos sacerdotes",
+  "petit-fils": "nieto", "petite-fille": "nieta",
+  "petits-enfants": "nietos", "petites-filles": "nietas",
+  "premier-né": "primogénito", "premiers-nés": "primogénitos",
+  "première-née": "primogénita", "premières-nées": "primogénitas",
+  "très-haut": "Altísimo", "très-grand": "muy grande",
+  "par-dessus": "por encima de", "par-dessus tout": "sobre todo",
+  "au-devant": "delante / al encuentro", "ici-bas": "aquí abajo",
+  "non-juifs": "no judíos", "non-juif": "no judío",
+  "demi-tour": "media vuelta", "demi-tribu": "media tribu",
+  "quelques-uns": "algunos", "quelques-unes": "algunas",
+  "tous les deux": "ambos", "toutes les deux": "ambas",
+  "les deux": "ambos", "l'un et l'autre": "uno y otro",
+  "prêtres-lévites": "sacerdotes levíticos",
+  "bien-aimé": "amado", "bien-aimée": "amada", "bien-aimés": "amados", "bien-aimées": "amadas",
+  "bien-être": "bienestar",
+  "après-midi": "tarde", "après-demain": "pasado mañana",
+  "arrière-petit-fils": "bisnieto", "arrière-petite-fille": "bisnieta",
+  "petits-fils": "nietos", "petites-filles": "nietas",
+  "belles-filles": "nueras", "belles-mères": "suegras",
+  "belles-sœurs": "cuñadas", "belles-soeurs": "cuñadas",
+  "demi-sœur": "hermanastra", "demi-soeur": "hermanastra", "demi-frère": "hermanastro",
+  "mort-né": "natimuerto", "mort-née": "natimuerta",
+  "grand-chose": "gran cosa", "par-dessous": "por debajo de",
+  "nord-est": "noreste", "demi-litre": "medio litro",
+  "elles-mêmes": "ellas mismas",
+  "puis-je": "¿puedo?", "puis-je?": "¿puedo?",
+  "grands-prêtres": "sumos sacerdotes",
+  "sages-femmes": "parteras", "chauves-souris": "murciélagos",
+  "non-chrétiens": "no cristianos", "non-chrétien": "no cristiano",
+  "non-croyants": "incrédulos", "non-croyant": "incrédulo",
+  "par-devant": "delante de",
 };
 
 // ---- Dictionary class -----------------------------------------------------
+// Every word the overlays already teach (curated, common, extra) is resolved
+// correctly on its own; a blind -er/-ir stem guess must never override them.
+const _OVERLAY_KEYS = new Set([
+  ...Object.keys(_CURATED),
+  ...Object.keys(_COMMON_VERBS),
+  ...Object.keys(_COMMON_NOUNS),
+  ...Object.keys(_EXTRA_WORDS),
+].map((k) => normalize(k)));
 class Dictionary {
   constructor(map) {
     this._map = map;
@@ -8950,6 +9052,15 @@ class Dictionary {
     this._accent = new Map();
     for (const [key, val] of Object.entries(map)) {
       this._accent.set(String(key).toLowerCase().replace(/[’‘]/g, "'"), val);
+    }
+    // lay the accent-discriminated glosses over the raw dict (the raw dict
+    // itself has no accented keys, so accented words only ever reach these)
+    for (const [key, gloss] of Object.entries(_ACCENT_CURATED)) {
+      const k = key.toLowerCase().replace(/[’‘]/g, "'");
+      if (!gloss) continue;
+      const arr = this._accent.get(k) || [];
+      if (!arr.includes(gloss)) arr.unshift(gloss);
+      this._accent.set(k, arr);
     }
     // layer curated overlays (mirroring the python __init__ merge)
     for (const [key, val] of Object.entries(_CURATED)) {
@@ -9021,11 +9132,11 @@ class Dictionary {
       // singular noun (été/verano, somme/suma, peu/poco) or a wrong -er stem.
       // L'élision check both the raw surface ("l'avait") and the stripped
       // form ("avait") so elided verb forms resolve to their real verb.
-      for (const morph of new Set([cand, cand.replace(/^[ldqnsjcmt][’']/i, "")])) {
+      for (const morph of new Set([cand, cand.replace(/^(?:qu|jusqu|lorsqu|puisqu|[ldnsjctm])[’']/i, "")])) {
       const known = this._knownVerbForm(morph);
       if (known) {
         const [inf, tense] = known;
-        const vmeanings = this.lookup(inf);
+        const vmeanings = this._preferCurated(this.lookup(inf), inf);
         if (vmeanings) {
           info.infinitive = inf;
           info.tense = tense || "";
@@ -9068,14 +9179,34 @@ class Dictionary {
       const adv = this._tryAdverb(cand, info);
       if (adv) return adv;
     }
-    // hyphenated forms (impératif + pronom, e.g. "dominez-la")
+    // hyphenated forms (impératif + pronom, e.g. "dominez-la"). Only verbs get
+    // the compound label: hyphenated nouns/names (jésus-christ, grand-prêtre,
+    // jour-là) fall through to name/phrase resolution instead.
     if (word.includes("-") && !word.includes(" ")) {
       const left = word.split("-")[0];
-      const [m2, info2] = this.resolve(left);
-      if (m2) {
-        info.form = `«${left}-…» (forma compuesta)`;
-        Object.assign(info, info2);
-        return [m2, info];
+      // The verb side may itself carry an elided pronoun (m'as-tu, n'avez-vous):
+      // check the raw and the elision-stripped form.
+      const leftMorphs = new Set([left, left.replace(/^(?:qu|jusqu|lorsqu|puisqu|[ldnsjctm])[’']/i, "")]);
+      if ([...leftMorphs].some((lm) => verbInfinitive(lm).some(([inf]) => this.lookup(inf)))) {
+        const [m2, info2] = this.resolve(left);
+        if (m2) {
+          info.form = `«${left}-…» (forma compuesta)`;
+          Object.assign(info, info2);
+          return [m2, info];
+        }
+      }
+    }
+    // demonstratives / location compounds built on -là / -ci (ce jour-là,
+    // ces gens-ci): the base word carries the meaning, the suffix the deixis.
+    if (/^(.+)-(là|ci)$/.test(word)) {
+      const mIndex = word.lastIndexOf("-");
+      const base = word.slice(0, mIndex);
+      const sfx = word.slice(mIndex + 1);
+      const [mBase, infoLoc] = this.resolve(base);
+      if (mBase) {
+        info.form = `«${base}…» con «-${sfx}» (${sfx === "là" ? "ese / aquel" : "este"})`;
+        Object.assign(info, infoLoc);
+        return [mBase, info];
       }
     }
     // accent-stripped fallback
@@ -9084,7 +9215,7 @@ class Dictionary {
                         normalize(variant.charAt(0).toUpperCase() + variant.slice(1))];
       for (const v2 of variants) {
         const meanings = this.lookup(v2);
-        if (meanings) return [meanings, info];
+        if (meanings) return [this._preferCurated(meanings, v2), info];
       }
       // last resort: exact accented key in the raw dict (lookup() strips accents)
       const acc = this._accent.get(variant.toLowerCase().replace(/[’‘]/g, "'"));
@@ -9102,14 +9233,20 @@ class Dictionary {
   }
 
   _tryDirect(cand, info) {
+    // Accented words resolve through their accent-preserving meaning first:
+    // "où" is "donde", never the collision-gloss of its twin "ou".
+    if (/[àâäéèêëîïìôöòùûüç]/.test(cand)) {
+      const acc = this._accent.get(cand.toLowerCase().replace(/[’‘]/g, "'"));
+      if (acc) return [acc, info];
+    }
     const m = this.lookup(cand);
-    if (m) return [m, info];
+    if (m) return [this._preferCurated(m, cand), info];
     const sing = Dictionary._singular(cand);
     if (sing !== cand) {
       const meanings = this.lookup(sing);
       if (meanings) {
         info.form = `plural de «${sing}»`;
-        return [meanings, info];
+        return [this._preferCurated(meanings, sing), info];
       }
     }
     return null;
@@ -9131,7 +9268,10 @@ class Dictionary {
 
   _verbGroup(cand, inf) {
     if (/er$/.test(inf) && !/oir$/.test(inf) && !_IRR_ER_VERBS.has(inf)) return "er";
-    if (/ir$/.test(inf) && cand.includes("iss")) return "ir2";
+    // 2nd group only if the form really shows the -iss- infix AND the verb is
+    // a plain -ir verb. «puisse» contains "iss" but pouvoir ends in -oir, so it
+    // is not a 2nd-group -ir verb; only finir/choisir-style verbs qualify.
+    if (!/[ao]ir$/i.test(inf) && cand.includes("iss")) return "ir2";
     return null;
   }
 
@@ -9140,7 +9280,7 @@ class Dictionary {
     // Curated overlay words (me, se, ne, mais, chez...) are already resolved
     // correctly; a blind -er stem guess would degrade them (me -> mer "sea").
     const key = normalize(cand);
-    if (_CURATED[key] || _EXTRA_WORDS[key]) return;
+    if (_CURATED[key] || _EXTRA_WORDS[key] || _OVERLAY_KEYS.has(key)) return;
     for (const [inf, tense] of verbInfinitive(cand)) {
       // -er rules derive "me" -> "m"+"er" -> "mer": only trust stems long
       // enough to be a real verb root.
