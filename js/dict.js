@@ -7616,6 +7616,10 @@ const _VERB_IRREGULAR = {
   "produisant": ["produire", "participe présent"],
   "élu": ["élire", "participe passé"], "élue": ["élire", "participe passé f."],
   "élus": ["élire", "participe passé pl"], "élues": ["élire", "participe passé f. pl"],
+  "mort": ["mourir", "participe passé"], "morte": ["mourir", "participe passé f."],
+  "morts": ["mourir", "participe passé pl"], "mortes": ["mourir", "participe passé f. pl"],
+  "assis": ["asseoir", "participe passé"], "assise": ["asseoir", "participe passé f."],
+  "assises": ["asseoir", "participe passé f. pl"],
   "serve": ["servir", "subjonctif 3sg"], "servent": ["servir", "présent 3pl"],
   "servait": ["servir", "imparfait 3sg"], "servira": ["servir", "futur 3sg"],
   "serviront": ["servir", "futur 3pl"],
@@ -8258,6 +8262,7 @@ const _VERB_IRREGULAR = {
   "naît": ["naître", "présent 3sg"], "naquit": ["naître", "passé simple 3sg"],
   "naquît": ["naître", "subjonctif 3sg"], "né": ["naître", "participe passé"],
   "née": ["naître", "participe passé f."],
+  "nés": ["naître", "participe passé pl"], "nées": ["naître", "participe passé f. pl"],
   "saches": ["savoir", "subjonctif 2sg"], "sachent": ["savoir", "subjonctif 3pl"],
   "sachiez": ["savoir", "subjonctif 2pl"],
   "commit": ["commettre", "passé simple 3sg"], "commirent": ["commettre", "passé simple 3pl"],
@@ -8576,6 +8581,10 @@ function verbInfinitive(word) {
     ["u$", "participe passé"]
   ];
   for (const [re, tense] of _P3) {
+    // Los pronombres «nous»/«vous» no derivan participios aunque terminen en
+    // «ous»/«us» («nous» -> no+ir = noir, «vous» -> vo+ir = voir); el sufijo
+    // «us$» coincide de forma casual y falsea compuestos como «c'est vous».
+    if (w === "nous" || w === "vous") continue;
     const m = new RegExp(re).exec(w);
     if (m) {
       const base = w.slice(0, m.index);
@@ -9386,12 +9395,29 @@ class Dictionary {
         i += 1;
       }
     }
+    // «s'en aller»: el clítico «s'en/m'en/t'en» ante el verbo «aller» hace el
+    // verbo pronominal («s'en vont» → «se van», «je m'en vais» → «me voy»).
+    // Se marca la fila y se funde el clítico en su forma.
+    for (let i = 0; i < out.length; i++) {
+      if (!out[i][2] || out[i][2].infinitive !== "aller") continue;
+      if (!_isEnClitical(out, i)) continue;
+      out[i][0] = String(out[i - 1][0]) + " " + out[i][0];
+      out[i][2].pronominalEn = true;
+      out.splice(i - 1, 1);
+      i--;
+    }
     // Tiempos compuestos: «a parlé», «avait mangé», «est venu»… se unen en una
     // sola unidad «a parlé» con la etiqueta del tiempo compuesto; el participio
     // consumido se elimina de la lista (sigue disponible por palabra en el lector).
     for (let j = 0; j < out.length - 1; j++) {
-      const [, aM, aI] = out[j];
-      if (!aI || !_AUX_INF.has(aI.infinitive)) continue;
+      const [, aM, aI0] = out[j];
+      // La frase «ne sont pas» se comporta como un auxiliar negativo cuando va
+      // seguida de participio («ne sont pas venus» → «no han venido»).
+      const phraseNeg = /^ne sont pas$/i.test(out[j][0]);
+      const aI = (aI0 && _AUX_INF.has(aI0.infinitive))
+        ? aI0
+        : (phraseNeg ? { infinitive: "être", tense: "présent 3pl" } : null);
+      if (!aI) continue;
       const label = _compoundLabel(aI.tense);
       if (!label) continue;
       let k = j + 1;
@@ -9403,8 +9429,11 @@ class Dictionary {
       let pM = pM0;
       // Participios que también son nombres (o cuya forma fem./pl. no trae
       // información de verbo): se reapuntan como participio dentro del compuesto.
+      // «vous»/«nous» caen por la regla «us$» («vo»+"ir" = voir), falsos
+      // positivos: «C'est vous qui…» no es un compuesto.
       if (!pI || pI.infinitive === undefined) {
-        const der = verbInfinitive(pWord).find(([, tp]) => /participe|participle/.test(String(tp)));
+        const der = /^(?:vous|nous)$/i.test(pWord) ? null
+          : verbInfinitive(pWord).find(([, tp]) => /participe|participle/.test(String(tp)));
         if (der && this.lookup(der[0])) {
           pI = { infinitive: der[0], tense: der[1], group: this._verbGroup(pWord, der[0]) };
           pM = this.lookup(der[0]);
@@ -9413,11 +9442,16 @@ class Dictionary {
       if (!pI || pI.infinitive === undefined) continue;
       if (!/(participe passé|participle|past participle)/.test(String(pI.tense))) continue;
       const aWord = out[j][0];
-      // Clítico reflexivo: escrito pegado a la forma («s'est») o como token
-      // suelto con/sin apóstrofo («s'est», «t es», «s est»). Solo es reflexivo
-      // si el auxiliar es «être»; un acusativo ante «avoir» («il m'a vu») no lo es.
-      const reflPrev = j > 0 && /^(?:s['’]?|se|me|m['’]?|te|t['’]?)$/i.test(out[j - 1][0]);
-      const reflexive = aI.infinitive === "être" && (reflPrev || /^(?:s|se|me|te|m|t)['’]/i.test(aWord));
+      const prevTok = j > 0 ? String(out[j - 1][0]) : "";
+      // Clíticos reflexivos: pegados a la forma («s'est»), sueltos con/sin
+      // apóstrofo («s est», «t es»), «nous nous / vous vous» y «s'en/m'en» +
+      // «aller». Solo son reflexivos si el auxiliar es «être»; un acusativo
+      // ante «avoir» («il m'a vu») no lo es.
+      const reflClit = /^(?:s['’]?|se|me|m['’]?|te|t['’]?)$/i.test(prevTok);
+      const doublePron = /^(nous|vous)$/i.test(prevTok) && j > 1 && /^(nous|vous)$/i.test(out[j - 2][0]);
+      const enClit = _isEnClitical(out, j);
+      const reflexive = aI.infinitive === "être" &&
+        (reflClit || doublePron || enClit || /^(?:s|se|me|te|m|t)['’]/i.test(aWord));
       let femAgree = /(?:^|\s)f\.(?: pl)?/.test(String(pI.tense));
       let es0 = esInfinitive(pI.infinitive, pM || aM, (f) => this.lookup(f));
       let esInf = es0 && (reflexive && !es0.endsWith("se") ? es0 + "se" : es0);
@@ -9440,7 +9474,7 @@ class Dictionary {
               pM2 = this.lookup(der2[0]);
             }
           }
-if (pI2 && /(participe passé|participle|past participle)/.test(String(pI2.tense))) {
+          if (pI2 && /(participe passé|participle|past participle)/.test(String(pI2.tense))) {
             passive = true;
             femAgree = /(?:^|\s)f\.(?: pl)?/.test(String(pI2.tense));
             pI = pI2;
@@ -9452,8 +9486,13 @@ if (pI2 && /(participe passé|participle|past participle)/.test(String(pI2.tense
           }
         }
       }
+      // «être + participio» sin sujeto pronominal: perfecto solo para verbos de
+      // movimiento/cambio (incluye «été»); el resto es voz/estado («est cassée»
+      // → «es rota o está rota», «serait puni» → «sería castigado o estaría…»).
+      const stative = aI.infinitive === "être" && pI.infinitive !== "être" &&
+        !reflexive && !_BE_PERFECT_VERBS.has(pI.infinitive);
       out[j] = [
-        aWord + " " + pWord,
+        (phraseNeg ? "ne sont pas " : (enClit && j > 0 ? prevTok + " " : "") + aWord + " ") + pWord,
         pM || aM,
         Object.assign({}, pI, {
           tense: label,
@@ -9462,7 +9501,10 @@ if (pI2 && /(participe passé|participle|past participle)/.test(String(pI2.tense
             auxPerson: _esCells(aI.tense),
             tenseKey: _esTenseKey(label, _AUX_TENSE),
             femAgree,
-            passive,
+            passive: stative ? false : passive,
+            stative,
+            stativeKey: stative ? aI.tense : undefined,
+            neg: phraseNeg || undefined,
             agree: femAgree,
             reflexive,
             esInf
@@ -9471,6 +9513,7 @@ if (pI2 && /(participe passé|participle|past participle)/.test(String(pI2.tense
       ];
       out.splice(k, 1);
       if (extra >= 0) out.splice(extra - 1, 1);
+      if (enClit && j > 0) { out.splice(j - 1, 1); j--; }
     }
     return out;
   }
@@ -10274,18 +10317,32 @@ function _esPPAgree(esInf, fem, pl) {
 
 function esCompuesto(esInf, label, cells, opts) {
   if (!esInf) return [];
-  const auxT = _esTenseKey(label, _AUX_TENSE);
-  if (!auxT) return [];
   const o = opts || {};
-  const reflexive = esInf.endsWith("se");
   const cs = cells && cells.length ? cells : _esCells(label);
   if (!cs.length) cs.push(0);
   const pl = cs.some((c) => c >= 3);
-  const pp = o.passive ? _esPPAgree(esInf, !!o.agree, pl) : _esPP(esInf);
+  const pp = (o.passive || o.stative) ? _esPPAgree(esInf, !!o.agree, pl) : _esPP(esInf);
+  if (o.stative) {
+    // «est cassée» → voz/estado: ser/estar + participio («es rota o está rota»).
+    const key = _esTenseKey(String(o.stativeKey || ""), _SIMPLE_ES_TENSE);
+    if (!key) return [];
+    const forms = [];
+    for (const c of cs) {
+      const s = _esForm("ser", key, c);
+      const e = _esForm("estar", key, c);
+      if (s && e) forms.push((o.neg ? "no " : "") + `${s} ${pp} o ${e} ${pp}`);
+    }
+    return forms;
+  }
+  const auxT = _esTenseKey(label, _AUX_TENSE);
+  if (!auxT) return [];
+  const reflexive = esInf.endsWith("se");
   const forms = [];
   for (const c of cs) {
     const aux = _esForm("haber", auxT, c);
-    if (aux) forms.push((reflexive ? _ES_PRON[c] + " " : "") + aux + (o.passive ? " sido" : "") + " " + pp);
+    if (!aux) continue;
+    const pronoun = reflexive ? _ES_PRON[c] + " " : "";
+    forms.push((o.neg ? "no " : "") + pronoun + aux + (o.passive ? " sido" : "") + " " + pp);
   }
   return forms;
 }
@@ -10347,6 +10404,26 @@ const _COMPOUND_TENSE_LABEL = {
 };
 const _AUX_INF = new Set(["avoir", "être"]);
 const _NEG_TOKENS = new Set(["pas", "point", "plus", "jamais", "guère", "rien", "personne", "déjà", "encore", "bien", "mal", "même", "beaucoup", "peu", "tant", "trop", "autant", "tout", "toute", "toutes", "tous", "très", "si"]);
+
+// Verbos que forman el perfecto con «être» (movimiento / cambio de estado):
+// «est venu» → «ha venido». Los demás con «être + participio» son voz/estado
+// («est cassée» → «es rota o está rota»).
+const _BE_PERFECT_VERBS = new Set([
+  "aller", "venir", "arriver", "partir", "entrer", "sortir", "monter",
+  "descendre", "tomber", "rester", "demeurer", "mourir", "naître",
+  "devenir", "revenir", "retourner", "repartir", "rentrer", "survenir",
+  "parvenir", "advenir", "apparaître", "disparaître", "intervenir",
+  "accourir", "ressusciter", "éclore", "décéder"
+]);
+
+// ¿Es un clítico de «s'en aller»? «s’en/m’en/t’en» ante el verbo, o la
+// secuencia «nous nous/vous vous + en» («nous nous en sommes allés»).
+function _isEnClitical(rows, i) {
+  const prev = i > 0 ? String(rows[i - 1][0]) : "";
+  if (/^(?:s|me|te|m|t)['’]?en$/i.test(prev)) return true;
+  return /^en$/i.test(prev) && i > 2 &&
+    /^(nous|vous)$/i.test(rows[i - 2][0]) && /^(nous|vous)$/i.test(rows[i - 3][0]);
+}
 
 // Etiqueta compuesta correspondiente a una etiqueta simple («présent 3sg» →
 // «passé composé 3sg»), conservando el sufijo de persona.

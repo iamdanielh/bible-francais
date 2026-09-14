@@ -486,9 +486,16 @@ function verbNote(info, withMeaning, glosses) {
   const glossesGiven = (info.compound && info.compound.esInf)
     ? []
     : (Array.isArray(glosses) && glosses.length ? glosses : []);
-  const es = (info.compound && info.compound.esInf) || esInfinitive(inf, glossesGiven, (f) => dictionary.lookup(f));
+  let es = (info.compound && info.compound.esInf) || esInfinitive(inf, glossesGiven, (f) => dictionary.lookup(f));
+  if (info.pronominalEn && es && !es.endsWith("se")) es += "se";
   const esp = info.compound
-    ? esCompuesto(es, info.tense, info.compound.auxPerson, { passive: info.compound.passive, agree: info.compound.agree })
+    ? esCompuesto(es, info.tense, info.compound.auxPerson, {
+        passive: info.compound.passive,
+        agree: info.compound.agree,
+        stative: info.compound.stative,
+        stativeKey: info.compound.stativeKey,
+        neg: info.compound.neg
+      })
     : esConjugado(es, info.tense);
   if (esp && esp.length) parts.push("esp: «" + esp.join(" o ") + "»");
   return parts.join(" · ");
@@ -985,9 +992,16 @@ function plainGloss(info, firstMean, glosses) {
     if (firstMean) s += " Aquí significa «" + firstMean + "».";
     // Forma española: conjugada (tiempo simple) o compuesta («haber» + participio).
     const glossesGiven = Array.isArray(glosses) && glosses.length ? glosses : (firstMean ? [firstMean] : []);
-    const es = (info.compound && info.compound.esInf) || esInfinitive(info.infinitive, glossesGiven, (f) => dictionary.lookup(f));
+    let es = (info.compound && info.compound.esInf) || esInfinitive(info.infinitive, glossesGiven, (f) => dictionary.lookup(f));
+    if (info.pronominalEn && es && !es.endsWith("se")) es += "se";
     const esp = info.compound
-      ? esCompuesto(es, info.tense, info.compound.auxPerson, { passive: info.compound.passive, agree: info.compound.agree })
+      ? esCompuesto(es, info.tense, info.compound.auxPerson, {
+          passive: info.compound.passive,
+          agree: info.compound.agree,
+          stative: info.compound.stative,
+          stativeKey: info.compound.stativeKey,
+          neg: info.compound.neg
+        })
       : esConjugado(es, info.tense);
     if (esp && esp.length) {
       s += " En español: «" + esp.join(" o ") + "».";

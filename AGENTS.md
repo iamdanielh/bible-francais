@@ -45,11 +45,11 @@ En 5.000 versos: 17.119 filas de verbo, 15.815 con español (92,4%), 1.304 sin (
 | A2 | Compuesto sin esInf | **CONFIRMADO**: emparer(10 «s'est emparé de») manifester(8) frapper(5) coucher(4)… (100/2057) | misma causa que A1 |
 | A3 | Participios irregulares no derivables | **CONFIRMADO**: «a été élu» → «ha sido» + «élu» vacío (élire); familia -cevoir no deriva | hace falta regla/entradas en `verbInfinitive`/`_VERB_IRREGULAR` |
 | A4 | Reflexivos con elisión pegada | **OK en corpus**: s'est(61) m'est(13) t'es(4) t'est(3) → todos bien | solo falla escrito suelto «s est»/«t es» (texto a mano), impacto mínimo |
-| A5 | être perfecto vs pasiva | CONFIRMADO manual («est cassée»→«ha roto») pero frecuencia baja + riesgo alto; NO abordar ahora | — |
-| A6 | nous nous / vous vous reflexivos | CONFIRMADO; trade-off deliberado aceptado | — |
-| A7 | s'en vont / m'en vais | CONFIRMADO; no abordar (en) | — |
+| A5 | être perfecto vs pasiva | **HECHO** (lote A5–A8): movimiento→perfecto, resto→«ser o estar» estativo | — |
+| A6 | nous nous / vous vous reflexivos | **HECHO**: fundidos ante être | — |
+| A7 | s'en vont / m'en vais | **HECHO**: clítico «en» fusionado (`pronominalEn`) | — |
 | A8 | Frase fija que roba aux («ne sont pas»→«no son», 71 versos) | CONFIRMADO; aceptable/debatible | — |
-| A9 | tout/si/très rompen el merge («a tout mangé») | CONFIRMADO manual; raro en corpus (8/5000, casi todos adjetivos) | fix barato |
+| A9 | tout/si/très rompen el merge («a tout mangé») | **HECHO** (lote A6): «ne sont pas»/«a tout mangé» se fusionan igual | — |
 | A10 | Tiempos imposibles (impératif passé, surcomposé) | silencio esperado | — |
 
 ## BATCH 1 — HECHO (commit de más abajo)
@@ -83,6 +83,28 @@ cuir/soufre… son sustantivos sin acepción verbal en el diccionario (no es pro
   impératif passé / passé surcomposé (A10).
 - Cobertura de glosas del diccionario en sí (verbos sin entrada: p.ej. frapper→tiene entrada,
   pero hay otros sin ninguna → dependerá de añadir entradas de diccionario, no de código).
+
+## LOTE A5–A8 — HECHO
+
+**«être + participio» sin sujeto pronominal** (cadena de la parte derecha del merge A2):
+- Movimiento/cambio → **perfecto**: `_BE_PERFECT_VERBS` (~10345, Set). «il est venu»→«ha venido»,
+  «elle est morte»→«ha muerto», «étaient venus»→«habían venido» (no erosiona la base).
+- Resto → **estativo/pasiva** (ser y estar en el tiempo simple, concordancia con `agree`):
+  «est cassée»→«es rota o está rota», «furent achevés»→«fueron terminados o estuvieron
+  terminados», «sera puni»→«será castigado o estará castigado», «ait été vengé»→«haya sido
+  o esté vengado» (glosa « o », prefijo «no » si `neg`).
+- Perífrasis negativa **«ne sont pas»**: fila-frase → aux être 3pl sintetizado, `compound.neg`
+  («ne sont pas venus»→«no han venido»; cobertura sube 44 versos más).
+- Clítico **«en»** de «s'en aller»: pasada previa fusiona «aller»+«en» pegando `pronominalEn`
+  («s'en vont»→«se van», «nous nous en allons»→«nos vamos»); en el merge el clítico se
+  funde en el compuesto («s'en est allée»→«se ha ido»).
+- «nous nous / vous vous» ante être → reflexivo («nous nous sommes levés»→«nos hemos levantado»).
+- Guard `_P3`: «nous»/«vous» no derivan participios («nous»→noir, «vous»→voir) — dos falsos
+  compuestos en 5.000 quitados.
+- Participios irregulares añadidos (V_I): né(s)/née(s)→naître, mort(e)(s)→mourir, assis(es)→asseoir.
+
+**Medido** (corpus, 5.000 versos): compuestos rotos 3 → **2** (noyer/ligure: sustantivos
+mal-etiquetados, gap de diccionario); fullregress **1580/0**; es-brainer/segtest/plaingloss OK.
 
 ## Historial
 
