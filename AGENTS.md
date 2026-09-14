@@ -86,7 +86,7 @@ cuir/soufre… son sustantivos sin acepción verbal en el diccionario (no es pro
 
 ## Historial
 
-- (próximo) — *BATCH 1*: cobertura española 99,3% (sin español 1304→122; compuestos rotos 100→3).
+- `afe836e` — *BATCH 1*: cobertura española 99,3% (sin español 1304→122; compuestos rotos 100→3).
 - `47b5ca0` — concordancia de número en pasivas («hemos sido salvados»): base actual.
 - `50433cb` — pasivas, participios fem/pl desnudos, PP irregulares españoles, pronombres reflexivos por persona.
 - `b8eeea1` — derivación inversa de glossas conjugadas + compuestos reflexivos + separador de glosas « / ».
