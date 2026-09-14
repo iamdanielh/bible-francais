@@ -7614,6 +7614,8 @@ const _VERB_IRREGULAR = {
   "produit": ["produire", "participe passé / 3sg"],
   "produise": ["produire", "subjonctif 3sg"],
   "produisant": ["produire", "participe présent"],
+  "élu": ["élire", "participe passé"], "élue": ["élire", "participe passé f."],
+  "élus": ["élire", "participe passé pl"], "élues": ["élire", "participe passé f. pl"],
   "serve": ["servir", "subjonctif 3sg"], "servent": ["servir", "présent 3pl"],
   "servait": ["servir", "imparfait 3sg"], "servira": ["servir", "futur 3sg"],
   "serviront": ["servir", "futur 3pl"],
@@ -8583,6 +8585,12 @@ function verbInfinitive(word) {
       }
     }
   }
+  // participios en -çu/-çue/-çus/-çues de la familia «-cevoir» (apercevoir,
+  // recevoir, percevoir, concevoir, décevoir): la base queda cerrada en -e-.
+  for (const [re, tense] of [["çues$", "participe passé f. pl"], ["çue$", "participe passé f."], ["çus$", "participe passé pl"], ["çu$", "participe passé"]]) {
+    const m = new RegExp(re).exec(w);
+    if (m && m.index >= 1) out.push([w.slice(0, m.index) + "cevoir", tense, m[0]]);
+  }
   // -ir verbs
   for (const [re, tense] of _IR_RULES) {
     const m = new RegExp(re).exec(w);
@@ -9405,10 +9413,13 @@ class Dictionary {
       if (!pI || pI.infinitive === undefined) continue;
       if (!/(participe passé|participle|past participle)/.test(String(pI.tense))) continue;
       const aWord = out[j][0];
-      const reflPrev = j > 0 && /^(?:s['’]|se|me|m['’]|te|t['’])$/i.test(out[j - 1][0]);
-      const reflexive = reflPrev || /^s['’]|^se\b|^me\b|^te\b|^m['’]|^t['’]/i.test(aWord);
+      // Clítico reflexivo: escrito pegado a la forma («s'est») o como token
+      // suelto con/sin apóstrofo («s'est», «t es», «s est»). Solo es reflexivo
+      // si el auxiliar es «être»; un acusativo ante «avoir» («il m'a vu») no lo es.
+      const reflPrev = j > 0 && /^(?:s['’]?|se|me|m['’]?|te|t['’]?)$/i.test(out[j - 1][0]);
+      const reflexive = aI.infinitive === "être" && (reflPrev || /^(?:s|se|me|te|m|t)['’]/i.test(aWord));
       let femAgree = /(?:^|\s)f\.(?: pl)?/.test(String(pI.tense));
-      let es0 = esInfinitive(pI.infinitive, pM || aM);
+      let es0 = esInfinitive(pI.infinitive, pM || aM, (f) => this.lookup(f));
       let esInf = es0 && (reflexive && !es0.endsWith("se") ? es0 + "se" : es0);
       let passive = false;
       let extra = -1;
@@ -9435,7 +9446,7 @@ if (pI2 && /(participe passé|participle|past participle)/.test(String(pI2.tense
             pI = pI2;
             pWord = pWord + " " + p2Word;
             pM = pM2;
-            es0 = esInfinitive(pI2.infinitive, pM2 || aM);
+            es0 = esInfinitive(pI2.infinitive, pM2 || aM, (f) => this.lookup(f));
             esInf = es0 && (reflexive && !es0.endsWith("se") ? es0 + "se" : es0);
             extra = k2;
           }
@@ -9885,7 +9896,11 @@ const _ES_INF = {
   "reconnaître": "reconocer", "paraître": "parecer", "apparaître": "aparecer",
   "disparaître": "desaparecer", "souvenir": "recordar", "pourvoir": "proveer",
   "grouiller": "hormiguear", "ressembler": "parecerse", "rester": "quedarse",
-  "emporter": "llevarse", "remettre": "poner", "admirer": "admirar"
+  "emporter": "llevarse", "remettre": "poner", "admirer": "admirar",
+  "concevoir": "concebir", "toucher": "tocar",
+  "dîner": "cenar", "diner": "cenar", "accoucher": "parir",
+  "conseiller": "aconsejar", "braiser": "estofar",
+  "tapir": "agazaparse", "gare": "aparcar"
 };
 
 // Detección ortográfica: palabras claramente no españolas (diptongos y letras
@@ -10275,33 +10290,50 @@ function esCompuesto(esInf, label, cells, opts) {
   return forms;
 }
 
-function esInfinitive(frInf, glosses) {
+function esInfinitive(frInf, glosses, lookup) {
   const fr = String(frInf || "").toLowerCase();
   if (_ES_INF[fr]) return _ES_INF[fr];
-  const list = Array.isArray(glosses) ? glosses : [];
-  for (const g of list) {
-    for (const part of String(g).split(/\s*(?:\/|\|)\s*/)) {
-      const p = part.trim();
-      const exact = p.match(/^([a-záéíóúüñà-ú]+(?:se|ar|er|ir))$/i);
-      if (exact) return exact[1];
-      const der = p.match(/\(de\s+([a-záéíóúüñ]+(?:ar|er|ir))\)/i);
-      if (der && !_ES_FRAUD_RX.test(der[1])) return der[1];
-      const eq = p.match(/=\s*([a-záéíóúüñ]+se)\b/i);
-      if (eq && !_ES_FRAUD_RX.test(eq[1])) return eq[1];
-      const any = p.match(/\([^)]*(\b[a-záéíóúüñ]+se)\b[^)]*\)/);
-      if (any && !_ES_FRAUD_RX.test(any[1])) return any[1];
+  const from = (list) => {
+    // Primero: la glosa contiene directamente un infinitivo («encontrar»), un
+    // «(de X)», un «= Xse» o un Xse entre paréntesis.
+    for (const g of list) {
+      for (const part of String(g).split(/\s*(?:\/|\|)\s*/)) {
+        const p = part.trim();
+        const exact = p.match(/^([a-záéíóúüñà-ú]+(?:se|ar|er|ir))$/i);
+        if (exact) return exact[1];
+        const der = p.match(/\(de\s+([a-záéíóúüñ]+(?:ar|er|ir))\)/i);
+        if (der && !_ES_FRAUD_RX.test(der[1])) return der[1];
+        const eq = p.match(/=\s*([a-záéíóúüñ]+se)\b/i);
+        if (eq && !_ES_FRAUD_RX.test(eq[1])) return eq[1];
+        const any = p.match(/\([^)]*(\b[a-záéíóúüñ]+se)\b[^)]*\)/);
+        if (any && !_ES_FRAUD_RX.test(any[1])) return any[1];
+        // Infinitivo seguido de paréntesis («apoderarse (s'emparer)»,
+        // «exclamar (s'écrier)»): se prueba al final, tras las marcas «= Xse».
+        const pre = p.match(/^([a-záéíóúüñà-ú]+(?:se|ar|er|ir))\s*\(/i);
+        if (pre && !_ES_FRAUD_RX.test(pre[1])) return pre[1];
+        // Perífrasis «volver a + infinitivo» («volver a ver», «ir a buscar»).
+        const per = p.match(/^[a-záéíóúüñà-ú]+(?:ar|er|ir)\s+a\s+([a-záéíóúüñà-ú]+(?:ar|er|ir))$/i);
+        if (per && !_ES_FRAUD_RX.test(per[1])) return per[1];
+      }
     }
-  }
-  // Último recurso: la glosa es una forma conjugada («hablo», «amaba», «siento»);
-  // se vuelve a su infinitivo comprobando qué verbo conocido produce esa forma.
-  for (const g of list) {
-    for (const tok of String(g).toLowerCase().split(/[^a-záéíóúüñ]+/i)) {
-      if (tok.length < 3 || /(se|ar|er|ir)$/i.test(tok)) continue;
-      const back = _esBackderive(tok);
-      if (back) return back;
+    // Último recurso: la glosa es una forma conjugada («hablo», «amaba»,
+    // «siento»); se vuelve a su infinitivo comprobando qué verbo conocido
+    // produce esa forma.
+    for (const g of list) {
+      for (const tok of String(g).toLowerCase().split(/[^a-záéíóúüñ]+/i)) {
+        if (tok.length < 3 || /(se|ar|er|ir)$/i.test(tok)) continue;
+        const back = _esBackderive(tok);
+        if (back) return back;
+      }
     }
-  }
-  return null;
+    return null;
+  };
+  // Las acepciones del token suelen ser del sustantivo («rencontré» →
+  // «Reunión…»); la glosa del infinitivo francés (lookup) trae el verbo y se
+  // prueba después.
+  return from(Array.isArray(glosses) ? glosses : [])
+    || (typeof lookup === "function" ? from(Array.isArray(lookup(fr)) ? lookup(fr) : []) : null)
+    || null;
 }
 
 // Etiquetas para los tiempos compuestos del francés.
@@ -10314,7 +10346,7 @@ const _COMPOUND_TENSE_LABEL = {
   "subjonctif": "subjonctif passé"
 };
 const _AUX_INF = new Set(["avoir", "être"]);
-const _NEG_TOKENS = new Set(["pas", "point", "plus", "jamais", "guère", "rien", "personne", "déjà", "encore", "bien", "mal", "même", "beaucoup", "peu", "tant", "trop", "autant"]);
+const _NEG_TOKENS = new Set(["pas", "point", "plus", "jamais", "guère", "rien", "personne", "déjà", "encore", "bien", "mal", "même", "beaucoup", "peu", "tant", "trop", "autant", "tout", "toute", "toutes", "tous", "très", "si"]);
 
 // Etiqueta compuesta correspondiente a una etiqueta simple («présent 3sg» →
 // «passé composé 3sg»), conservando el sufijo de persona.

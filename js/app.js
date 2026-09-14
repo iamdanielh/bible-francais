@@ -486,7 +486,7 @@ function verbNote(info, withMeaning, glosses) {
   const glossesGiven = (info.compound && info.compound.esInf)
     ? []
     : (Array.isArray(glosses) && glosses.length ? glosses : []);
-  const es = (info.compound && info.compound.esInf) || esInfinitive(inf, glossesGiven);
+  const es = (info.compound && info.compound.esInf) || esInfinitive(inf, glossesGiven, (f) => dictionary.lookup(f));
   const esp = info.compound
     ? esCompuesto(es, info.tense, info.compound.auxPerson, { passive: info.compound.passive, agree: info.compound.agree })
     : esConjugado(es, info.tense);
@@ -985,7 +985,7 @@ function plainGloss(info, firstMean, glosses) {
     if (firstMean) s += " Aquí significa «" + firstMean + "».";
     // Forma española: conjugada (tiempo simple) o compuesta («haber» + participio).
     const glossesGiven = Array.isArray(glosses) && glosses.length ? glosses : (firstMean ? [firstMean] : []);
-    const es = (info.compound && info.compound.esInf) || esInfinitive(info.infinitive, glossesGiven);
+    const es = (info.compound && info.compound.esInf) || esInfinitive(info.infinitive, glossesGiven, (f) => dictionary.lookup(f));
     const esp = info.compound
       ? esCompuesto(es, info.tense, info.compound.auxPerson, { passive: info.compound.passive, agree: info.compound.agree })
       : esConjugado(es, info.tense);
