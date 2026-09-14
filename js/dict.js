@@ -9452,7 +9452,7 @@ if (pI2 && /(participe passé|participle|past participle)/.test(String(pI2.tense
             tenseKey: _esTenseKey(label, _AUX_TENSE),
             femAgree,
             passive,
-            agree: passive && femAgree,
+            agree: femAgree,
             reflexive,
             esInf
           }
@@ -10266,7 +10266,7 @@ function esCompuesto(esInf, label, cells, opts) {
   const cs = cells && cells.length ? cells : _esCells(label);
   if (!cs.length) cs.push(0);
   const pl = cs.some((c) => c >= 3);
-  const pp = _esPPAgree(esInf, !!o.agree, o.agree ? pl : false);
+  const pp = o.passive ? _esPPAgree(esInf, !!o.agree, pl) : _esPP(esInf);
   const forms = [];
   for (const c of cs) {
     const aux = _esForm("haber", auxT, c);
