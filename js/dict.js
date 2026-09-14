@@ -8564,6 +8564,25 @@ function verbInfinitive(word) {
       out.push([base + "ir", "participe présent", "ant"]);
     }
   }
+  // participles of 3rd group verbs whose fem./pl. forms don't fit the -er/-ir
+  // patterns («partie» -> partir, «souvenu» -> se souvenir, «guérie» -> guérir,
+  // «revenues» -> revenir). Guesses; only real dictionary stems survive lookup.
+  const _P3 = [
+    ["ies$", "participle f. pl"], ["ue$", "participle f. sg"],
+    ["ues$", "participle f. pl"], ["us$", "participle m. pl"],
+    ["ie$", "participle f. sg"], ["is$", "participle m. pl"],
+    ["u$", "participe passé"]
+  ];
+  for (const [re, tense] of _P3) {
+    const m = new RegExp(re).exec(w);
+    if (m) {
+      const base = w.slice(0, m.index);
+      if (base.length >= 2) {
+        out.push([base + "ir", tense, m[0]]);
+        out.push([base + "re", tense, m[0]]);
+      }
+    }
+  }
   // -ir verbs
   for (const [re, tense] of _IR_RULES) {
     const m = new RegExp(re).exec(w);
@@ -9370,12 +9389,13 @@ class Dictionary {
       let k = j + 1;
       while (k < out.length && _NEG_TOKENS.has(out[k][0])) k++;
       if (k >= out.length) continue;
-      const [pWord, pM0] = out[k];
+      const [pWord0, pM0] = out[k];
+      let pWord = pWord0;
       let pI = out[k][2];
       let pM = pM0;
+      // Participios que también son nombres (o cuya forma fem./pl. no trae
+      // información de verbo): se reapuntan como participio dentro del compuesto.
       if (!pI || pI.infinitive === undefined) {
-        // Participios regulares en -er («a parlé») que también son nombres:
-        // se reapuntan como participio solo dentro del tiempo compuesto.
         const der = verbInfinitive(pWord).find(([, tp]) => /participe|participle/.test(String(tp)));
         if (der && this.lookup(der[0])) {
           pI = { infinitive: der[0], tense: der[1], group: this._verbGroup(pWord, der[0]) };
@@ -9387,8 +9407,40 @@ class Dictionary {
       const aWord = out[j][0];
       const reflPrev = j > 0 && /^(?:s['’]|se|me|m['’]|te|t['’])$/i.test(out[j - 1][0]);
       const reflexive = reflPrev || /^s['’]|^se\b|^me\b|^te\b|^m['’]|^t['’]/i.test(aWord);
-      const es0 = esInfinitive(pI.infinitive, pM || aM);
-      const esInf = es0 && (reflexive && !es0.endsWith("se") ? es0 + "se" : es0);
+      let femAgree = /(?:^|\s)f\.(?: pl)?/.test(String(pI.tense));
+      let es0 = esInfinitive(pI.infinitive, pM || aM);
+      let esInf = es0 && (reflexive && !es0.endsWith("se") ? es0 + "se" : es0);
+      let passive = false;
+      let extra = -1;
+      if (pI.infinitive === "être") {
+        // «été» es el participio de «être», no el sustantivo «verano»: se usa la
+        // glosa del verbo; si además le sigue otro participio, es una pasiva
+        // («a été mangé» -> «ha sido comido»).
+        pM = this.lookup("être");
+        const k2 = k + 1;
+        if (k2 < out.length) {
+          const [p2Word, pM20] = out[k2];
+          let pI2 = out[k2][2];
+          let pM2 = pM20;
+          if (!pI2 || pI2.infinitive === undefined) {
+            const der2 = verbInfinitive(p2Word).find(([, tp]) => /participe|participle/.test(String(tp)));
+            if (der2 && this.lookup(der2[0])) {
+              pI2 = { infinitive: der2[0], tense: der2[1], group: this._verbGroup(p2Word, der2[0]) };
+              pM2 = this.lookup(der2[0]);
+            }
+          }
+if (pI2 && /(participe passé|participle|past participle)/.test(String(pI2.tense))) {
+            passive = true;
+            femAgree = /(?:^|\s)f\.(?: pl)?/.test(String(pI2.tense));
+            pI = pI2;
+            pWord = pWord + " " + p2Word;
+            pM = pM2;
+            es0 = esInfinitive(pI2.infinitive, pM2 || aM);
+            esInf = es0 && (reflexive && !es0.endsWith("se") ? es0 + "se" : es0);
+            extra = k2;
+          }
+        }
+      }
       out[j] = [
         aWord + " " + pWord,
         pM || aM,
@@ -9398,13 +9450,16 @@ class Dictionary {
             aux: aWord,
             auxPerson: _esCells(aI.tense),
             tenseKey: _esTenseKey(label, _AUX_TENSE),
-            femAgree: /(?:^|\s)f\.(?: pl)?/.test(String(pI.tense)),
+            femAgree,
+            passive,
+            agree: passive && femAgree,
             reflexive,
             esInf
           }
         })
       ];
       out.splice(k, 1);
+      if (extra >= 0) out.splice(extra - 1, 1);
     }
     return out;
   }
@@ -9803,7 +9858,12 @@ const _ES_FAM = {
 // Participios irregulares de otro modo, por verbo.
 const _ES_PP_IRR = {
   "proveer": "provisto", "freír": "frito", "romper": "roto", "imprimir": "impreso",
-  "escribir": "escrito", "abrir": "abierto", "cubrir": "cubierto"
+  "escribir": "escrito", "abrir": "abierto", "cubrir": "cubierto",
+  "volver": "vuelto", "devolver": "devuelto", "resolver": "resuelto",
+  "absolver": "absuelto", "disolver": "disuelto", "envolver": "envuelto",
+  "hacer": "hecho", "deshacer": "deshecho", "satisfacer": "satisfecho",
+  "decir": "dicho", "poner": "puesto", "ver": "visto", "morir": "muerto",
+  "ser": "sido", "estar": "estado"
 };
 
 // Infinitivos españoles no derivables de las acepciones del diccionario.
@@ -9909,9 +9969,15 @@ function _esFormsTable() {
 function _esBackderive(tok) {
   const t = String(tok || "").toLowerCase().trim();
   if (!t) return null;
-  const v = _esFormsTable().get(t);
-  if (v) return v;
-  if (t.endsWith("se")) return _esFormsTable().get(t.slice(0, -2)) || null;
+  const table = _esFormsTable();
+  const tries = [t];
+  if (t.endsWith("s")) tries.push(t.slice(0, -1));
+  if (t.endsWith("a")) tries.push(t.slice(0, -1) + "o");
+  if (t.endsWith("e")) tries.push(t.slice(0, -1) + "o");
+  for (const cand of tries) {
+    if (table.has(cand)) return table.get(cand);
+    if (cand.endsWith("se") && table.has(cand.slice(0, -2))) return table.get(cand.slice(0, -2));
+  }
   return null;
 }
 
@@ -10184,18 +10250,27 @@ const _AUX_TENSE = [
   ["conditionnel passé", "cd"], ["subjonctif passé", "sj"]
 ];
 
-function esCompuesto(esInf, label, cells) {
+function _esPPAgree(esInf, fem, pl) {
+  let pp = _esPP(esInf);
+  if (fem) pp = pp.endsWith("o") ? pp.slice(0, -1) + "a" : pp;
+  if (pl) pp += "s";
+  return pp;
+}
+
+function esCompuesto(esInf, label, cells, opts) {
   if (!esInf) return [];
   const auxT = _esTenseKey(label, _AUX_TENSE);
   if (!auxT) return [];
-  const pp = _esPP(esInf);
+  const o = opts || {};
   const reflexive = esInf.endsWith("se");
   const cs = cells && cells.length ? cells : _esCells(label);
   if (!cs.length) cs.push(0);
+  const pl = cs.some((c) => c >= 3);
+  const pp = _esPPAgree(esInf, !!o.agree, o.agree ? pl : false);
   const forms = [];
   for (const c of cs) {
     const aux = _esForm("haber", auxT, c);
-    if (aux) forms.push((reflexive ? "se " : "") + aux + " " + pp);
+    if (aux) forms.push((reflexive ? _ES_PRON[c] + " " : "") + aux + (o.passive ? " sido" : "") + " " + pp);
   }
   return forms;
 }

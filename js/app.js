@@ -488,7 +488,7 @@ function verbNote(info, withMeaning, glosses) {
     : (Array.isArray(glosses) && glosses.length ? glosses : []);
   const es = (info.compound && info.compound.esInf) || esInfinitive(inf, glossesGiven);
   const esp = info.compound
-    ? esCompuesto(es, info.tense, info.compound.auxPerson)
+    ? esCompuesto(es, info.tense, info.compound.auxPerson, { passive: info.compound.passive, agree: info.compound.agree })
     : esConjugado(es, info.tense);
   if (esp && esp.length) parts.push("esp: «" + esp.join(" o ") + "»");
   return parts.join(" · ");
@@ -987,7 +987,7 @@ function plainGloss(info, firstMean, glosses) {
     const glossesGiven = Array.isArray(glosses) && glosses.length ? glosses : (firstMean ? [firstMean] : []);
     const es = (info.compound && info.compound.esInf) || esInfinitive(info.infinitive, glossesGiven);
     const esp = info.compound
-      ? esCompuesto(es, info.tense, info.compound.auxPerson)
+      ? esCompuesto(es, info.tense, info.compound.auxPerson, { passive: info.compound.passive, agree: info.compound.agree })
       : esConjugado(es, info.tense);
     if (esp && esp.length) {
       s += " En español: «" + esp.join(" o ") + "».";
