@@ -3880,7 +3880,9 @@ const _BIBLE_WORDS = {
   "scintillant": "centelleante",
   "paraissaient": "parecían (de paraître)",
   "alerter": "alertar",
-  "immobilisé": "inmovilizado",
+  "immobilisé": "inmovilizado", "immobiliser": "inmovilizar",
+  "intéresser": "interesar", "emprunter": "pedir prestado / tomar prestado",
+  "efforcer": "esforzarse", "advenir": "suceder / acontecer", "rayer": "rayar / tachar",
   "monstrueuses": "monstruosas",
   "plaintives": "lastimeras",
   "retrouvai": "volví a encontrar (de retrouver)",
@@ -7651,7 +7653,8 @@ const _VERB_IRREGULAR = {
   "eu": ["avoir", "participe passé"], "eurent": ["avoir", "passé simple 3pl"],
   "eus": ["avoir", "passé simple 1sg"], "aurez": ["avoir", "futur 2pl"],
   "aurai": ["avoir", "futur 1sg"], "auront": ["avoir", "futur 3pl"],
-  "aurons": ["avoir", "futur 1pl"], "aie": ["avoir", "subjonctif 1sg"],
+  "aurons": ["avoir", "futur 1pl"], "aurions": ["avoir", "conditionnel 1pl"],
+  "auriez": ["avoir", "conditionnel 2pl"], "aie": ["avoir", "subjonctif 1sg"],
   "ayant": ["avoir", "participe présent"],
   "veux": ["vouloir", "présent 1sg/2sg"], "voulez": ["vouloir", "présent 2pl"],
   "voulut": ["vouloir", "passé simple 3sg"], "voulurent": ["vouloir", "passé simple 3pl"],
@@ -7942,10 +7945,12 @@ const _VERB_IRREGULAR = {
   "guérit": ["guérir", "présent 3sg / passé simple 3sg"], "guéri": ["guérir", "participe passé"],
   "réjouit": ["réjouir", "présent 3sg / passé simple 3sg"], "réjoui": ["réjouir", "participe passé"],
   "aperçut": ["apercevoir", "passé simple 3sg"], "aperçurent": ["apercevoir", "passé simple 3pl"],
-  "aperçoit": ["apercevoir", "présent 3sg"],
+  "aperçoit": ["apercevoir", "présent 3sg"], "aperçois": ["apercevoir", "présent 1sg / 2sg"],
+  "reçois": ["recevoir", "présent 1sg / 2sg"],
   "fallait": ["falloir", "imparfait 3sg"], "faudra": ["falloir", "futur 3sg"],
   "entendra": ["entendre", "futur 3sg"],
   "reviendra": ["revenir", "futur 3sg"], "reviendront": ["revenir", "futur 3pl"], "reviendrais": ["revenir", "conditionnel 1sg/3sg"],
+  "adviendra": ["advenir", "futur 3sg"], "adviendraient": ["advenir", "conditionnel 3pl"],
   "interviendra": ["intervenir", "futur 3sg"], "interviendrait": ["intervenir", "conditionnel 3sg"],
   "réduit": ["réduire", "participe passé / présent 3sg"], "réduira": ["réduire", "futur 3sg"],
   "reconstruira": ["reconstruire", "futur 3sg"], "reconstruirai": ["reconstruire", "futur 1sg"],
@@ -8004,6 +8009,7 @@ const _VERB_IRREGULAR = {
   "voulais": ["vouloir", "imparfait 1sg/2sg"], "voulait": ["vouloir", "imparfait 3sg"],
   "rendront": ["rendre", "futur 3pl"], "rendrai": ["rendre", "futur 1sg"],
   "secourra": ["secourir", "futur 3sg"], "recouvrit": ["recouvrir", "passé simple 3sg"],
+  "secours": ["secourir", "présent 1sg / 2sg"], "rayons": ["rayer", "présent 1pl"],
   "recouvrirent": ["recouvrir", "passé simple 3pl"], "accueilli": ["accueillir", "participe passé"],
   "accueillis": ["accueillir", "participe passé pl"], "exclu": ["exclure", "participe passé"],
   "exclue": ["exclure", "participe passé f."], "exclus": ["exclure", "participe passé pl"],
@@ -8060,6 +8066,7 @@ const _VERB_IRREGULAR = {
   "monterait": ["monter", "conditionnel 3sg"], "montera": ["monter", "futur 3sg"],
   "tombez": ["tomber", "présent 2pl"], "tombons": ["tomber", "présent 1pl"],
   "appelle": ["appeler", "présent 1sg/3sg"],
+  "appelles": ["appeler", "présent 2sg"],
   "appellent": ["appeler", "présent 3pl"], "appela": ["appeler", "passé simple 3sg"],
   "souleva": ["soulever", "passé simple 3sg"], "soulève": ["soulever", "présent 1sg/3sg"],
   "jeta": ["jeter", "passé simple 3sg"], "jetèrent": ["jeter", "passé simple 3pl"],
@@ -8151,7 +8158,7 @@ const _VERB_IRREGULAR = {
   "tenez": ["tenir", "présent 2pl"], "tenant": ["tenir", "participe présent"],
   "prenant": ["prendre", "participe présent"], "prenais": ["prendre", "imparfait 1/2sg"],
   "apprennent": ["apprendre", "présent 3pl"], "apprenant": ["apprendre", "participe présent"],
-  "apprenez": ["apprendre", "présent 2pl"],
+  "apprenez": ["apprendre", "présent 2pl"], "apprends": ["apprendre", "présent 1sg / 2sg"],
   "comprenez": ["comprendre", "présent 2pl"], "comprends": ["comprendre", "présent 1sg/2sg"],
   "renvoie": ["renvoyer", "présent 1sg/3sg"],
   "composait": ["composer", "imparfait 3sg"], "compose": ["composer", "présent 1sg/3sg"],
@@ -8340,6 +8347,7 @@ const _VERB_IRREGULAR = {
   "voudrai": ["vouloir", "futur 1sg"], "voudrons": ["vouloir", "futur 1pl"],
   "entrepris": ["entreprendre", "participe passé"], "entreprise": ["entreprendre", "participe passé f."],
   "maudira": ["maudire", "futur 3sg"], "maudirent": ["maudire", "passé simple 3pl"],
+  "maudis": ["maudire", "présent 1sg / 2sg"],
   "maudit": ["maudire", "participe passé / présent 3sg"],
   "cuira": ["cuire", "futur 3sg"], "cuirons": ["cuire", "futur 1pl"],
   "cuirez": ["cuire", "futur 2pl"], "cuiront": ["cuire", "futur 3pl"],
@@ -8513,6 +8521,9 @@ const _ER_RULES = [
   ["eront$", "futur 3pl"], ["erons$", "futur 1pl"],
   ["erez$", "futur 2pl"], ["eras$", "futur 2sg"],
   ["era$", "futur 3sg"], ["erai$", "futur 1sg"],
+  ["eraient$", "conditionnel 3pl"], ["eriez$", "conditionnel 2pl"],
+  ["erions$", "conditionnel 1pl"], ["erait$", "conditionnel 3sg"],
+  ["erais$", "conditionnel 1/2sg"],
   ["aient$", "imparfait 3pl"], ["iez$", "imparfait 2pl"],
   ["ions$", "imparfait 1pl"], ["ait$", "imparfait 3sg"],
   ["ais$", "imparfait 1/2sg"],
@@ -8530,6 +8541,9 @@ const _IR_RULES = [
   ["issant$", "participle"], ["ie?nt$", "présent 3pl"],
   ["issent$", "présent 3pl"],
   ["issaient$", "imparfait 3pl"], ["issait$", "imparfait 3sg"], ["issais$", "imparfait 1/2sg"],
+  ["iraient$", "conditionnel 3pl"], ["iriez$", "conditionnel 2pl"],
+  ["irions$", "conditionnel 1pl"], ["irait$", "conditionnel 3sg"],
+  ["irais$", "conditionnel 1/2sg"],
   ["iront$", "futur 3pl"], ["irez$", "futur 2pl"], ["irons$", "futur 1pl"],
   ["ira$", "futur 3sg"], ["irai$", "futur 1sg"], ["iras$", "futur 2sg"],
   ["issons$", "présent 1pl"], ["issez$", "présent 2pl"],
@@ -9100,10 +9114,136 @@ const _PHRASES = {
   "non-chrétiens": "no cristianos", "non-chrétien": "no cristiano",
   "non-croyants": "incrédulos", "non-croyant": "incrédulo",
   "par-devant": "delante de",
+  "grand-route": "carretera principal", "contre-attaque": "contraataque",
+  "guet-apens": "emboscada", "petite-nièce": "sobrina nieta",
+  "arrière-pensée": "segunda intención", "arrière-pensées": "segundas intenciones",
+  "avant-garde": "vanguardia", "avant-mur": "antemuro / barbacana",
+  "haut-pays": "tierras altas", "bas-pays": "tierras bajas",
+  "nord-ouest": "noroeste", "sud-ouest": "suroeste",
+  "là-dessus": "encima de eso / sobre eso", "par-derrière": "por detrás",
+  "arrière-trains": "cuartos traseros / ancas", "demi-cercle": "semicírculo",
+  "demi-heure": "media hora", "demi-livre": "medio litro", "demi-mort": "medio muerto",
+  "nouveau-nés": "recién nacidos", "avant-postes": "puestos avanzados",
+  "nu-pieds": "descalzo", "main-forte": "ayuda / apoyo",
+  "toute-puissance": "omnipotencia", "palmier-dattier": "palmera datilera",
+  "pots-de-vin": "sobornos", "chefs-sacrés": "jefes sagrados / príncipes consagrados",
+  "grand-peine": "gran esfuerzo", "dieu-roi": "dios-rey", "dieu-étoile": "dios-astro",
+  "non-civilisés": "no civilizados", "non-circoncis": "no circuncisos",
+  "contre-cœur": "de mala gana", "contre-coeur": "de mala gana",
+  "à contre-cœur": "de mala gana / a regañadientes",
 };
 
+// ---- French number words -> Spanish -----------------------------------------
+// French cardinals compose with hyphens (soixante-quinze, quatre-vingt-dix-neuf)
+// and with "et" (vingt et un). Each token must be purely numeric for the
+// resolver to fire: otherwise "quatre" alone is a determiner, "cent" a noun, etc.
+const _FR_NUM = {
+  zéro: 0, un: 1, une: 1, deux: 2, trois: 3, quatre: 4, cinq: 5,
+  six: 6, sept: 7, huit: 8, neuf: 9, dix: 10, onze: 11, douze: 12,
+  treize: 13, quatorze: 14, quinze: 15, seize: 16,
+  vingt: 20, vingts: 20, trente: 30, quarante: 40, cinquante: 50,
+  soixante: 60, cent: 100, cents: 100, mille: 1000, mille: 1000,
+};
+const _FR_ORD = {
+  unième: "un", deuxième: "deux", second: "deux", troisième: "trois",
+  quatrième: "quatre", cinquième: "cinq", sixième: "six", septième: "sept",
+  huitième: "huit", neuvième: "neuf", dixième: "dix", onzième: "onze",
+  douzième: "douze", treizième: "treize", quatorzième: "quatorze",
+  quinzième: "quinze", seizième: "seize", vingtième: "vingt",
+  trentième: "trente", quarantième: "quarante", cinquantième: "cinquante",
+  soixantième: "soixante", centième: "cent", millième: "mille",
+};
+// index = cardinal value (0..99); ordinal tens beyond 19 are folded below
+const _ES_CARD = {
+  0: "cero", 1: "uno", 2: "dos", 3: "tres", 4: "cuatro", 5: "cinco",
+  6: "seis", 7: "siete", 8: "ocho", 9: "nueve", 10: "diez", 11: "once",
+  12: "doce", 13: "trece", 14: "catorce", 15: "quince", 16: "dieciséis",
+  17: "diecisiete", 18: "dieciocho", 19: "diecinueve", 20: "veinte",
+  21: "veintiuno", 22: "veintidós", 23: "veintitrés", 24: "veinticuatro",
+  25: "veinticinco", 26: "veintiséis", 27: "veintisiete", 28: "veintiocho",
+  29: "veintinueve", 30: "treinta", 40: "cuarenta", 50: "cincuenta",
+  60: "sesenta", 70: "setenta", 80: "ochenta", 90: "noventa",
+};
+const _ES_ORD = {
+  1: "primero", 2: "segundo", 3: "tercero", 4: "cuarto", 5: "quinto",
+  6: "sexto", 7: "séptimo", 8: "octavo", 9: "noveno", 10: "décimo",
+  11: "undécimo", 12: "duodécimo", 13: "decimotercero", 14: "decimocuarto",
+  15: "decimoquinto", 16: "decimosexto", 17: "decimoséptimo", 18: "decimoctavo",
+  19: "decimonoveno", 20: "vigésimo", 30: "trigésimo", 40: "cuadragésimo",
+  50: "quincuagésimo", 60: "sexagésimo", 70: "septuagésimo",
+  80: "octogésimo", 90: "nonagésimo", 100: "centésimo",
+};
+const _ES_HUND = {
+  2: "doscientos", 3: "trescientos", 4: "cuatrocientos", 5: "quinientos",
+  6: "seiscientos", 7: "setecientos", 8: "ochocientos", 9: "novecientos",
+};
+function _esCardinal(n) {
+  if (n <= 99) {
+    const t = Math.floor(n / 10) * 10;
+    if (n === t && _ES_CARD[t] !== undefined) return _ES_CARD[t];
+    if (n <= 29) return _ES_CARD[n];
+    return _ES_CARD[t] + " y " + _ES_CARD[n - t];
+  }
+  if (n < 1000) {
+    const h = Math.floor(n / 100), r = n % 100;
+    if (h === 1) return r === 0 ? "cien" : "ciento " + _esCardinal(r);
+    return _ES_HUND[h] + (r ? " " + _esCardinal(r) : "");
+  }
+  const m = Math.floor(n / 1000), r = n % 1000;
+  const mw = m === 1 ? "mil" : _esCardinal(m) + " mil";
+  return r ? mw + " " + _esCardinal(r) : mw;
+}
+function _esOrdinal(n) {
+  if (n <= 19) return _ES_ORD[n];
+  if (n <= 99) {
+    const t = Math.floor(n / 10) * 10, u = n % 10;
+    const tw = _ES_ORD[t] || _esCardinal(t);
+    return u ? tw + " " + _ES_ORD[u] : tw;
+  }
+  if (n < 1000) {
+    const h = Math.floor(n / 100);
+    return h === 1 ? "centésimo" + (n % 100 ? " " + _esOrdinal(n % 100) : "")
+      : _ES_ORD[h];
+  }
+  return "milésimo";
+}
+function _frNumberEs(word) {
+  const low = word.toLowerCase().replace(/,/g, "");
+  const parts = low.split(/[\s-]+/).filter(Boolean);
+  if (!parts.length) return null;
+  // every part must be numeric (or the "et" conjunction, or an ordinal stem)
+  const values = [];
+  let ordinal = false;
+  for (let i = 0; i < parts.length; i++) {
+    let p = parts[i];
+    if (p === "et" || p === "'") continue;
+    if (p === "premier" || p === "première") { ordinal = true; values.push(1); continue; }
+    const ord = _FR_ORD[p];
+    if (ord) { ordinal = true; p = ord; }
+    const v = _FR_NUM[p];
+    if (v === undefined) return null;
+    values.push(v);
+  }
+  if (!values.length) return null;
+  let total = 0, cur = 0;
+  for (let i = 0; i < values.length; i++) {
+    const v = values[i];
+    if (v === 100 || v === 1000) {
+      cur = (cur === 0 ? 1 : cur) * v;
+      if (v === 1000) { total += cur; cur = 0; }
+    } else if (v === 20 && cur === 4) {
+      cur = 80; // quatre-vingt: 4 × 20
+    } else {
+      cur += v;
+    }
+  }
+  const num = total + cur;
+  if (num === 0 && !/zéro/.test(low)) return null;
+  const es = ordinal ? _esOrdinal(num) : _esCardinal(num);
+  return es === undefined ? null : es;
+}
+
 // ---- Dictionary class -----------------------------------------------------
-// Every word the overlays already teach (curated, common, extra) is resolved
 // correctly on its own; a blind -er/-ir stem guess must never override them.
 const _OVERLAY_KEYS = new Set([
   ...Object.keys(_CURATED),
@@ -9233,6 +9373,14 @@ class Dictionary {
         this._enrichVerb(cand, info);
         return res;
       }
+      // French cardinal/ordinal numbers (hyphenated «soixante-quinze», ordinal
+      // «vingt-septième»): only fire when the whole token is numeric so common
+      // words like «quatre»/«cent»/«mille» keep their normal senses.
+      const num = _frNumberEs(cand);
+      if (num) {
+        info.form = "número";
+        return [[num], info];
+      }
       let _vbFallback = null;
       // The derivational verb guesser is single-token only: multi-word segments
       // would hallucinate false verbs («effet mille» -> «effet miller»). Real
@@ -9275,7 +9423,12 @@ class Dictionary {
       // The verb side may itself carry an elided pronoun (m'as-tu, n'avez-vous):
       // check the raw and the elision-stripped form.
       const leftMorphs = new Set([left, left.replace(/^(?:qu|jusqu|lorsqu|puisqu|[ldnsjctm])[’']/i, "")]);
-      if ([...leftMorphs].some((lm) => verbInfinitive(lm).some(([inf]) => this.lookup(inf)))) {
+      const verbMorph = (lm) =>
+        verbInfinitive(lm).some(([inf]) => this.lookup(inf)) ||
+        // conjugated forms that only exist as flat overlay glosses
+        // («querrás (de vouloir)») carry the infinitive in a parenthetical.
+        Boolean((this.lookup(lm) || []).some((g) => /\(de[^()]*\)/.test(g)));
+      if ([...leftMorphs].some(verbMorph)) {
         const [m2, info2] = this.resolve(left);
         if (m2) {
           info.form = `«${left}-…» (forma compuesta)`;

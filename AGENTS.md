@@ -134,6 +134,34 @@ Implementado:
   traduire; cuire (cuira/cuirons/cuirez/cuiront); sentions→sentir imparfait 1pl.
   (El audit no los encontraba porque no había regla de derivación para -ire futur.)
 
+## LOTE C (resolver numérico FR→ES + compuestos con guion + verbos+clítico) — HECHO
+
+**Medido** (es-audit, 5.000 versos): filas de verbo 17.183 con español 17.183 (**100%**, 0 sin);
+compuestos 2.092, **0** rotos; fullregress **172/0**; es-brainer(38)/segtest(32)/
+plaingloss(38)/accent-scan(35)/elide(44)/scan OK. Escaneo de TODA la Biblia: los únicos
+tokens con guion sin resolver que quedan son nombres de persona/lugar en minúscula
+(i.e. `obed-édom` a mitad de verso) — reales, se aceptan como no-resueltos.
+
+Implementado:
+- **C1** Resolver numérico FR→ES (`_frNumberEs` + `_esCardinal`/`_esOrdinal`, ~9105, antes de
+  la clase): números con guion («soixante-quinze»→setenta y cinco), compuestos
+  («quatre-vingt-dix-neuf»→noventa y nueve, regla 4×20), ordinales («vingt-septième»→
+  vigésimo séptimo), «et» («quatre et un»→cuarenta y uno), cientos/miles («quatre mille»).
+  Se dispara en `resolve()` tras `_tryDirect` (solo si todo el token es numérico).
+- **C2** `segment()` ya resuelve «œufs»/«œuvre», pero el scan separaba `œ`/`’`; compuestos
+  reales con guion curados en `_EXTRA_WORDS`: grand-route, contre-attaque, guet-apens,
+  contre-cœur, là-dessus, demi-*, nouveau-nés, pots-de-vin, nu-pieds, main-forte,
+  palmier-dattier, toute-puissance, nord/sud-ouest, dieu-roi/dieu-étoile, etc.
+- **C3** Verbos+clítico con guion («maudis-le», «reçois-les», «appelles-tu»,
+  «empêcherait-il», «adviendra-t-il», «secours-nous»): la puerta de `resolve()` (forma
+  compuesta) ahora acepta también glosas planas con `(de verbo)` Y `_ER_RULES`/`_IR_RULES`
+  añaden condicionales (`erait$`, `iraient$`, …). Verbos faltantes al diccionario:
+  immobiliser, intéresser, emprunter, efforcer, advenir, rayer.
+- **C4** `_VERB_IRREGULAR` añadidos: maudis, reçois, apprends, appelles, aperçois,
+  aurions/auriez, adviendra, secours, rayons.
+- **C5** Nombres con guion en minúscula («d’Obed-Édom») → `isName` con form «nombre propio»
+  (el scan los cuenta como no-resueltos aunque la app los pinta bien; son reales).
+
 ## Historial
 
 - `afe836e` — *BATCH 1*: cobertura española 99,3% (sin español 1304→122; compuestos rotos 100→3).
@@ -142,3 +170,4 @@ Implementado:
 - `b8eeea1` — derivación inversa de glossas conjugadas + compuestos reflexivos + separador de glosas « / ».
 - `c2794ec` — conjugación española en popups y fusión de tiempos compuestos.
 - `fe4d9d8` — *LOTE B*: verbo vs sustantivo homónimo, futur -ire, cobertura 100%.
+- `425159a` — AGENTS.md: verificación + arquitectura + veredictos A1/A2 + LOTE B.
