@@ -212,6 +212,18 @@ Implementado:
   (injurièrent), accroître (accroîtront/accroissait), assiéger (assiégeant), adopter
   (adoptera), arriver (arrivât), instruire (instruisit).
 
+## LOTE D2 (cifras y tokens punteados) — HECHO
+
+`segment()` **descartaba enteramente los tokens de solo dígitos** (`!/^\d+$/`)
+→ «3 017 kilos» pintaba solo «kilos»; ahora las cifras se conservan y se traducen a
+español por `_esCardinal` («1 100 000» → «mil cien mil», «1 290» → «mil doscientos
+noventa»), por lo que cada número del corpus aparece en el panel de selección.
+Además: glosa para `ouailles`/`kilo`/`gramme(s)`, y la elipsis `…` (U+2026) se añadió
+al recorte de puntuación de `segment()` (había ~31 versos con palabra+`…` que daba
+nulos). Verificación: escaneo `segment()` de TODA la Biblia (30.742 versos) →
+**0 tokens con significado nulo**; suite completa verde (fullregress 172, es-audit
+17.245 filas verbo 100%, compuestos 2.102 rotos 0).
+
 ## Historial
 
 - `afe836e` — *BATCH 1*: cobertura española 99,3% (sin español 1304→122; compuestos rotos 100→3).
@@ -222,4 +234,4 @@ Implementado:
 - `fe4d9d8` — *LOTE B*: verbo vs sustantivo homónimo, futur -ire, cobertura 100%.
 - `425159a` — AGENTS.md: verificación + arquitectura + veredictos A1/A2 + LOTE B.
 - `e79f758` — *LOTE C*: resolver numérico FR→ES + compuestos con guion + verbos con clítico.
-- *(próximo)* — *LOTE D*: huecos reales del corpus a cero (reglas ai/isse + entradas de diccionario + V_I).
+- `b06ca69` — *LOTE D*: huecos reales del corpus a cero (reglas ai/isse + entradas de diccionario + V_I).

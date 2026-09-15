@@ -3967,6 +3967,8 @@ const _BIBLE_WORDS = {
   "affectueuse": "afectuosa", "imposition": "imposición",
   "exhortation": "exhortación", "entraînement": "entrenamiento",
   "ariel": "brasero / ara del altar", "éfa": "efá (medida de granos)",
+  "ouailles": "ovejas / ovinos", "kilo": "kilo / kilogramo",
+  "gramme": "gramo", "grammes": "gramos",
   "assouvir": "saciar / colmar", "injurier": "injuriar",
   "adopter": "adoptar", "aiguisage": "afilado",
   "monstrueuses": "monstruosas",
@@ -9544,6 +9546,19 @@ class Dictionary {
         info.form = "número";
         return [[num], info];
       }
+      // Arabic numerals as written in the corpus («1», «290», «1 290»): the
+      // segmenter now keeps them so the gloss reads as a Spanish number word
+      // instead of dropping the token entirely.
+      if (/^\d[\d\s]*\d$|^\d$/.test(cand)) {
+        const flat = cand.replace(/\s/g, "");
+        if (/^\d{1,9}$/.test(flat)) {
+          const parsed = parseInt(flat, 10);
+          if (parsed > 0 && parsed <= 999999999) {
+            const card = _esCardinal(parsed, "número");
+            if (card) { info.form = "número"; return [[card], info]; }
+          }
+        }
+      }
       let _vbFallback = null;
       // The derivational verb guesser is single-token only: multi-word segments
       // would hallucinate false verbs («effet mille» -> «effet miller»). Real
@@ -9730,8 +9745,8 @@ class Dictionary {
   segment(text) {
     const words = [];
     for (const tok of text.split(/\s+/)) {
-      const w = tok.replace(/^[.,;:!?«»"'“”‘’\[\]()*–—]+|[.,;:!?«»"'“”‘’\[\]()*–—]+$/g, "");
-      if (w && !/^\d+$/.test(w)) words.push(w);
+      const w = tok.replace(/^[.,;:!?«»"'“”‘’\[\]()*–—…]+|[.,;:!?«»"'“”‘’\[\]()*–—…]+$/g, "");
+      if (w) words.push(w);
     }
     const out = [];
     let i = 0;
