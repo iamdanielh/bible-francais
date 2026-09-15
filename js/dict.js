@@ -73,7 +73,9 @@ const _CURATED = {
   "yeux": "ojos", "main": "mano", "pied": "pie", "tête": "cabeza",
   "bouche": "boca", "oreille": "oreja", "montagne": "montaña",
   "porte": "puerta", "peuple": "pueblo", "chose": "cosa",
-  "pièces": "piezas", "entrée": "entrada", "fumée": "humo"
+  "pièces": "piezas", "entrée": "entrada", "fumée": "humo",
+  "combattant": "combatiente / guerrero", "combattants": "combatientes / guerreros",
+  "designer": "designar / señalar"
 };
 
 // Accented words whose meaning differs from their accent-stripped twin
@@ -158,6 +160,7 @@ const _COMMON_VERBS = {
   "s'asseoir": "sentarse", "se coucher": "acostarse", "se taire": "callarse",
   "se rencontrer": "encontrarse",
   "constater": "constatar / comprobar",
+  "liguer": "aliar", "noyer": "ahogar",
   "séparer": "separar", "réaliser": "realizar / darse cuenta",
   "rassembler": "reunir", "ajouter": "añadir", "placer": "colocar / poner",
   "produire": "producir", "paraître": "aparecer", "paraitre": "aparecer",
@@ -498,6 +501,7 @@ const _EXTRA_WORDS = {
   "vert": "verde", "verte": "verde", "terrestre": "terrestre",
   "terrestres": "terrestres", "ressemblant": "parecido",
   "ressemblante": "parecida", "gros": "grande / gordo",
+  "nu": "desnudo", "nue": "desnuda", "nus": "desnudos", "nues": "desnudas",
   "nombreux": "numerosos", "nombreuse": "numerosa",
   "propre": "propio / limpio", "propres": "propios",
   "unique": "único", "chaque": "cada", "même": "mismo / incluso",
@@ -541,12 +545,14 @@ const _EXTRA_WORDS = {
   "bouclier": "escudo", "lance": "lanza", "arc": "arco", "flèche": "flecha",
   "ville": "ciudad", "villes": "ciudades", "village": "aldea",
   "villageois": "aldeanos", "chemin": "camino", "sentier": "sendero",
+  "arche": "arca (Noé)", "vente": "venta",
   "porte": "puerta", "portes": "puertas", "mur": "muro", "murs": "muros",
   "tour": "torre", "chambre": "habitación", "lit": "cama", "table": "mesa",
   "chaise": "silla", "robe": "vestido", "vêtement": "vestido / ropa",
   "vêtements": "ropa", "habit": "traje", "chaussure": "zapato",
   "manteau": "abrazo / capa", "bâton": "bastón",
   "bâtons": "bastones", "pierre": "piedra", "pierres": "piedras",
+  "bouton": "botón / grano / pústula", "boutons": "botones / granos / pústulas",
   "or": "oro", "argent": "plata / dinero", "perle": "perla",
   "joyau": "joya", "trésor": "tesoro", "trésors": "tesoros",
   "don": "regalo / don", "dons": "regalos", "cadeau": "regalo",
@@ -7551,7 +7557,8 @@ const _BIBLE_NAMES = {
   "Jaffa": "Jope", "Philistin": "filisteo", "Ahimaas": "Ahimaas", "Bani": "Baní",
   "Obadia": "Abdías", "Malkia": "Malquías", "Hittite": "hitita", "Chamma": "Sama",
   "Guerchom": "Gersom", "Arnon": "Arnón", "Adar": "Adar", "Aroër": "Aroer",
-  "Écron": "Ecrón", "Amots": "Amós", "Asdod": "Asdod"
+  "Écron": "Ecrón", "Amots": "Amós", "Asdod": "Asdod",
+  "Soufa": "Sufá (lugar)"
 };
 
 // ---- grammar: irregular verbs -> (infinitive, tense) ----------------------
@@ -7657,6 +7664,7 @@ const _VERB_IRREGULAR = {
   "verrai": ["voir", "futur 1sg"],
   "firent": ["faire", "passé simple 3pl"], "faisaient": ["faire", "imparfait 3pl"],
   "feront": ["faire", "futur 3pl"], "ferai": ["faire", "futur 1sg"],
+  "ferons": ["faire", "futur 1pl"], "ferez": ["faire", "futur 2pl"],
   "viennent": ["venir", "présent 3pl"], "viens": ["venir", "présent 1sg/2sg"],
   "vinrent": ["venir", "passé simple 3pl"], "venu": ["venir", "participe passé"],
   "venus": ["venir", "participe passé pl"], "venue": ["venir", "participe passé f."],
@@ -7960,14 +7968,23 @@ const _VERB_IRREGULAR = {
   "vivront": ["vivre", "futur 3pl"], "vivrez": ["vivre", "futur 2pl"],
   "vivons": ["vivre", "présent 1pl"], "vivez": ["vivre", "présent 2pl"],
   "devras": ["devoir", "futur 2sg"], "devra": ["devoir", "futur 3sg"],
+  "devrons": ["devoir", "futur 1pl"], "devrez": ["devoir", "futur 2pl"],
   "enverra": ["envoyer", "futur 3sg"], "enverront": ["envoyer", "futur 3pl"],
   "mettrez": ["mettre", "futur 2pl"], "mettras": ["mettre", "futur 2sg"],
   "mettent": ["mettre", "présent 3pl"],
   "accomplis": ["accomplir", "présent 1sg/2sg / participe pl"],
   "guéris": ["guérir", "présent 1sg/2sg / participe pl"],
   "écris": ["écrire", "présent 1sg/2sg"], "écrivant": ["écrire", "participe présent"],
+  "écrira": ["écrire", "futur 3sg"], "écrirons": ["écrire", "futur 1pl"],
+  "écrirai": ["écrire", "futur 1sg"], "écriras": ["écrire", "futur 2sg"],
+  "écrirez": ["écrire", "futur 2pl"], "écriront": ["écrire", "futur 3pl"],
   "acquis": ["acquérir", "participe passé"], "acquise": ["acquérir", "participe passé f."],
   "conduis": ["conduire", "présent 1sg/2sg"],
+  "conduira": ["conduire", "futur 3sg"], "conduirons": ["conduire", "futur 1pl"],
+  "conduirai": ["conduire", "futur 1sg"], "conduiras": ["conduire", "futur 2sg"],
+  "conduirez": ["conduire", "futur 2pl"], "conduiront": ["conduire", "futur 3pl"],
+  "traduira": ["traduire", "futur 3sg"], "traduirons": ["traduire", "futur 1pl"],
+  "traduirai": ["traduire", "futur 1sg"], "traduiras": ["traduire", "futur 2sg"],
   "fis": ["faire", "passé simple 1sg"],
   "découvert": ["découvrir", "participe passé"], "découverte": ["découvrir", "participe passé f."],
   "découvre": ["découvrir", "présent 1sg/3sg"],
@@ -7997,6 +8014,9 @@ const _VERB_IRREGULAR = {
   "descendirent": ["descendre", "passé simple 3pl"], "descendit": ["descendre", "passé simple 3sg"],
   "descendront": ["descendre", "futur 3pl"],
   "lu": ["lire", "participe passé"], "lus": ["lire", "participe passé pl / passé simple 1sg"],
+  "lira": ["lire", "futur 3sg"], "lirons": ["lire", "futur 1pl"],
+  "lirai": ["lire", "futur 1sg"], "liras": ["lire", "futur 2sg"],
+  "lirez": ["lire", "futur 2pl"], "liront": ["lire", "futur 3pl"],
   "lisaient": ["lire", "imparfait 3pl"], "lisait": ["lire", "imparfait 3sg"],
   "tienne": ["tenir", "subjonctif 1sg/3sg"],
   "boit": ["boire", "présent 3sg"], "bois": ["boire", "présent 1sg/2sg"],
@@ -8142,7 +8162,6 @@ const _VERB_IRREGULAR = {
   "corrige": ["corriger", "présent 1sg/3sg"], "balance": ["balancer", "présent 1sg/3sg"], "demandai": ["demander", "passé simple 1sg"], "demandas": ["demander", "passé simple 2sg"],
   "donnerait": ["donner", "conditionnel 3sg"], "donnerais": ["donner", "conditionnel 1sg/2sg"],
   "donnerez": ["donner", "futur 2pl"],
-  "nus": ["nu", "adjectif pl"],
   "recueilli": ["recueillir", "participe passé"],
   "recueillirent": ["recueillir", "passé simple 3pl"],
   "retenu": ["retenir", "participe passé"], "retenue": ["retenir", "participe passé f."],
@@ -8318,10 +8337,13 @@ const _VERB_IRREGULAR = {
   "combattront": ["combattre", "futur 3pl"], "combattrez": ["combattre", "futur 2pl"],
   "combattit": ["combattre", "passé simple 3sg"],
   "voudrez": ["vouloir", "futur 2pl"], "voudront": ["vouloir", "futur 3pl"],
-  "voudrai": ["vouloir", "futur 1sg"],
+  "voudrai": ["vouloir", "futur 1sg"], "voudrons": ["vouloir", "futur 1pl"],
   "entrepris": ["entreprendre", "participe passé"], "entreprise": ["entreprendre", "participe passé f."],
   "maudira": ["maudire", "futur 3sg"], "maudirent": ["maudire", "passé simple 3pl"],
   "maudit": ["maudire", "participe passé / présent 3sg"],
+  "cuira": ["cuire", "futur 3sg"], "cuirons": ["cuire", "futur 1pl"],
+  "cuirez": ["cuire", "futur 2pl"], "cuiront": ["cuire", "futur 3pl"],
+  "sentions": ["sentir", "imparfait 1pl"],
   "interpella": ["interpeller", "passé simple 3sg"],
   "fasses": ["faire", "subjonctif 2sg"], "fasse": ["faire", "subjonctif 1sg/3sg"],
   "entendus": ["entendre", "participe passé pl"], "entendis": ["entendre", "passé simple 1sg"],
@@ -9211,9 +9233,15 @@ class Dictionary {
         this._enrichVerb(cand, info);
         return res;
       }
+      let _vbFallback = null;
+      // The derivational verb guesser is single-token only: multi-word segments
+      // would hallucinate false verbs («effet mille» -> «effet miller»). Real
+      // multi-word verb entries live in _VERB_IRREGULAR and were tried above.
+      if (!/\s/.test(cand)) {
       for (const [inf, tense, ending, flags] of verbInfinitive(cand)) {
         const meanings = this.lookup(inf);
-        if (meanings) {
+        if (!meanings) continue;
+        const stamp = (preferCurated) => {
           info.infinitive = inf;
           info.tense = tense || "";
           info.group = this._verbGroup(cand, inf);
@@ -9222,13 +9250,22 @@ class Dictionary {
             info.stem = cand.slice(0, -ending.length);
             info.ending = ending;
           }
-          return [meanings, info];
-        }
+          return [preferCurated ? this._preferCurated(meanings, inf) : meanings, info];
+        };
+        // Prefer guesses whose infinitive really is a verb (has a Spanish verb
+        // gloss): noun homographs would otherwise win the race («sentier»/sendero
+        // beats «sentir» for «sentions»). The curated gloss is surfaced first so
+        // accent-collapsed homographs («désigner» vs «Diseñador» de «designer»)
+        // don't steal the display.
+        if (esInfinitive(inf, meanings, (f) => this.lookup(f))) return stamp(true);
+        if (!_vbFallback) _vbFallback = stamp;
       }
+      if (_vbFallback) return _vbFallback();
       // adverbs in -ment built from an adjective base
       // (réellement -> réel, simplement -> simple, abondamment -> abondant)
       const adv = this._tryAdverb(cand, info);
       if (adv) return adv;
+      }
     }
     // hyphenated forms (impératif + pronom, e.g. "dominez-la"). Only verbs get
     // the compound label: hyphenated nouns/names (jésus-christ, grand-prêtre,
@@ -9336,7 +9373,11 @@ class Dictionary {
       // -er rules derive "me" -> "m"+"er" -> "mer": only trust stems long
       // enough to be a real verb root.
       if (inf.replace(/er$|ir$|re$|oir$/, "").length < 2) continue;
-      if (this.lookup(inf)) {
+      const glosses = this.lookup(inf);
+      // Only stamp a verb label when the guessed infinitive actually has a
+      // Spanish verb gloss; noun-only collisions (pere=padre, archer=arquero,
+      // sentier=sendero, cuir=Cuero...) would otherwise brand nouns as verbs.
+      if (esInfinitive(inf, glosses || [], (f) => this.lookup(f))) {
         info.infinitive = inf;
         info.tense = tense || "";
         info.group = this._verbGroup(cand, inf);
@@ -9943,7 +9984,8 @@ const _ES_INF = {
   "concevoir": "concebir", "toucher": "tocar",
   "dîner": "cenar", "diner": "cenar", "accoucher": "parir",
   "conseiller": "aconsejar", "braiser": "estofar",
-  "tapir": "agazaparse", "gare": "aparcar"
+  "tapir": "agazaparse", "gare": "aparcar",
+  "noyer": "ahogar", "liguer": "aliar"
 };
 
 // Detección ortográfica: palabras claramente no españolas (diptongos y letras
