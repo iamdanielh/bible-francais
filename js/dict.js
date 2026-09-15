@@ -3883,6 +3883,92 @@ const _BIBLE_WORDS = {
   "immobilisé": "inmovilizado", "immobiliser": "inmovilizar",
   "intéresser": "interesar", "emprunter": "pedir prestado / tomar prestado",
   "efforcer": "esforzarse", "advenir": "suceder / acontecer", "rayer": "rayar / tachar",
+  "émerveiller": "maravillar / asombrar", "attrouper": "amontonarse / agruparse",
+  "écrouler": "derrumbarse / desplomarse", "écouler": "fluir / correr",
+  "accoupler": "aparear / unir en pareja", "entêter": "obstinarse / empeñarse",
+  "acharner": "encarnizarse / ensañarse", "affaisser": "hundirse / abatirse",
+  "élancer": "lanzar / impulsar", "affoler": "asustar / enloquecer",
+  "enraciner": "arraigar / enraizar", "excuser": "disculpar / excusar",
+  "ancrer": "anclar", "enfoncer": "hundir / clavar",
+  "attarder": "demorarse / atrasarse", "empresser": "apresurarse / darse prisa",
+  "accroupir": "acurrucarse / agacharse", "épanouir": "florecer / desplegarse",
+  "élargir": "ensanchar / ampliar", "assombrir": "oscurecer / ensombrecer",
+  "évanouir": "desmayarse / desvanecerse", "adonner": "dedicarse / entregarse",
+  "effondrer": "derrumbarse / desplomarse", "adjurer": "conjurar / suplicar",
+  "expirer": "expirar / fallecer", "enchanter": "encantar / deleitar",
+  "insinuer": "insinuar", "enlacer": "entrelazar / abrazar",
+  "allonger": "alargar / extender", "essouffler": "quedarse sin aliento",
+  "arranger": "arreglar / ordenar", "aligner": "alinear",
+  "entrechoquer": "chocar entre sí", "encastrer": "empotrar / incrustar",
+  "abréger": "abreviar / acortar", "aggraver": "agravar",
+  "aliter": "guardar cama / postrar", "avantager": "favorecer / aventajar",
+  "expulser": "expulsar", "étrangler": "estrangular",
+  "empaler": "empalar", "embarrasser": "avergonzar / estorbar",
+  "affecter": "afectar", "angoisser": "angustiar",
+  "empêtrer": "enredar / atascar", "animer": "animar",
+  "assimiler": "asimilar", "activer": "activar",
+  "affamer": "hambrear", "embrouiller": "enredar / confundir",
+  "empaqueter": "empaquetar", "endurer": "soportar / aguantar",
+  "égrener": "desgranar", "aboyer": "ladrar",
+  "instaurer": "instaurar / establecer", "illuminer": "iluminar",
+  "orienter": "orientar", "esquiver": "esquivar / evitar",
+  "affluer": "afluir", "imbriquer": "imbricar / encajar",
+  "instituer": "instituir", "engouffrer": "engullir / tragar",
+  "ébrouer": "sacudirse / resoplar", "entretuer": "matarse mutuamente",
+  "affiner": "afinar / refinar", "entailler": "mellar / cortar",
+  "enrouler": "enrollar", "enchevêtrer": "enmarañar / enredar",
+  "exagérer": "exagerar", "évaluer": "evaluar",
+  "échauffer": "calentar / sofocar", "empiffrer": "atiborrarse / hartarse",
+  "éreinter": "deslomar / agotar", "enrôler": "reclutar / alistar",
+  "évader": "evadirse / escapar", "accrocher": "enganchar / colgar",
+  "infléchir": "doblar / flexionar", "alourdir": "pesar / hacer más pesado",
+  "envisager": "envisar / contemplar", "employer": "emplear",
+  "interposer": "interponer", "entamer": "comenzar / iniciar",
+  "accrocher": "enganchar / colgar", "enrôler": "reclutar / alistar",
+  "évader": "evadirse", "exaspérer": "exasperar",
+  "avérer": "resultar ser", "aménager": "acondicionar",
+  "abstenir": "abstenerse", "obscurcir": "oscurecer",
+  "assoupir": "adormecer", "appauvrir": "empobrecer",
+  "entrouvrir": "entornar / entreabrir", "embellir": "embellecer",
+  "assourdir": "ensordecer", "ébattre": "retozar / juguetear",
+  "adjoindre": "adjuntar / adosar", "accroître": "crecer / aumentar",
+  "interdire": "prohibir", "émettre": "emitir / lanzar",
+  "inclure": "incluir", "admettre": "admitir",
+  "enrôler": "reclutar / alistar",
+  // --- nouns, adjectives, misc ---
+  "impression": "impresión", "acheteur": "comprador",
+  "ivrognerie": "ebriedad / borrachera", "attrait": "atractivo / encanto",
+  "expression": "expresión", "emprunteur": "prestatario",
+  "improviste": "de improviso", "alcool": "alcohol",
+  "épervier": "gavilán", "éperviers": "gavilanes",
+  "achat": "compra", "essentiel": "esencial",
+  "engourdissement": "entumecimiento", "araignée": "araña",
+  "insolence": "insolencia", "autruche": "avestruz",
+  "octave": "octava", "aigu": "agudo",
+  "immigré": "inmigrante", "aise": "a gusto / contento",
+  "étude": "estudio", "inauguration": "inauguración",
+  "immobilisation": "inmovilización", "effraction": "allanamiento / fractura",
+  "édification": "edificación", "émigration": "emigración",
+  "avènement": "advenimiento", "affliction": "aflicción",
+  "institution": "institución", "inconvenant": "inconveniente",
+  "ail": "ajo", "ibis": "ibis", "affût": "acecho / apostadero",
+  "hippopotame": "hipopótamo", "agresseur": "agresor",
+  "escrocs": "estafadores", "enlisement": "atascamiento",
+  "insolation": "insolación", "indolence": "indolencia",
+  "adversité": "adversidad", "amadou": "yesca",
+  "agrément": "aprobación / agrado", "embouchure": "desembocadura",
+  "enclume": "yunque", "itinéraire": "itinerario",
+  "envahisseur": "invasor", "aplomb": "aplomo",
+  "hôtelier": "hotelero", "objection": "objeción",
+  "unanimité": "unanimidad", "évangéliste": "evangelista",
+  "interrogatoire": "interrogatorio", "accomplissement": "cumplimiento",
+  "acquittement": "absolución / pago", "envoi": "envío",
+  "abus": "abuso", "assistance": "asistencia",
+  "affectueuse": "afectuosa", "imposition": "imposición",
+  "exhortation": "exhortación", "entraînement": "entrenamiento",
+  "ariel": "brasero / ara del altar", "éfa": "efá (medida de granos)",
+  "assouvir": "saciar / colmar", "injurier": "injuriar",
+  "adopter": "adoptar", "aiguisage": "afilado",
   "monstrueuses": "monstruosas",
   "plaintives": "lastimeras",
   "retrouvai": "volví a encontrar (de retrouver)",
@@ -8511,7 +8597,82 @@ const _VERB_IRREGULAR = {
   "cria": ["crier", "passé simple 3sg"], "crièrent": ["crier", "passé simple 3pl"],
   "serrée": ["serrer", "participe passé f."], "serré": ["serrer", "participe passé"],
   "bordèrent": ["border", "passé simple 3pl"],
-  "épouvantés": ["épouvanter", "participe passé pl"], "bouleversé": ["bouleverser", "participe passé"], "recouverte": ["recouvrir", "participe passé f."]
+  "épouvantés": ["épouvanter", "participe passé pl"], "bouleversé": ["bouleverser", "participe passé"], "recouverte": ["recouvrir", "participe passé f."],
+  // --- asseoir ---
+  "assied": ["asseoir", "présent 3sg"], "assieds": ["asseoir", "présent 1sg"],
+  "asseyant": ["asseoir", "participe présent"], "asseyent": ["asseoir", "présent 3pl"],
+  // --- appartenir ---
+  "appartiens": ["appartenir", "présent 1sg/2sg"],
+  // --- abattre ---
+  "abattrai": ["abattre", "futur 1sg"],
+  // --- entretenir ---
+  "entretint": ["entretenir", "passé simple 3sg"],
+  "entretiendras": ["entretenir", "futur 2sg"],
+  // --- éteindre ---
+  "éteindra": ["éteindre", "futur 3sg"], "éteigne": ["éteindre", "subjonctif 1/3sg"],
+  "éteignit": ["éteindre", "passé simple 3sg"], "éteignent": ["éteindre", "présent 3pl"],
+  "éteindrai": ["éteindre", "futur 1sg"],
+  // --- obtenir ---
+  "obtiendrai": ["obtenir", "futur 1sg"], "obtiens": ["obtenir", "présent 1sg/2sg"],
+  "obtiendrais": ["obtenir", "conditionnel 1/2sg"],
+  // --- appuyer ---
+  "appuient": ["appuyer", "présent 3pl"],
+  // --- étendre ---
+  "étendrai": ["étendre", "futur 1sg"], "étendît": ["étendre", "subjonctif imparfait 3sg"],
+  // --- enfuir ---
+  "enfuyaient": ["enfuir", "imparfait 3pl"], "enfuyais": ["enfuir", "imparfait 1/2sg"],
+  "enfuyait": ["enfuir", "imparfait 3sg"],
+  // --- apercevoir ---
+  "aperçoive": ["apercevoir", "subjonctif 1/3sg"], "aperçoivent": ["apercevoir", "présent 3pl"],
+  // --- entendre ---
+  "entendrai": ["entendre", "futur 1sg"], "attendrai": ["attendre", "futur 1sg"],
+  // --- exclure ---
+  "excluant": ["exclure", "participe présent"],
+  // --- apprendre ---
+  "apprendrai": ["apprendre", "futur 1sg"], "apprendrais": ["apprendre", "conditionnel 1/2sg"],
+  // --- atteindre ---
+  "atteindrai": ["atteindre", "futur 1sg"], "atteignant": ["atteindre", "participe présent"],
+  // --- appeler ---
+  "appellerez": ["appeler", "futur 2pl"], "appellerons": ["appeler", "futur 1pl"],
+  "appellerais": ["appeler", "conditionnel 1/2sg"],
+  // --- enduire ---
+  "enduiras": ["enduire", "futur 2sg"],
+  // --- interdire ---
+  "interdisait": ["interdire", "imparfait 3sg"], "interdirai": ["interdire", "futur 1sg"],
+  // --- introduire ---
+  "introduisit": ["introduire", "passé simple 3sg"], "introduis": ["introduire", "présent 1sg"],
+  // --- apparaître ---
+  "apparais": ["apparaître", "présent 1sg"],
+  // --- adjoindre ---
+  "adjoignirent": ["adjoindre", "passé simple 3pl"],
+  // --- employer ---
+  "emploierez": ["employer", "futur 2pl"], "emploie": ["employer", "présent 1sg/3sg"],
+  // --- aménager ---
+  "aménageant": ["aménager", "participe présent"],
+  // --- assouvir ---
+  "assouvirai": ["assouvir", "futur 1sg"],
+  // --- émettre ---
+  "émet": ["émettre", "présent 3sg"],
+  // --- admettre ---
+  "admettrai": ["admettre", "futur 1sg"], "admit": ["admettre", "passé simple 3sg"],
+  // --- inclure ---
+  "inclut": ["inclure", "présent 3sg"],
+  // --- envoyer ---
+  "enverrait": ["envoyer", "conditionnel 3sg"],
+  // --- injurier ---
+  "injurièrent": ["injurier", "passé simple 3pl"],
+  // --- accroître ---
+  "accroîtront": ["accroître", "futur 3pl"], "accroissait": ["accroître", "imparfait 3sg"],
+  // --- assiéger ---
+  "assiégeant": ["assiéger", "participe présent"],
+  // --- adopter ---
+  "adoptera": ["adopter", "futur 3sg"],
+  // --- arriver ---
+  "arrivât": ["arriver", "subjonctif imparfait 3sg"],
+  // --- instruire ---
+  "instruisit": ["instruire", "passé simple 3sg"],
+  // --- aiguisage ---
+  "aiguisage": ["aiguisage", "sustantivo"],
   };
 
 // -er conjugation suffixes -> tense (ordered longest-first; port of _ER_RULES).
@@ -8528,7 +8689,8 @@ const _ER_RULES = [
   ["ions$", "imparfait 1pl"], ["ait$", "imparfait 3sg"],
   ["ais$", "imparfait 1/2sg"],
   ["èrent$", "passé simple 3pl"], ["âtes$", "passé simple 2pl"],
-  ["âmes$", "passé simple 1pl"], ["à$", "passé simple 3sg"],
+  ["âmes$", "passé simple 1pl"], ["ai$", "passé simple 1sg"],
+  ["à$", "passé simple 3sg"],
   ["â$", "passé simple 3sg"],
   ["ons$", "présent 1pl"], ["ez$", "présent 2pl"],
   ["ent$", "présent 3pl"],
@@ -8547,6 +8709,7 @@ const _IR_RULES = [
   ["iront$", "futur 3pl"], ["irez$", "futur 2pl"], ["irons$", "futur 1pl"],
   ["ira$", "futur 3sg"], ["irai$", "futur 1sg"], ["iras$", "futur 2sg"],
   ["issons$", "présent 1pl"], ["issez$", "présent 2pl"],
+  ["isse$", "subjonctif 1/3sg"],
   ["irent$", "passé simple 3pl"],
   ["it$", "présent/ passé simple 3sg"],
   ["i$", "participe passé"],

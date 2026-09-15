@@ -162,6 +162,56 @@ Implementado:
 - **C5** Nombres con guion en minúscula («d’Obed-Édom») → `isName` con form «nombre propio»
   (el scan los cuenta como no-resueltos aunque la app los pinta bien; son reales).
 
+## LOTE D (huecos reales del corpus) — HECHO
+
+**Medido** (es-audit, 5.000 versos): filas de verbo **17.244** con español **17.244 (100%,
+0 sin)**; compuestos **2.102, 0 rotos**; fullregress **172/0**; es-brainer(38)/segtest(32)/
+plaingloss(38)/accent-scan(35)/elide(44)/scan OK. Escaneo de TODA la Biblia: 800.882 tokens,
+los únicos sin resolver son los 8 fragmentos de elisión (`qu`/`jusqu`/`quelqu`/`hui`/
+`aujourd`/`lorsqu`/`puisqu`/`quoiqu`, que maneja `segment()`) y `chef-d` (artefacto del split
+de `chef-d'œuvre`) — **cero huecos reales**.
+
+Implementado:
+- **D1** `_ER_RULES`/`_IR_RULES` nuevos: `ai$` → «passé simple 1sg» (ordonnai→ordonner,
+  ajoutai→ajouter, achetai→acheter, llegó a resolver 17 formas -ai) e `isse$` →
+  «subjonctif 1/3sg» (unisse→unir, accomplisse→accomplir, épanouisse→épanouir).
+- **D2** ~75 infinitivos `-er`/`-ir` añadidos a `_EXTRA_WORDS` (los conjugados derivables se
+  resuelven solos por reglas): émerveiller, attrouper, écrouler, écouler, accoupler, entêter,
+  acharner, affaisser, élancer, affoler, enraciner, excuser, ancrer, enfoncer, attarder,
+  empresser, accroupir, épanouir, élargir, assombrir, évanouir, adonner, effondrer, adjurer,
+  expirer, enchanter, insinuer, enlacer, allonger, essouffler, arranger, aligner,
+  entrechoquer, encastrer, abréger, aggraver, aliter, avantager, expulser, étrangler,
+  empaler, embarrasser, affecter, angoisser, empêtrer, animer, assimiler, activer, affamer,
+  embrouiller, empaqueter, endurer, égrener, aboyer, instaurer, illuminer, orienter,
+  esquiver, affluer, imbriquer, instituer, engouffrer, ébrouer, entretuer, affiner,
+  entailler, enrouler, enchevêtrer, exagérer, évaluer, échauffer, empiffrer, éreinter,
+  enrôler, évader, accrocher, infléchir, alourdir, envisager, employer, interposer,
+  entamer, exaspérer, avérer, aménager, abstenir, obscurcir, assoupir, appauvrir,
+  entrouvrir, embellir, assourdir, ébattre, adjoindre, accroître, interdire, émettre,
+  inclure, admettre, assouvir, injurier, adopter.
+- **D3** ~60 sustantivos/adjetivos añadidos a `_EXTRA_WORDS`: impression, acheteur,
+  ivrognerie, attrait, expression, emprunteur, improviste, alcool, épervier(s), achat,
+  essentiel, engourdissement, araignée, insolence, autruche, octave, aigu, immigré, aise,
+  étude, inauguration, immobilisation, effraction, édification, émigration, avènement,
+  affliction, institution, inconvenant, ail, ibis, affût, hippopotame, agresseur, escrocs,
+  enlisement, insolation, indolence, adversité, amadou, agrément, embouchure, enclume,
+  itinéraire, envahisseur, aplomb, hôtelier, objection, unanimité, évangéliste,
+  interrogatoire, accomplissement, acquittement, envoi, abus, assistance, affectueuse,
+  imposition, exhortation, entraînement, aiguisage, ariel, éfa.
+- **D4** `_VERB_IRREGULAR` (~55 formas no derivables, futur/cond/subj de 3er grupo y
+  pronominales): asseoir (assied(s)/asseyant/asseyent), appartenir (appartiens), abattre
+  (abattrai), entretenir (entretint/entretiendras), éteindre (éteindra/éteigne/éteignit/
+  éteignent/éteindrai), obtenir (obtiendrai/obtiens/obtiendrais), appuyer (appuient),
+  étendre (étendrai/étendît), enfuir (enfuyaient/enfuyais/enfuyait), apercevoir (aperçoive/
+  aperçoivent), entendre (entendrai), attendre (attendrai), exclure (excluant), apprendre
+  (apprendrai/apprendrais), atteindre (atteindrai/atteignant), appeler (appellerez/
+  appellerons/appellerais), enduire (enduiras), interdire (interdisait/interdirai),
+  introduire (introduisit/introduis), apparaître (apparais), adjoindre (adjoignirent),
+  employer (emploierez/emploie), aménager (aménageant), assouvir (assouvirai), émettre
+  (émet), admettre (admettrai/admit), inclure (inclut), envoyer (enverrait), injurier
+  (injurièrent), accroître (accroîtront/accroissait), assiéger (assiégeant), adopter
+  (adoptera), arriver (arrivât), instruire (instruisit).
+
 ## Historial
 
 - `afe836e` — *BATCH 1*: cobertura española 99,3% (sin español 1304→122; compuestos rotos 100→3).
@@ -171,3 +221,5 @@ Implementado:
 - `c2794ec` — conjugación española en popups y fusión de tiempos compuestos.
 - `fe4d9d8` — *LOTE B*: verbo vs sustantivo homónimo, futur -ire, cobertura 100%.
 - `425159a` — AGENTS.md: verificación + arquitectura + veredictos A1/A2 + LOTE B.
+- `e79f758` — *LOTE C*: resolver numérico FR→ES + compuestos con guion + verbos con clítico.
+- *(próximo)* — *LOTE D*: huecos reales del corpus a cero (reglas ai/isse + entradas de diccionario + V_I).
