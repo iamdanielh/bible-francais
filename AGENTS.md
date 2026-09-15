@@ -141,4 +141,4 @@ Implementado:
 - `50433cb` — pasivas, participios fem/pl desnudos, PP irregulares españoles, pronombres reflexivos por persona.
 - `b8eeea1` — derivación inversa de glossas conjugadas + compuestos reflexivos + separador de glosas « / ».
 - `c2794ec` — conjugación española en popups y fusión de tiempos compuestos.
-- *(pendiente de commit)* — *LOTE B*: verbo vs sustantivo homónimo, futur -ire, cobertura 100%.
+- `fe4d9d8` — *LOTE B*: verbo vs sustantivo homónimo, futur -ire, cobertura 100%.
