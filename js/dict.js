@@ -9387,18 +9387,27 @@ function _frNumberEs(word) {
   const low = word.toLowerCase().replace(/,/g, "");
   const parts = low.split(/[\s-]+/).filter(Boolean);
   if (!parts.length) return null;
-  // every part must be numeric (or the "et" conjunction, or an ordinal stem)
+  // every part must be numeric (or the "et" conjunction, or an ordinal stem).
+  // «et» is only valid between a tens/multiple word and a unit (vingt et un,
+  // soixante et onze, cent et un) — NEVER between two plain units («neuf et
+  // un» is «Neuf» (nombre propio) + conjunción, not 9+1).
   const values = [];
   let ordinal = false;
+  let lastVal = 0;
   for (let i = 0; i < parts.length; i++) {
     let p = parts[i];
-    if (p === "et" || p === "'") continue;
-    if (p === "premier" || p === "première") { ordinal = true; values.push(1); continue; }
+    if (p === "et" || p === "'") {
+      // Only a tens/multiple may carry «et» before a following unit.
+      if (lastVal % 10 !== 0 || lastVal === 0) return null;
+      continue;
+    }
+    if (p === "premier" || p === "première") { ordinal = true; values.push(1); lastVal = 1; continue; }
     const ord = _FR_ORD[p];
     if (ord) { ordinal = true; p = ord; }
     const v = _FR_NUM[p];
     if (v === undefined) return null;
     values.push(v);
+    lastVal = v;
   }
   if (!values.length) return null;
   let total = 0, cur = 0;
