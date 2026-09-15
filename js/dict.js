@@ -9354,9 +9354,20 @@ function _esCardinal(n) {
     if (h === 1) return r === 0 ? "cien" : "ciento " + _esCardinal(r);
     return _ES_HUND[h] + (r ? " " + _esCardinal(r) : "");
   }
-  const m = Math.floor(n / 1000), r = n % 1000;
-  const mw = m === 1 ? "mil" : _esCardinal(m) + " mil";
-  return r ? mw + " " + _esCardinal(r) : mw;
+  if (n < 1000000) {
+    const m = Math.floor(n / 1000), r = n % 1000;
+    const mw = m === 1 ? "mil" : _esCardinal(m).replace(/veintiuno$/, "veintiún").replace(/ uno$/, " un") + " mil";
+    return r ? mw + " " + _esCardinal(r) : mw;
+  }
+  const mi = Math.floor(n / 1000000), r = n % 1000000;
+  const miw = mi === 1 ? "un millón" : _esCardinal(mi).replace(/veintiuno$/, "veintiún").replace(/ uno$/, " un") + " millones";
+  if (!r) return miw;
+  const rh = Math.floor(r / 1000), rr = r % 1000;
+  if (rh) {
+    const mw = rh === 1 ? "mil" : _esCardinal(rh) + " mil";
+    return miw + (rr ? " " + mw + " " + _esCardinal(rr) : " " + mw);
+  }
+  return miw + " " + _esCardinal(rr);
 }
 function _esOrdinal(n) {
   if (n <= 19) return _ES_ORD[n];
