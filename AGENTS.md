@@ -262,6 +262,40 @@ No son traducciones. Implementado:
 Verificación: escaneo `segment()` de TODA la Biblia → **0 tokens con significado nulo**;
 suite completa verde; es-audit 17.223 filas verbo 100%, compuestos 2.102 rotos 0.
 
+## LOTE AP (palabras ligadas por apóstrofo / elisión) — HECHO
+
+Los volcados de Wikipedia también traen **entradas-título** sobre palabras francesas
+corrientes que pisan su significado real («l'empereur»→"El Emperador (Tarot)",
+«âge»→"Edad biológica", «ayer»→"Ayer (Valais)", «isaac»→"ISAAC (cifrador)",
+«aine»→"Ingle", «l'aîné»→"Eldest", «animal»→"Animalia"), y 3 familias se resolvían
+semánticamente mal. Implementado:
+
+- **`DROSS_EXACT`** (exact-match en `strip()` de la construcción): elimina las glosas
+  exactas `el emperador (tarot)`/`edad biológica`/`ayer (valais)`/`isaac (cifrador)`/
+  `ingle`/`eldest`/`animalia`. Sin patrón genérico "Título (X)" (mataría nombres
+  legítimos como «Huy (Bélgica)»). Las claves que quedan con 0 glosas se borran →
+  `l'empereur`→elide→`empereur`→"Emperador", `d'Isaac`→`Isaac`→nombre bíblico.
+- **`_ACCENT_CURATED`** (gorjeo de acento, se unshift a `_accent`): `âge`→edad,
+  `âme`→alma, `armée`→ejército, `aîné`→mayor / primogénito + variantes. Faltaba: el
+  gorjeo para «où»/«dès» etc. no tenía estas palabras y la rama acentuada de
+  `_tryDirect` lee `_accent` **antes** que `_map` → la glosa curada no ganaba.
+- **`_VERB_IRREGULAR`**: subjonctif/impératif de `avoir` (aye/ayes/ayez/ayons) →
+  `n'ayez`/`N'ayez`/`n'ayons`/`t'ayons` ya no derivan a "Ayer (Valais)" (un -er falso
+  de «aez»); `s'agit`/`s'agissant` → s'agir ("se trata").
+- **`_PHRASES`**: `n'a jamais`→«nunca» (no «para siempre» de "à jamais"),
+  `d'après`→«según» (no «después»). Con y sin apóstrofo tipográfico.
+- **`_BIBLE_NAMES`**: Isaac→Isaac (antes el cifrado informático).
+- **`_EXTRA_WORDS`**: `aîné(s)`/`aînée(s)`, `s'agir`, `armée(s)`, `animal`/`animaux`,
+  y las formas ligadas `l'âme`, `l'aîné`.
+
+**Medido** (corpus completo, 30.742 versos): los **43.276** spans con apóstrofo →
+`null-as-name` 680 (nombres propios, aceptados) y **0** null reales; `segfull` **0**
+tokens nulos no-nombre; suite completa verde (fullregress 172, elide 44→86 con checks
+AP exactos); es-audit 17.220 filas verbo 100%, compuestos 2.104 rotos 0.
+
+Nota: la verificación de `elide.mjs` ahora incluye `APOS_MEANING` (glosas EXACTAS de
+cada defecto apóstrofo corregido) — no solo no-null.
+
 ## Historial
 
 - `afe836e` — *BATCH 1*: cobertura española 99,3% (sin español 1304→122; compuestos rotos 100→3).
@@ -276,3 +310,4 @@ suite completa verde; es-audit 17.223 filas verbo 100%, compuestos 2.102 rotos 0
 - `b8eaedc` — *LOTE D2*: cifras del corpus ya se traducen (segment() no las descarta) + elipsis puntuación + glosa ouailles/kilo/gramme.
 - `aed0060` — *Números ES*: millones y elisión «un/veintiún» ante mil/millón.
 - `52541c5` — *Números FR*: «et» solo entre decena y unidad (neuf et un → no 10).
+- `b4931bf` — *LOTE D3*: limpieza de glosas dross (desambiguación/media) + ~80 glossas reales; «l'a b c de»→abecedario.

@@ -94,6 +94,10 @@ const _ACCENT_CURATED = {
   "dû": "debido", "dûs": "debidos", "dût": "debiera (de devoir)",
   "crû": "crecido (de croître)",
   "sacré": "sagrado", "sacrée": "sagrada", "sacrés": "sagrados", "sacrées": "sagradas",
+  "âge": "edad", "âges": "edades",
+  "armée": "ejército", "armées": "ejércitos",
+  "âme": "alma", "âmes": "almas",
+  "aîné": "mayor / primogénito", "aînée": "mayor / primogénita",
 };
 
 // Common French verb infinitives -> Spanish (port of _COMMON_VERBS).
@@ -697,7 +701,14 @@ const _EXTRA_WORDS = {
   "parallèle": "paralelo / paralela", "piper": "engañar (de piper)",
   "singulier": "singular / particular", "tendance": "tendencia",
   "transparent": "transparente", "d'abandon": "de abandono",
+  "aîné": "mayor / primogénito", "aînée": "mayor / primogénita",
+  "aînés": "mayores / primogénitos", "aînées": "mayores / primogénitas",
+  "s'agir": "tratarse (s'agir)", "s'agit": "se trata (s'agir)",
   "homer": "hómer (medida de granos)", "saveur": "sabor",
+  "armée": "ejército", "armées": "ejércitos", "animal": "animal",
+  "animaux": "animales",
+  "l’âme": "alma", "l'âme": "alma", "l’aîné": "mayor / primogénito",
+  "l'aîné": "mayor / primogénito",
   "quart": "cuarta parte / cuarto",
   "l": "lo / la (pronombre, antecedente apocopado sin apóstrofo)",
   "moissonneur": "segador / cosechador", "moissonneurs": "segadores / cosechadores",
@@ -7651,6 +7662,7 @@ const _BIBLE_NAMES = {
   "Israël": "Israel", "Israélite": "israelita", "Israélites": "israelitas",
   "Jérusalem": "Jerusalén", "Moïse": "Moisés", "Juda": "Judá",
   "Jacob": "Jacob", "Saül": "Saúl", "Joseph": "José", "Aaron": "Aarón",
+  "Isaac": "Isaac",
   "Josué": "Josué", "Jérémie": "Jeremías", "Abraham": "Abraham",
   "Égypte": "Egipto", "Galaad": "Galaad", "Moab": "Moab",
   "Manassé": "Manasés", "Joab": "Joab", "Jean": "Juan",
@@ -7758,6 +7770,10 @@ const _VERB_IRREGULAR = {
   "avait": ["avoir", "imparfait 3sg"], "avaient": ["avoir", "imparfait 3pl"],
   "aura": ["avoir", "futur 3sg"], "eut": ["avoir", "passé simple 3sg"],
   "ait": ["avoir", "subjonctif 3sg"], "aient": ["avoir", "subjonctif 3pl"],
+  "aye": ["avoir", "subjonctif 1sg"], "ayes": ["avoir", "subjonctif 2sg"],
+  "ayez": ["avoir", "subjonctif 2pl / impératif 2pl"],
+  "ayons": ["avoir", "subjonctif 1pl / impératif 1pl"],
+  "s'agit": ["s'agir", "présent 3sg"], "s'agissant": ["s'agir", "participe présent"],
   "fit": ["faire", "passé simple 3sg"], "faisait": ["faire", "imparfait 3sg"],
   "fais": ["faire", "présent 1sg/2sg"], "fait": ["faire", "participe passé / présent 3sg"],
   "faite": ["faire", "participe passé f."], "font": ["faire", "présent 3pl"],
@@ -9042,6 +9058,10 @@ const _PHRASES = {
   "l'a b c de": "el abecé de",
   "l’a b c de": "el abecé de",
   "a b c de": "el abecé de",
+  "n’a jamais": "nunca",
+  "n'a jamais": "nunca",
+  "d’après": "según",
+  "d'après": "según",
   // negation
   "ne pas": "no",
   "ne point": "no",
@@ -9588,11 +9608,19 @@ class Dictionary {
     // Wikipedia-driven dictionary dumps carry "… (desambiguación)" stub pages as
     // glosses («sur» -> "sobre" + "Sur (desambiguación)", «gens» -> only
     // "Gens (desambiguación)") plus media-title dross («nier» -> "Nier
-    // (videojuego)"). They are not translations: drop them from every
-    // entry up front so no resolve path can surface them.
+    // (videojuego)") plus article-title dross on ordinary French words
+    // («l'empereur» -> "El Emperador (Tarot)", «âge» -> "Edad biológica",
+    // «ayer» -> "Ayer (Valais)", «isaac» -> "ISAAC (cifrador)"). They are
+    // not translations: drop them from every entry up front so no resolve
+    // path can surface them.
+    const DROSS_EXACT = new Set([
+      "el emperador (tarot)", "edad biológica", "ayer (valais)",
+      "isaac (cifrador)", "ingle", "eldest", "animalia",
+    ]);
     const strip = (arr) => (arr || []).filter((g) => {
       const s = String(g);
-      return !/(desambiguaci|\((?:pel[íi]cula|canci[óo]n|álbum|c[óo]mic|videojuego|serie de TV|novela de|Marvel Comics|DC Comics)[^)]*\))/i.test(s) &&
+      return !DROSS_EXACT.has(s.trim().toLowerCase()) &&
+        !/(desambiguaci|\((?:pel[íi]cula|canci[óo]n|álbum|c[óo]mic|videojuego|serie de TV|novela de|Marvel Comics|DC Comics)[^)]*\))/i.test(s) &&
         !/^(?:e\.\s?t\.|phone|furie)$/i.test(s.trim());
     });
     for (const [k, arr] of Object.entries(this._map)) {
