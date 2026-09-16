@@ -335,6 +335,43 @@ escaneo de conectores elididos → todas las formas del corpus (`lorsqu'`×230+,
 `elide.mjs` 86→116 checks (APOS_MEANING + conectores); suite completa verde
 (fullregress 172, es-audit 17.221 filas verbo 100%, compuestos 2.104 rotos 0).
 
+## LOTE AP3 (relativo «qu'» + pronombre y existencial negado «il n'y a») — HECHO
+
+Dos huecos detectados por el usuario tras AP2:
+- **`qu'` + pronombre** se resolvía por elisión al pronombre desnudo (`qu'il`→"él"),
+  perdiendo el «que»; y
+- **el existencial negado `il n'y a`** se segmentaba `il|n'y|a` glosando el clítico
+  locativo «y» como "allí" → leía mal («il y a»==hay, «il n'y a»==no hay).
+
+Implementado (todo en `_PHRASES`, claves exactas; el greedy de `segment()` elige la
+forma más larga, así `qu'il n'y aura pas` sale entera):
+- **`qu'` + pronombre**: `qu'il`→que él, `qu'elle`→que ella, `qu'ils`→que ellos,
+  `qu'elles`→que ellas, `qu'on`→que se, `qu'un`→que un / uno, `qu'une`→que una,
+  `qu'eux`→que ellos (Qu' inicial mayúscula también via normalize).
+- **`qu'` + impersonal**: `qu'il faut`→que es necesario / que hay que, `qu'il y a`→
+  que hay, `qu'il y avait`→que había, `qu'il y aura`→que habrá.
+- **Existencial negado** con y sin sujeto, tiempo y negación:
+  `il n'y a`→no hay, `pas`→no hay, `plus`→ya no hay, `rien`→no hay nada,
+  `personne`→no hay nadie, `il n'y avait (pas/plus)`→no había (ya no había),
+  `il n'y avait`/`aura`/`eut`→no había/no habrá/no hubo (con pas/plus), `il n'y en a`→
+  no hay (de ello/ellos) + `en avait/en aura`, `il n'y a-t-il (pas)`→¿no hay…?,
+  `il n'y ait`→no haya, `il n'y aurait (pas)`→no habría.
+- **Conjunciones ante el negado** conservan su sentido: `qu'il n'y a (pas/plus/rien/
+  avait/en/aura/eut/ait)`→que no hay…, `s'il n'y a (pas/avait/rien)`→si no hay…,
+  `lorsqu'il n'y a (plus)/avait/eut`→cuando no hay…, `puisqu'il n'y a`→ya que no hay.
+- El `n'y` suelto del corpus (`n'y touchait pas`, 121×) sigue → "allí": es el clítico
+  locativo real, no existencial.
+
+Sin patrón genérico: cada forma es una clave exacta de `_PHRASES`.
+
+**Medido** (corpus completo, 30.742 versos): `segfull` **0** tokens nulos no-nombre;
+escaneo `qu'`/`n'y` (elidequ/elideny) → los 2.000+ spans `qu'`+pronombre y los ~360
+`n'y` del corpus resuelven con «que/no» correctos (los pocos `null` del scan son la
+forma «bruta» multi-token que `segment()` sí agrupa como compuesto: `qu'avait fait`→
+"hecho", `Qu'avez-vous fait`→"hecho", o nombres propios elididos aceptados);
+`elide.mjs` 116→147 checks; suite completa verde (fullregress 172, es-audit 17.194
+filas verbo 100%, compuestos 2.101 rotos 0).
+
 ## Historial
 
 - `afe836e` — *BATCH 1*: cobertura española 99,3% (sin español 1304→122; compuestos rotos 100→3).
@@ -352,3 +389,4 @@ escaneo de conectores elididos → todas las formas del corpus (`lorsqu'`×230+,
 - `b4931bf` — *LOTE D3*: limpieza de glosas dross (desambiguación/media) + ~80 glossas reales; «l'a b c de»→abecedario.
 - `59746a0` — *LOTE AP*: palabras ligadas por apóstrofo (dross exacto, acentos curados, aye/ayez, n'a jamais, d'après, Isaac).
 - `e6dcc9e` — *LOTE AP2*: conectores elididos conservan su conjunción (lorsqu/puisqu/quoiqu/parce qu/s'il/s'ils/jusqu' + pronombre).
+- `19b2c43` — AGENTS.md: referencia del hash de LOTE AP2 en el historial.
