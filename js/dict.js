@@ -9062,6 +9062,59 @@ const _PHRASES = {
   "n'a jamais": "nunca",
   "d’après": "según",
   "d'après": "según",
+  // elided connectors: lorsque/jusque/quoique forzado a "cuando/hasta/aunque"
+  // before a vowel-initial pronoun. Resolve strips the elided prefix, which
+  // would leave only the bare pronoun ("lorsqu'il" -> "él"); the phrase entry
+  // keeps the conjunction meaning surface first.
+  "lorsqu'il": "cuando él",
+  "lorsqu'elle": "cuando ella",
+  "lorsqu'ils": "cuando ellos",
+  "lorsqu'elles": "cuando ellas",
+  "lorsqu'on": "cuando se",
+  "lorsqu'un": "cuando un / uno",
+  "lorsqu'une": "cuando una",
+  "puisqu'il": "ya que él",
+  "puisqu'elle": "ya que ella",
+  "puisqu'ils": "ya que ellos",
+  "puisqu'elles": "ya que ellas",
+  "puisqu'on": "ya que se",
+  "puisqu'eux": "ya que ellos",
+  "puisqu'il y a": "ya que hay",
+  "puisqu'il y avait": "ya que había",
+  "puisqu'il y en a": "ya que hay (de ello/ellos)",
+  "puisqu'il s'agit de": "ya que se trata de",
+  "quoiqu'il": "aunque él",
+  "quoiqu'elle": "aunque ella",
+  "quoiqu'ils": "aunque ellos",
+  "quoiqu'elles": "aunque ellas",
+  "quoiqu'on": "aunque se",
+  "parce qu'il": "porque él",
+  "parce qu'elle": "porque ella",
+  "parce qu'ils": "porque ellos",
+  "parce qu'elles": "porque ellas",
+  "parce qu'on": "porque se",
+  // si + il/ils elide to s' (never before elle): preserve the conditional.
+  "s'il": "si él",
+  "s'ils": "si ellos",
+  "s'il y a": "si hay",
+  "s'il y avait": "si había",
+  "s'il y en a": "si hay (de ello/ellos)",
+  "s'il faut": "si es necesario / si hay que",
+  "s'il s'agit de": "si se trata de",
+  // special one-off elisions the grammar allows only in these fixed forms
+  "presqu'île": "península",
+  "presqu'îles": "penínsulas",
+  "quelqu'une": "alguien (f.) / alguna",
+  "d'accord": "de acuerdo",
+  // jusqu' + expressions of time currently resolved as bare adverb ("ahora",
+  // "entonces") or a Wikipedia title ("La mañana (Peer Gynt)") — keep "hasta".
+  "jusqu'alors": "hasta entonces",
+  "jusqu'à présent": "hasta ahora",
+  "jusqu'à la fin": "hasta el final",
+  "jusqu'au matin": "hasta la mañana",
+  "jusqu'en": "hasta",
+  "jusqu'où": "hasta dónde",
+  "jusqu'en bas": "hasta abajo",
   // negation
   "ne pas": "no",
   "ne point": "no",
@@ -9616,6 +9669,7 @@ class Dictionary {
     const DROSS_EXACT = new Set([
       "el emperador (tarot)", "edad biológica", "ayer (valais)",
       "isaac (cifrador)", "ingle", "eldest", "animalia",
+      "la mañana (peer gynt)",
     ]);
     const strip = (arr) => (arr || []).filter((g) => {
       const s = String(g);

@@ -296,6 +296,45 @@ AP exactos); es-audit 17.220 filas verbo 100%, compuestos 2.104 rotos 0.
 Nota: la verificación de `elide.mjs` ahora incluye `APOS_MEANING` (glosas EXACTAS de
 cada defecto apóstrofo corregido) — no solo no-null.
 
+## LOTE AP2 (conectores elididos) — HECHO
+
+Gramática del francés: quando las conjunciones/preposiciones terminan en -e antes de una
+palabra con vocal se eliden (`lorsque`→`lorsqu'`, `puisque`→`puisqu'`, `quoique`→`quoiqu'`,
+`parce que`→`parce qu'`, `jusque`→`jusqu'`, `de`→`d'`); `presque`/`si`/`quelque`solo
+contraen en casos fijos (`presqu'île`, `quelqu'un/une`, `s'il`/`s'ils`). El `strip` de
+elisión de `resolve()` quitaba el prefijo elidido y dejaba solo el pronombre
+(`lorsqu'il`→"él"), perdiendo la conjunción. Implementado:
+
+- **`_PHRASES`** (~40 entradas de conectores elididos + pronombre): conservan la
+  conjunción/preposición delante del pronombre. Cuando el número que sigue empieza por
+  vocal la elisión pide la forma contraída:
+  - `lorsqu'il`→cuando él, `lorsqu'elle`→cuando ella, `lorsqu'ils/elles`→cuando
+    ellos/ellas, `lorsqu'on`→cuando se, `lorsqu'un/une`→cuando un/una;
+  - `puisqu'il elle ils elles on eux`→ya que él/ella/ellos/ellas/se/ellos (+ `puisqu'il
+    y a/avait`, `puisqu'il y en a`, `puisqu'il s'agit de`→ya que …);
+  - `quoiqu'il elle ils elles on`→aunque…;
+  - `parce qu'il elle ils elles on`→porque…;
+  - `s'il`→si él, `s'ils`→si ellos (si + il/ils, nunca elle), + `s'il y a/avait`,
+    `s'il y en a`, `s'il faut`, `s'il s'agit de`→si …;
+  - fijos: `presqu'île(s)`→península(s), `quelqu'une`→alguien (f.) / alguna,
+    `d'accord`→de acuerdo;
+  - `jusqu'` + tiempo: `jusqu'alors`→hasta entonces (antes "entonces"),
+    `jusqu'à présent`→hasta ahora (antes "ahora"), `jusqu'à la fin`→hasta el final
+    (antes "al final"), `jusqu'au matin`→hasta la mañana (antes el dross-título
+    "La mañana (Peer Gynt)"), `jusqu'en`→hasta, `jusqu'où`→hasta dónde,
+    `jusqu'en bas`→hasta abajo.
+- **`DROSS_EXACT`** += `la mañana (peer gynt)` (título de Wikipedia que pisaba
+  `jusqu'au matin`).
+
+Sin patrón genérico: cada forma elidida es una clave exacta de `_PHRASES`.
+
+**Medido** (corpus completo, 30.742 versos): `segfull` **0** tokens nulos no-nombre;
+escaneo de conectores elididos → todas las formas del corpus (`lorsqu'`×230+,
+`puisqu'`×85+, `quoiqu'`×3, `parce qu'`×170+ que el scan previo silenciaba, `s'il(s)`×353,
+`jusqu'`×…) resuelven YA con la conjunción (`cuando/ya que/aunque/porque/si/hasta`);
+`elide.mjs` 86→116 checks (APOS_MEANING + conectores); suite completa verde
+(fullregress 172, es-audit 17.221 filas verbo 100%, compuestos 2.104 rotos 0).
+
 ## Historial
 
 - `afe836e` — *BATCH 1*: cobertura española 99,3% (sin español 1304→122; compuestos rotos 100→3).
@@ -311,3 +350,5 @@ cada defecto apóstrofo corregido) — no solo no-null.
 - `aed0060` — *Números ES*: millones y elisión «un/veintiún» ante mil/millón.
 - `52541c5` — *Números FR*: «et» solo entre decena y unidad (neuf et un → no 10).
 - `b4931bf` — *LOTE D3*: limpieza de glosas dross (desambiguación/media) + ~80 glossas reales; «l'a b c de»→abecedario.
+- `59746a0` — *LOTE AP*: palabras ligadas por apóstrofo (dross exacto, acentos curados, aye/ayez, n'a jamais, d'après, Isaac).
+- (lista) *LOTE AP2*: conectores elididos conservan su conjunción (lorsqu/puisqu/quoiqu/parce qu/s'il/s'ils/jusqu' + pronombre).
