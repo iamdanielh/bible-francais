@@ -351,4 +351,4 @@ escaneo de conectores elididos → todas las formas del corpus (`lorsqu'`×230+,
 - `52541c5` — *Números FR*: «et» solo entre decena y unidad (neuf et un → no 10).
 - `b4931bf` — *LOTE D3*: limpieza de glosas dross (desambiguación/media) + ~80 glossas reales; «l'a b c de»→abecedario.
 - `59746a0` — *LOTE AP*: palabras ligadas por apóstrofo (dross exacto, acentos curados, aye/ayez, n'a jamais, d'après, Isaac).
-- (lista) *LOTE AP2*: conectores elididos conservan su conjunción (lorsqu/puisqu/quoiqu/parce qu/s'il/s'ils/jusqu' + pronombre).
+- `e6dcc9e` — *LOTE AP2*: conectores elididos conservan su conjunción (lorsqu/puisqu/quoiqu/parce qu/s'il/s'ils/jusqu' + pronombre).
