@@ -453,6 +453,7 @@ const _COMMON_VERBS = {
 // Common French nouns -> Spanish (port of _COMMON_NOUNS).
 const _COMMON_NOUNS = {
   "commencement": "comienzo / principio", "forme": "forma",
+  "gens": "gente / personas",
   "obscurité": "oscuridad", "abîme": "abismo", "océan": "océano",
   "surface": "superficie", "eau": "agua", "voûte": "bóveda",
   "fête": "fiesta", "année": "año", "source": "fuente / manantial",
@@ -614,7 +615,98 @@ const _EXTRA_WORDS = {
   "fautes": "faltas", "voiture": "coche", "route": "ruta / camino",
   "routes": "rutas", "pont": "puente", "ponts": "puentes",
   "château": "castillo", "châteaux": "castillos", "palais": "palacio",
-  "maison de Dieu": "casa de Dios", "tournoi": "torneo"
+  "maison de Dieu": "casa de Dios", "tournoi": "torneo",
+  "passage": "pasaje / tramo", "passages": "pasajes / tramos",
+  "prince": "príncipe", "princes": "príncipes",
+  "corne": "cuerno", "cornes": "cuernos",
+  "vision": "visión", "visions": "visiones",
+  "cher": "querido / caro", "chers": "queridos / caros", "chère": "querida / cara",
+  "cadre": "marco / armazón / marco funcional", "cadres": "marcos / armazones / cuadros",
+  "plan": "plan / plano", "plans": "planes / planos",
+  "ô": "oh", "filet": "red / filete", "filets": "redes / filetes",
+  "profondeur": "profundidad", "profondeurs": "profundidades",
+  "irrésistible": "irresistible", "irrésistibles": "irresistibles",
+  "irrésistiblement": "irresistiblemente",
+  "crochet": "gancho / corchete", "crochets": "ganchos / corchetes",
+  "coin": "rincón / esquina", "coins": "rincones / esquinas",
+  "allié": "aliado", "alliés": "aliados", "alliée": "aliada",
+  "allier": "aliar", "s'allier": "aliarse", "s'allia": "se alió",
+  "s'allièrent": "se aliaron", "alliant": "aliando / aliar", "s'allieront": "se aliarán",
+  "jugement": "juicio", "jugements": "juicios",
+  "service": "servicio", "services": "servicios",
+  "rangée": "hilera / fila", "rangées": "hileras / filas",
+  "personnage": "personaje", "personnages": "personajes",
+  "argument": "argumento", "arguments": "argumentos",
+  "horreur": "horror", "horreurs": "horrores",
+  "pointe": "punta / punto", "pointes": "puntas / puntos",
+  "dommage": "daño", "dommages": "daños",
+  "vase": "vasija / florero", "vases": "vasijas / floreros",
+  "assassin": "asesino", "assassins": "asesinos",
+  "ressource": "recurso", "ressources": "recursos",
+  "ânon": "asnillo / pollino", "l'ânon": "el asnillo / el pollino",
+  "métal": "metal", "métaux": "metales",
+  "chouette": "lechuza / búho", "chouettes": "lechuzas / búhos",
+  "essence": "esencia / gasolina", "essences": "esencias / gasolinas",
+  "brave": "valiente / buena persona", "braves": "valientes",
+  "lange": "pañal", "langes": "pañales",
+  "patriarche": "patriarca", "patriarches": "patriarcas",
+  "sort": "suerte / hechizo", "sorts": "suertes / hechizos",
+  "sol": "suelo / piso / sol", "sols": "suelos / pisos",
+  "suite": "continuación / resultado", "suites": "continuaciones / secuelas",
+  "principe": "principio", "principes": "principios",
+  "hymne": "himno / himno", "hymnes": "himnos",
+  "proposition": "propuesta", "propositions": "propuestas",
+  "tendant": "tendiendo / tender",
+  "élite": "élite", "élites": "élites",
+  "dragon": "dragón", "dragons": "dragones",
+  "signal": "señal", "signaux": "señales",
+  "oracle": "oráculo", "oracles": "oráculos", "d'oracles": "de oráculos",
+  "droit": "derecho / derecha / recto", "droite": "derecha / recta",
+  "droites": "derechas / rectas",
+  "herse": "rastrillo / verja", "herses": "rastrillos / verjas",
+  "crise": "crisis", "crises": "crisis",
+  "pasteur": "pastor", "pasteurs": "pastores",
+  "divin": "divino", "divine": "divina", "divines": "divinas",
+  "exercice": "ejercicio", "exercices": "ejercicios",
+  "passager": "pasajero / pasajero", "passagers": "pasajeros / pasajeras",
+  "bravé": "desafiado / retado",
+  "nier": "negar", "nie": "niega / negar", "nia": "negó (de nier)", "niaient": "negaban (de nier)",
+  "vis": "vi (de voir)", "vis-à-vis": "frente a / en presencia de",
+  "commandement": "mandamiento / orden", "acacia": "acacia", "d'acacia": "de acacia",
+  "activité": "actividad", "l'activité": "la actividad",
+  "intérêt": "interés", "l'intérêt": "el interés", "d'intérêt": "de interés",
+  "magie": "magia", "avis": "parecer / opinión / aviso", "l'avis": "el parecer",
+  "d'avis": "aconsejan / de acuerdo", "horizon": "horizonte", "l'horizon": "el horizonte",
+  "aire": "era (trillar) / área", "l'aire": "la era / el área",
+  "prestige": "prestigio", "d'apparat": "de aparato / de gala",
+  "passion": "pasión", "cannelle": "canela",
+  "prétendant": "pretendiente / alegando (de prétendre)",
+  "roux": "pelirrojo / rojizo", "moutarde": "mostaza",
+  "choc": "choque / impacto", "franchise": "franqueza / sinceridad",
+  "société": "sociedad", "interprétation": "interpretación",
+  "l'interprétation": "la interpretación", "invasion": "invasión",
+  "l'invasion": "la invasión", "d'invasion": "de invasión",
+  "ranger": "ordenar / colocar (de ranger)",
+  "carrefour": "encrucijada / cruce", "carrefours": "encrucijadas / cruces",
+  "horde": "horda", "puce": "pulga", "oh": "oh", "calcul": "cálculo",
+  "armure": "armadura", "butte": "colina / montículo", "bandera": "bandera",
+  "chaos": "caos", "commentaire": "comentario", "coque": "cáscara",
+  "fétiche": "ídolo / fetiche", "gel": "helada / escarcha",
+  "investigations": "investigaciones", "iris": "iris",
+  "lema": "lemá (¿por qué?, en arameo)", "net": "limpio / neto",
+  "parallèle": "paralelo / paralela", "piper": "engañar (de piper)",
+  "singulier": "singular / particular", "tendance": "tendencia",
+  "transparent": "transparente", "d'abandon": "de abandono",
+  "homer": "hómer (medida de granos)", "saveur": "sabor",
+  "quart": "cuarta parte / cuarto",
+  "l": "lo / la (pronombre, antecedente apocopado sin apóstrofo)",
+  "moissonneur": "segador / cosechador", "moissonneurs": "segadores / cosechadores",
+  "chanson": "canción", "chansons": "canciones",
+  "impitoyable": "implacable / despiadado", "impitoyables": "implacables / despiadados",
+  "inévitable": "inevitable", "inévitables": "inevitables",
+  "sers": "sirves (de servir)", "sent": "siente / siente (de sentir)",
+  "rangé": "ordenado", "rangés": "ordenados / en fila", "rangèrent": "ordenaron / colocaron por filas",
+  "sortir": "salir", "sors": "sales / sal"
 };
 
 // High-frequency vocabulary surfaced by the missing-word analysis of the Bible
@@ -8947,6 +9039,9 @@ const _PHRASES = {
   "la plupart": "la mayoría",
   "la plupart des": "la mayoría de",
   "un certain nombre de": "un cierto número de",
+  "l'a b c de": "el abecé de",
+  "l’a b c de": "el abecé de",
+  "a b c de": "el abecé de",
   // negation
   "ne pas": "no",
   "ne point": "no",
@@ -9490,6 +9585,26 @@ class Dictionary {
       if (!this._map[k]) this._map[k] = [];
       if (val && !this._map[k].includes(val)) this._map[k].push(val);
     }
+    // Wikipedia-driven dictionary dumps carry "… (desambiguación)" stub pages as
+    // glosses («sur» -> "sobre" + "Sur (desambiguación)", «gens» -> only
+    // "Gens (desambiguación)") plus media-title dross («nier» -> "Nier
+    // (videojuego)"). They are not translations: drop them from every
+    // entry up front so no resolve path can surface them.
+    const strip = (arr) => (arr || []).filter((g) => {
+      const s = String(g);
+      return !/(desambiguaci|\((?:pel[íi]cula|canci[óo]n|álbum|c[óo]mic|videojuego|serie de TV|novela de|Marvel Comics|DC Comics)[^)]*\))/i.test(s) &&
+        !/^(?:e\.\s?t\.|phone|furie)$/i.test(s.trim());
+    });
+    for (const [k, arr] of Object.entries(this._map)) {
+      const clean = strip(arr);
+      if (clean.length) this._map[k] = clean;
+      else delete this._map[k];
+    }
+    for (const [k, arr] of this._accent.entries()) {
+      const clean = strip(arr);
+      if (clean.length) this._accent.set(k, clean);
+      else this._accent.delete(k);
+    }
   }
 
   lookup(word) {
@@ -9658,7 +9773,7 @@ class Dictionary {
       }
       // last resort: exact accented key in the raw dict (lookup() strips accents)
       const acc = this._accent.get(variant.toLowerCase().replace(/[’‘]/g, "'"));
-      if (acc) return [acc.slice(), info];
+      if (acc && acc.length) return [acc.slice(), info];
     }
     // last resort: an unresolved capitalized word is almost certainly a
     // proper noun — person or place name (every common word now resolves,
@@ -9676,19 +9791,40 @@ class Dictionary {
     // "où" is "donde", never the collision-gloss of its twin "ou".
     if (/[àâäéèêëîïìôöòùûüç]/.test(cand)) {
       const acc = this._accent.get(cand.toLowerCase().replace(/[’‘]/g, "'"));
-      if (acc) return [acc, info];
+      if (acc) {
+        const clean = this._stripDross(acc, cand);
+        if (clean && clean.length) return [clean, info];
+        return null;
+      }
     }
     const m = this.lookup(cand);
-    if (m) return [this._preferCurated(m, cand), info];
+    if (m) {
+      const clean = this._stripDross(m, cand);
+      if (clean && clean.length) return [this._preferCurated(clean, cand), info];
+    }
     const sing = Dictionary._singular(cand);
     if (sing !== cand) {
       const meanings = this.lookup(sing);
       if (meanings) {
-        info.form = `plural de «${sing}»`;
-        return [this._preferCurated(meanings, sing), info];
+        const clean = this._stripDross(meanings, sing);
+        if (clean && clean.length) {
+          info.form = `plural de «${sing}»`;
+          return [this._preferCurated(clean, sing), info];
+        }
       }
     }
     return null;
+  }
+
+  // Wikipedia-driven dictionary dumps carry "… (desambiguación)" stub pages as
+  // glosses (sur -> "sobre, Sur (desambiguación)", gens -> "Gens
+  // (desambiguación)"). They are not translations: remove them so the app
+  // shows the real senses (or nothing, if every sense was dross).
+  _stripDross(meanings, cand) {
+    const cleaned = (meanings || []).filter(
+      (g) => !/desambiguaci/i.test(String(g)));
+    if (!cleaned.length) return null;
+    return cleaned;
   }
 
   _knownVerbForm(cand) {

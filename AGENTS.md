@@ -224,6 +224,44 @@ nulos). Verificación: escaneo `segment()` de TODA la Biblia (30.742 versos) →
 **0 tokens con significado nulo**; suite completa verde (fullregress 172, es-audit
 17.245 filas verbo 100%, compuestos 2.102 rotos 0).
 
+## LOTE D3 (limpieza de glosas "desambiguación"/media + dross) — HECHO
+
+El diccionario crudo `data/dict.json` (volcado de Wikipedia) trae miles de glosas basura:
+«Sur (desambiguación)», «Encore (desambiguación)», «Gens (desambiguación)», «Nier
+(videojuego)», «Imagine (canción)», «Buried (película)», «Segador (Marvel Comics)»…
+No son traducciones. Implementado:
+
+- **Strip en construcción** (`Dictionary`): `strip()` elimina de TODA entrada (`_map` y
+  `_accent`) las glosas que matchean `desambiguaci` o un paréntesis `(película|canción|
+  álbum|cómic|videojuego|serie de TV|novela de|Marvel Comics|DC Comics)`, y las exactas
+  `e.t.`/`phone`/`furie`. Si una clave queda con 0 glosas se borra.
+- **Bug corregido**: la regex original pisaba glosas legítimas (la «Canción» de
+  `chanson`, entrada que quedó en `[]` si no se borraba la clave) → solo se recortan
+  paréntesis con etiquetas, nunca palabras sueltas.
+- **`_tryDirect`** aplica el mismo filtro con `_stripDross` (y re-aplica `_preferCurated`),
+  y la «última carta» del acento (`_accent`) ahora exige `acc.length > 0` antes de devolver
+  `[]` (array vacío es truthy → antes cualquier dross en el mapa de acentos devolvía `[]`).
+- **~80 glosas reales añadidas a `_EXTRA_WORDS`** para las palabras del corpus cuyo único
+  sentido era dross (ahora serían null): passage, prince, corne, vision, cher, cadre,
+  plan, ô, filet, profondeur, irrésistible, crochet, coin, allié, allier, jugement,
+  service, rangée, personnage, argument, horreur, pointe, dommage, vase, assassin,
+  ressource, métal, chouette, essence, brave, lange, patriarche, sort, sol, suite,
+  principe, hymne, proposition, tendant, élite, dragon, signal, oracle, droit, herse,
+  crise, pasteur, divin, exercice, passager, bravé, rangé, sortir, sers (servir),
+  sent (sentir), nier/nie/nia, moissonneur, chanson, impitoyable, inévitable,
+  vis (voir), vis-à-vis, commandement, acacia, activité, intérêt, magie, avis, horizon,
+  aire, prestige, apparat, passion, cannelle, prétendant, roux, moutarde, choc, franchise,
+  société, interprétation, invasion, ranger, carrefour, horde, puce, oh, calcul, armure,
+  butte, bandera, chaos, commentaire, coque, fétiche, gel, investigations, iris, lema,
+  net, parallèle, piper, singulier, tendance, transparent, abandon, homer, saveur, quart.
+- **Idioma "l'a b c de"** → «el abecé de» (`_PHRASES`): las letras sueltas `b`/`c`
+  del corpus venían solo de «l'a b c de la sagesse» (el abecé de la sabiduría).
+- **`l` suelto** (1 verso, «l impose» sin apóstrofo, elisión de `l'impose`) →
+  glosa como pronombre apocopado.
+
+Verificación: escaneo `segment()` de TODA la Biblia → **0 tokens con significado nulo**;
+suite completa verde; es-audit 17.223 filas verbo 100%, compuestos 2.102 rotos 0.
+
 ## Historial
 
 - `afe836e` — *BATCH 1*: cobertura española 99,3% (sin español 1304→122; compuestos rotos 100→3).
@@ -235,3 +273,6 @@ nulos). Verificación: escaneo `segment()` de TODA la Biblia (30.742 versos) →
 - `425159a` — AGENTS.md: verificación + arquitectura + veredictos A1/A2 + LOTE B.
 - `e79f758` — *LOTE C*: resolver numérico FR→ES + compuestos con guion + verbos con clítico.
 - `b06ca69` — *LOTE D*: huecos reales del corpus a cero (reglas ai/isse + entradas de diccionario + V_I).
+- `b8eaedc` — *LOTE D2*: cifras del corpus ya se traducen (segment() no las descarta) + elipsis puntuación + glosa ouailles/kilo/gramme.
+- `aed0060` — *Números ES*: millones y elisión «un/veintiún» ante mil/millón.
+- `52541c5` — *Números FR*: «et» solo entre decena y unidad (neuf et un → no 10).
