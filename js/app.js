@@ -236,10 +236,57 @@ function showLoadError(msg) {
       btn.disabled = false;
     }
   });
+  const reset = document.createElement("button");
+  reset.className = "primary-btn";
+  reset.style.marginLeft = "10px";
+  reset.textContent = "Borrar caché y recargar";
+  reset.title = "Último recurso si la app se quedó atascada por una caché antigua";
+  reset.addEventListener("click", async () => {
+    reset.disabled = true;
+    btn.disabled = true;
+    try {
+      if ("serviceWorker" in navigator) {
+        const regs = await navigator.serviceWorker.getRegistrations();
+        await Promise.all(regs.map((r) => r.unregister()));
+      }
+      if ("caches" in window) {
+        const keys = await caches.keys();
+        await Promise.all(keys.map((k) => caches.delete(k)));
+      }
+    } catch (e) { /* proceed to reload regardless */ }
+    location.reload();
+  });
   el.loading.appendChild(p);
   el.loading.appendChild(hint);
   el.loading.appendChild(btn);
+  el.loading.appendChild(reset);
 }
+
+// Self-heal: if the Bible still hasn't loaded within ~25s and no error was
+// shown (a stale service worker can hang the data fetch silently on iOS),
+// discard every cache + SW and reload once. Prevents an eternal loading screen.
+let _hardResetAwaited = false;
+const _hardResetTimer = setTimeout(() => {
+  if (_hardResetAwaited || bible.length) {
+    clearTimeout(_hardResetTimer);
+    return;
+  }
+  _hardResetAwaited = true;
+  (async () => {
+    try {
+      if ("serviceWorker" in navigator) {
+        const regs = await navigator.serviceWorker.getRegistrations();
+        await Promise.all(regs.map((r) => r.unregister()));
+      }
+      if ("caches" in window) {
+        const keys = await caches.keys();
+        await Promise.all(keys.map((k) => caches.delete(k)));
+      }
+    } catch (e) { /* proceed regardless */ }
+    if (bible.length) return;
+    location.reload();
+  })();
+}, 25000);
 
 // ---- rendering ------------------------------------------------------------
 let currentBookIndex = 0;

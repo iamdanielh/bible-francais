@@ -1,9 +1,9 @@
-const CACHE = "biblefr-v5";
+const CACHE = "biblefr-v6";
 const DATA_ASSETS = ["data/bible.json", "data/dict.json"];
 
 // Install: pre-cache the big immutable data files for offline use. Failures are
-// tolerated — cache-first serve falls back to the network at runtime, and a
-// flaky fetch must never block this new version from activating.
+// tolerated — network-first serve repairs the cache at runtime, and a flaky
+// fetch must never block this new version from activating.
 self.addEventListener("install", (event) => {
   event.waitUntil(
     caches.open(CACHE)
@@ -24,16 +24,20 @@ self.addEventListener("fetch", (event) => {
   const url = new URL(event.request.url);
   const path = url.pathname;
 
-  // Data JSONs: cache-first (big, rarely change, needed for offline).
+  // Data JSONs: network-first. A stale/corrupt cached copy (e.g. from an
+  // interrupted first install) must not wedge the app — a live fetch succeeds
+  // the moment connectivity allows and repairs the cache. Cache is the offline
+  // fallback only.
   if (DATA_ASSETS.some((a) => path.endsWith(a))) {
     event.respondWith(
-      caches.match(event.request).then((cached) => {
-        return cached || fetch(event.request).then((resp) => {
+      fetch(event.request, { cache: "no-store" }).then((resp) => {
+        if (resp.ok) {
           const copy = resp.clone();
-          if (resp.ok) caches.open(CACHE).then((c) => c.put(event.request, copy));
+          caches.open(CACHE).then((c) => c.put(event.request, copy));
           return resp;
-        });
-      })
+        }
+        return caches.match(event.request).then((cached) => cached || resp);
+      }).catch(() => caches.match(event.request))
     );
     return;
   }
