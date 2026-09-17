@@ -19,7 +19,7 @@ const $ = (id) => document.getElementById(id);
 const el = {
   loading: $("loading"), bookSelect: $("bookSelect"), chapterSelect: $("chapterSelect"),
   prevBtn: $("prevBtn"), nextBtn: $("nextBtn"), vocabBtn: $("vocabBtn"),
-  readBtn: $("readBtn"), stopReadBtn: $("stopReadBtn"),
+  readBtn: $("readBtn"),
   chapterTitle: $("chapterTitle"), verseText: $("verseText"),
   wordLabel: $("wordLabel"), speakBtn: $("speakBtn"), meaning: $("meaning"),
   grammar: $("grammar"), saveBtn: $("saveBtn"), note: $("note"), vocabList: $("vocabList"),
@@ -727,18 +727,16 @@ function currentVerseEls() {
 
 function refreshReadButton() {
   const play = $("readBtn");
-  const stop = $("stopReadBtn");
-  if (!play || !stop) return;
-  stop.disabled = !_readerActive;
+  if (!play) return;
   if (!_readerActive) {
     play.textContent = "▶";
     play.title = "Leer todo el capítulo";
   } else if (_readerPaused) {
     play.textContent = "▶";
-    play.title = "Reanudar lectura";
+    play.title = "Reanudar lectura (mantén para detener)";
   } else {
     play.textContent = "⏸";
-    play.title = "Pausar lectura";
+    play.title = "Pausar lectura (mantén para detener)";
   }
   play.classList.toggle("active", _readerActive);
 }
@@ -1379,8 +1377,23 @@ el.chapterSelect.addEventListener("change", (e) => {
 el.prevBtn.addEventListener("click", gotoPrevChapter);
 el.nextBtn.addEventListener("click", gotoNextChapter);
 el.speakBtn.addEventListener("click", speak);
-el.readBtn.addEventListener("click", toggleChapterRead);
-el.stopReadBtn.addEventListener("click", stopChapterRead);
+// The single reader button is play/pause/resume on tap; a hold (≥600ms) stops.
+let _readHoldTimer = null;
+let _suppressReadClick = false;
+el.readBtn.addEventListener("pointerdown", () => {
+  if (!_readerActive) return;
+  clearTimeout(_readHoldTimer);
+  _readHoldTimer = setTimeout(() => {
+    _suppressReadClick = true;
+    stopChapterRead();
+  }, 600);
+});
+el.readBtn.addEventListener("pointerup", () => clearTimeout(_readHoldTimer));
+el.readBtn.addEventListener("pointercancel", () => clearTimeout(_readHoldTimer));
+el.readBtn.addEventListener("click", () => {
+  if (_suppressReadClick) { _suppressReadClick = false; return; }
+  toggleChapterRead();
+});
 el.saveBtn.addEventListener("click", saveCurrent);
 el.vocabBtn.addEventListener("click", () => { refreshVocab(); openPanel("vocab"); });
 $("scopeAll").addEventListener("click", () => { _vocabScope = "all"; refreshVocab(); });

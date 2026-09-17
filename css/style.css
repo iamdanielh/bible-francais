@@ -256,7 +256,6 @@ button:disabled {
   border-color: var(--accent);
   color: var(--accent-fg);
 }
-#stopReadBtn:disabled { opacity: 0.4; }
 
 /* --- lookup drawer / panel --- */
 .scrim {
@@ -489,6 +488,19 @@ html.touch .scrim.show { opacity: 0; }
   font-weight: 700;
   font-size: 1.02rem;
   letter-spacing: 0.3px;
+}
+.panel-head-spacer { flex: 1; }
+.panel-head #themeBtn {
+  width: 38px;
+  height: 38px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  font-size: 1.15rem;
+  line-height: 1;
+  box-shadow: none;
 }
 
 .panel-body {
