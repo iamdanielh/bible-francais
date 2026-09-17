@@ -7,7 +7,7 @@
   <title>Bible en français — Español</title>
   <link rel="manifest" href="manifest.webmanifest" />
   <link rel="apple-touch-icon" href="icon-180.png" />
-  <link rel="stylesheet" href="css/style.css?v=33" />
+  <link rel="stylesheet" href="css/style.css?v=34" />
 </head>
 <body>
   <script>
@@ -37,7 +37,7 @@
     </div>
   </header>
 
-  <div id="loading" class="loading">Cargando la Biblia… <span id="buildTag">v33</span><span id="bootTag"></span></div>
+  <div id="loading" class="loading">Cargando la Biblia… <span id="buildTag">v34</span><span id="bootTag"></span></div>
 
   <main class="layout">
     <section class="reader">
@@ -139,13 +139,17 @@
         <button id="rbStop" class="icon-btn" title="Detener" aria-label="Detener">⏹</button>
       </div>
       <div class="rb-right">
-        <button id="rbSpeed" class="speed-btn" title="Velocidad de lectura" aria-label="Velocidad de lectura">1.0×</button>
+        <button id="rbSpeed" class="speed-btn" title="Elegir velocidad de lectura" aria-label="Elegir velocidad de lectura">1.0×</button>
         <button id="rbClose" class="icon-btn" title="Cerrar" aria-label="Cerrar">✕</button>
       </div>
     </div>
+    <div id="rbSpeedMenu" class="rb-speed-menu" hidden>
+      <div class="rb-speed-label">Velocidad de lectura</div>
+      <div id="rbSpeedOptions" class="rb-speed-options"></div>
+    </div>
   </div>
 
-  <script type="module" src="js/app.js?v=33"></script>
+  <script type="module" src="js/app.js?v=34"></script>
 
   <script>
     // Non-module trap (runs even if the module above fails to load or parse).

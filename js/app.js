@@ -1,4 +1,4 @@
-import { Dictionary, friendlyTense, friendlyForm, esInfinitive, esConjugado, esCompuesto } from "./dict.js?v=33";
+import { Dictionary, friendlyTense, friendlyForm, esInfinitive, esConjugado, esCompuesto } from "./dict.js?v=34";
 
 const BOOK_ALIASES = {
   "Évangile selon Matthieu": "Matthieu",
@@ -951,6 +951,7 @@ function showReaderBar() {
 }
 
 function hideReaderBar() {
+  hideSpeedMenu();
   document.body.classList.remove("reader-bar-open");
   const bar = $("readerBar");
   if (bar) bar.hidden = true;
@@ -987,15 +988,80 @@ function setReaderRate(r) {
   // apply live where possible
   if (_readerAudio && !_readerUseDevice) { try { _readerAudio.playbackRate = _readerRate; } catch (e) {} }
   refreshReaderBar();
+  refreshSpeedMenu();
 }
 
-function cycleReaderRate() {
-  const next = (READER_RATES.findIndex((r) => r === _readerRate) + 1) % READER_RATES.length;
-  setReaderRate(READER_RATES[next] || 1);
-  if (_readerActive) {
-    // restart at the current verse so the new speed visibly applies
-    seekChapterRead(_readerIdx >= 0 ? _readerIdx : 0);
+function formatRate(r) { return `${r * 1}×`; }
+
+let _speedMenuBuilt = false;
+function buildSpeedMenu() {
+  const wrap = $("rbSpeedOptions");
+  if (!wrap) return;
+  wrap.innerHTML = "";
+  READER_RATES.forEach((r) => {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.textContent = formatRate(r);
+    b.dataset.rate = r;
+    b.addEventListener("click", () => {
+      const prev = _readerRate;
+      setReaderRate(parseFloat(b.dataset.rate) || 1);
+      hideSpeedMenu();
+      if (_readerActive && prev !== _readerRate) {
+        // restart at the current verse so the new speed visibly applies
+        seekChapterRead(_readerIdx >= 0 ? _readerIdx : 0);
+      }
+    });
+    wrap.appendChild(b);
+  });
+  _speedMenuBuilt = true;
+}
+
+function refreshSpeedMenu() {
+  const wrap = $("rbSpeedOptions");
+  if (!wrap) return;
+  wrap.querySelectorAll("button").forEach((b) => {
+    b.classList.toggle("sel", parseFloat(b.dataset.rate) === _readerRate);
+  });
+}
+
+function toggleSpeedMenu(force) {
+  const menu = $("rbSpeedMenu");
+  if (!menu) return;
+  if (!_speedMenuBuilt) buildSpeedMenu();
+  if (force === false) { menu.hidden = true; document.removeEventListener("click", onSpeedDocClick); return; }
+  refreshSpeedMenu();
+  const willShow = force === true || menu.hidden;
+  menu.hidden = !willShow;
+  if (willShow) {
+    menu.querySelectorAll("button").forEach((b) => {
+      b.classList.toggle("sel", parseFloat(b.dataset.rate) === _readerRate);
+    });
   }
+}
+
+let _speedMenuOpen = false;
+function onSpeedBtnClick(ev) {
+  ev.stopPropagation();
+  _speedMenuOpen = !_speedMenuOpen;
+  if (_speedMenuOpen) {
+    setTimeout(() => document.addEventListener("click", onSpeedDocClick), 0);
+  } else {
+    document.removeEventListener("click", onSpeedDocClick);
+  }
+  toggleSpeedMenu(_speedMenuOpen);
+}
+
+function onSpeedDocClick() {
+  _speedMenuOpen = false;
+  toggleSpeedMenu(false);
+}
+
+function hideSpeedMenu() {
+  _speedMenuOpen = false;
+  document.removeEventListener("click", onSpeedDocClick);
+  const menu = $("rbSpeedMenu");
+  if (menu) menu.hidden = true;
 }
 
 function seekChapterRead(i) {
@@ -1757,7 +1823,7 @@ if (rbPlay) rbPlay.addEventListener("click", toggleChapterRead);
 if (rbStop) rbStop.addEventListener("click", stopChapterRead);
 if (rbPrev) rbPrev.addEventListener("click", () => { if (_readerActive) seekChapterRead(Math.max(0, (_readerIdx >= 0 ? _readerIdx : 0) - 1)); });
 if (rbNext) rbNext.addEventListener("click", () => { if (_readerActive) seekChapterRead(_readerIdx + 1); });
-if (rbSpeed) rbSpeed.addEventListener("click", cycleReaderRate);
+if (rbSpeed) rbSpeed.addEventListener("click", onSpeedBtnClick);
 if (rbClose) rbClose.addEventListener("click", stopChapterRead);
 el.saveBtn.addEventListener("click", saveCurrent);
 el.vocabBtn.addEventListener("click", () => { refreshVocab(); openPanel("vocab"); });

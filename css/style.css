@@ -311,6 +311,48 @@ button:disabled {
   border-radius: 999px;
   font-variant-numeric: tabular-nums;
 }
+.rb-speed-menu {
+  position: absolute;
+  left: 14px;
+  right: 14px;
+  bottom: calc(100% + 8px);
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-drawer);
+  padding: 10px 12px 12px;
+  z-index: 59;
+}
+.rb-speed-label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 8px;
+}
+.rb-speed-options {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 6px;
+}
+.rb-speed-menu button {
+  border: 1px solid var(--border);
+  background: var(--ctrl-bg);
+  color: var(--fg);
+  border-radius: var(--radius-sm);
+  font-size: 0.85rem;
+  font-variant-numeric: tabular-nums;
+  padding: 8px 0;
+  cursor: pointer;
+}
+.rb-speed-menu button:active { background: var(--sel-bg); }
+.rb-speed-menu button.sel {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-fg);
+  font-weight: 700;
+}
 .reader-bar .icon-btn, .reader-bar .round-btn { width: 34px; height: 34px; font-size: 1rem; }
 /* keep the bottom of the text clear of the fixed bar while it's open */
 body.reader-bar-open .reader {
