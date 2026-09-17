@@ -720,6 +720,7 @@ let _readerAudio = null;
 let _readerChunks = [];
 let _readerChunk = 0;
 let _readerUseDevice = IS_IOS;
+let _readerUtterances = []; // retained refs: iOS GCs untracked utterances
 
 const READER_CHUNK = 180; // Google TTS tolerates ~200 chars per request
 
@@ -791,6 +792,7 @@ function stopChapterRead() {
   _readerActive = false;
   _readerPaused = false;
   _readerIdx = -1;
+  _readerUtterances = [];
   stopReaderAudio();
   try { window.speechSynthesis.cancel(); if (IS_IOS) window.speechSynthesis.resume(); } catch (e) {}
   clearReadHighlight();
@@ -837,7 +839,7 @@ function playReadChunk() {
 function readerUseDeviceFallback(i) {
   _readerUseDevice = true;
   stopReaderAudio();
-  speakReadVerse(i);
+  startDeviceRead(chapterVerses(), _readerGen, i);
 }
 
 function speakReadVerse(i) {
@@ -846,20 +848,39 @@ function speakReadVerse(i) {
   if (i >= verses.length) { stopChapterRead(); return; }
   _readerIdx = i;
   highlightReadVerse(i);
-  if (!_readerUseDevice) {
-    _readerChunks = readerChunks(verses[i]);
-    _readerChunk = 0;
-    playReadChunk();
-    return;
+  _readerChunks = readerChunks(verses[i]);
+  _readerChunk = 0;
+  playReadChunk();
+}
+
+// Device-voice engine. Every verse is built into an utterance and the whole
+// chapter is queued synchronously from inside the tap gesture. iOS only lets
+// the first speak() begin from the gesture, and it garbage-collects utterances
+// that aren't retained (a chained per-verse speak() was silently dropped until
+// the 🔊 word button warmed the engine) — so references are kept and each
+// verse highlights on its own onstart.
+function startDeviceRead(verses, gen, from) {
+  if (!verses || !verses.length) { stopChapterRead(); return; }
+  if (!("speechSynthesis" in window)) { stopChapterRead(); return; }
+  _readerUtterances = [];
+  for (let i = from || 0; i < verses.length; i++) {
+    if (!verses[i]) continue;
+    const u = new SpeechSynthesisUtterance(verses[i]);
+    u.lang = "fr-FR";
+    u.rate = 0.9;
+    if (_readerVoice) { try { u.voice = _readerVoice; } catch (e) {} }
+    u.onstart = () => {
+      if (gen === _readerGen && _readerActive) { _readerIdx = i; highlightReadVerse(i); }
+    };
+    const last = i === verses.length - 1;
+    u.onend = () => { if (last && gen === _readerGen && _readerActive) stopChapterRead(); };
+    u.onerror = () => { if (last && gen === _readerGen && _readerActive) stopChapterRead(); };
+    _readerUtterances.push(u);
   }
-  const u = new SpeechSynthesisUtterance(verses[i]);
-  u.lang = "fr-FR";
-  u.rate = 0.9;
-  if (_readerVoice) { try { u.voice = _readerVoice; } catch (e) {} }
-  const gen = _readerGen;
-  u.onend = () => { if (gen === _readerGen && _readerActive && !_readerPaused) speakReadVerse(i + 1); };
-  u.onerror = () => { if (gen === _readerGen && _readerActive && !_readerPaused) speakReadVerse(i + 1); };
-  try { window.speechSynthesis.speak(u); } catch (e) { stopChapterRead(); }
+  try { window.speechSynthesis.resume(); } catch (e) {} // clear any stuck iOS paused state
+  for (const u of _readerUtterances) { try { window.speechSynthesis.speak(u); } catch (e) {} }
+  // Classic iOS kick: some versions queue the list but only start after a
+  // pause/resume pair issued right after the batch speak().
   if (IS_IOS) { try { window.speechSynthesis.pause(); window.speechSynthesis.resume(); } catch (e) {} }
 }
 
@@ -874,6 +895,7 @@ function startChapterRead() {
   _readerIdx = -1;
   _readerChunks = [];
   _readerChunk = 0;
+  _readerUtterances = [];
   _readerUseDevice = IS_IOS && ("speechSynthesis" in window);
   clearReadHighlight();
   refreshReadButton();
@@ -884,6 +906,8 @@ function startChapterRead() {
   _readerVoice = null;
   if (_readerUseDevice) {
     try { _readerVoice = pickFrVoice(window.speechSynthesis.getVoices()); } catch (e) {}
+    startDeviceRead(verses, _readerGen, 0);
+    return;
   }
   speakReadVerse(0);
   // Device voices often populate a moment later; adopt the French one for the
