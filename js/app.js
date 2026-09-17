@@ -19,6 +19,7 @@ const $ = (id) => document.getElementById(id);
 const el = {
   loading: $("loading"), bookSelect: $("bookSelect"), chapterSelect: $("chapterSelect"),
   prevBtn: $("prevBtn"), nextBtn: $("nextBtn"), vocabBtn: $("vocabBtn"),
+  readBtn: $("readBtn"), stopReadBtn: $("stopReadBtn"),
   chapterTitle: $("chapterTitle"), verseText: $("verseText"),
   wordLabel: $("wordLabel"), speakBtn: $("speakBtn"), meaning: $("meaning"),
   grammar: $("grammar"), saveBtn: $("saveBtn"), note: $("note"), vocabList: $("vocabList"),
@@ -246,16 +247,20 @@ function gotoPrevChapter() {
 }
 
 function renderChapter() {
+  stopChapterRead();
   const book = bible[currentBookIndex];
   const verses = book.chapters[currentChapter] || [];
   el.chapterTitle.textContent = `${book.name} — capítulo ${currentChapter + 1}`;
   el.verseText.innerHTML = "";
   const docFrag = document.createDocumentFragment();
   verses.forEach((text, vi) => {
+    const verse = document.createElement("span");
+    verse.className = "verse";
+    verse.dataset.vi = vi;
     const vnum = document.createElement("span");
     vnum.className = "vnum";
     vnum.textContent = `[${vi + 1}] `;
-    docFrag.appendChild(vnum);
+    verse.appendChild(vnum);
     // split into tokens, keep punctuation attached for display but strip for lookup
     const tokens = text.split(" ");
     let sentenceStart = true;
@@ -266,11 +271,12 @@ function renderChapter() {
       word.dataset.word = token.replace(/[.,;:!?…«»"'“”‘’()[\]*–—]+$/g, "").replace(/^[.,;:!?…«»"'“”‘’()[\]*–—]+/g, "");
       const atSentenceStart = sentenceStart;
       word.addEventListener("click", () => presentWord(word.dataset.word, ti, token, atSentenceStart));
-      docFrag.appendChild(word);
-      if (ti < tokens.length - 1) docFrag.appendChild(document.createTextNode(" "));
+      verse.appendChild(word);
+      if (ti < tokens.length - 1) verse.appendChild(document.createTextNode(" "));
       sentenceStart = /[.!?…]+$/.test(token);
     });
-    docFrag.appendChild(document.createElement("br"));
+    docFrag.appendChild(verse);
+    if (vi < verses.length - 1) docFrag.appendChild(document.createElement("br"));
   });
   el.verseText.appendChild(docFrag);
   buildChapterTokens(book, currentChapter);
@@ -668,6 +674,7 @@ function stopActiveAudio() {
 
 async function speak() {
   if (!currentKey) return;
+  stopChapterRead();
   stopActiveAudio();
   const text = currentKey;
 
@@ -695,6 +702,135 @@ async function speak() {
   }
   await waitForVoices();
   startLocal();
+}
+
+// ---- whole-chapter read-aloud ----------------------------------------------
+// Reads the current chapter verse by verse through speechSynthesis (the device
+// voice) so the reader can pause, resume, and stop freely, and so the verse
+// currently being spoken can be highlighted and kept in view. The single-shot
+// web voice (playViaAudio above) is not usable here: it plays through one
+// <audio> element with no verse granularity or clean pause/resume.
+let _readerActive = false;
+let _readerPaused = false;
+let _readerGen = 0;   // bumped on stop/navigation so stale onend handlers give up
+let _readerIdx = -1;
+let _readerVoice = null;
+
+function chapterVerses() {
+  const book = bible[currentBookIndex];
+  return (book && book.chapters[currentChapter]) || [];
+}
+
+function currentVerseEls() {
+  return [...el.verseText.querySelectorAll(".verse")];
+}
+
+function refreshReadButton() {
+  const play = $("readBtn");
+  const stop = $("stopReadBtn");
+  if (!play || !stop) return;
+  stop.disabled = !_readerActive;
+  if (!_readerActive) {
+    play.textContent = "▶";
+    play.title = "Leer todo el capítulo";
+  } else if (_readerPaused) {
+    play.textContent = "▶";
+    play.title = "Reanudar lectura";
+  } else {
+    play.textContent = "⏸";
+    play.title = "Pausar lectura";
+  }
+  play.classList.toggle("active", _readerActive);
+}
+
+function clearReadHighlight() {
+  for (const v of currentVerseEls()) v.classList.remove("reading");
+}
+
+function highlightReadVerse(i) {
+  clearReadHighlight();
+  const v = currentVerseEls()[i];
+  if (!v) return;
+  v.classList.add("reading");
+  // keep the active verse comfortably visible in the reader pane
+  if (readerEl) {
+    const vTop = v.getBoundingClientRect().top - readerEl.getBoundingClientRect().top;
+    const vH = v.offsetHeight;
+    const target = readerEl.scrollTop + vTop - Math.max(0, (readerEl.clientHeight - vH) / 2);
+    _programmaticScrolls += 2;
+    readerEl.scrollTop = Math.max(0, target);
+    setTimeout(() => { _programmaticScrolls = Math.max(0, _programmaticScrolls - 2); }, 120);
+  }
+}
+
+function stopChapterRead() {
+  if (!_readerActive) { clearReadHighlight(); return; }
+  _readerGen++;
+  _readerActive = false;
+  _readerPaused = false;
+  _readerIdx = -1;
+  try { window.speechSynthesis.cancel(); if (IS_IOS) window.speechSynthesis.resume(); } catch (e) {}
+  clearReadHighlight();
+  refreshReadButton();
+  showTopbar();
+}
+
+function pauseChapterRead() {
+  if (!_readerActive || _readerPaused) return;
+  _readerPaused = true;
+  try { window.speechSynthesis.pause(); } catch (e) {}
+  refreshReadButton();
+}
+
+function resumeChapterRead() {
+  if (!_readerActive || !_readerPaused) return;
+  _readerPaused = false;
+  try { window.speechSynthesis.resume(); if (IS_IOS) { window.speechSynthesis.pause(); window.speechSynthesis.resume(); } } catch (e) {}
+  refreshReadButton();
+}
+
+function speakReadVerse(i) {
+  if (!_readerActive || _readerPaused) return;
+  const verses = chapterVerses();
+  if (i >= verses.length) { stopChapterRead(); return; }
+  _readerIdx = i;
+  highlightReadVerse(i);
+  const u = new SpeechSynthesisUtterance(verses[i]);
+  u.lang = "fr-FR";
+  u.rate = 0.9;
+  if (_readerVoice) { try { u.voice = _readerVoice; } catch (e) {} }
+  const gen = _readerGen;
+  u.onend = () => { if (gen === _readerGen && _readerActive && !_readerPaused) speakReadVerse(i + 1); };
+  u.onerror = () => { if (gen === _readerGen && _readerActive && !_readerPaused) speakReadVerse(i + 1); };
+  try { window.speechSynthesis.speak(u); } catch (e) { stopChapterRead(); }
+  if (IS_IOS) { try { window.speechSynthesis.pause(); window.speechSynthesis.resume(); } catch (e) {} }
+}
+
+async function startChapterRead() {
+  if (!("speechSynthesis" in window)) return;
+  const verses = chapterVerses();
+  if (!verses.length) return;
+  stopActiveAudio();
+  _readerGen++;
+  if (_readerActive) { try { window.speechSynthesis.cancel(); } catch (e) {} }
+  _readerActive = true;
+  _readerPaused = false;
+  _readerIdx = -1;
+  clearReadHighlight();
+  refreshReadButton();
+  showTopbar();
+  // gather the French voice; some engines need a moment (the same wait the
+  // single-word path uses), so resolve it before queueing the first verse.
+  await waitForVoices();
+  if (!_readerActive) return; // stopped while waiting
+  const voices = (() => { try { return window.speechSynthesis.getVoices(); } catch (e) { return []; } })();
+  _readerVoice = pickFrVoice(voices);
+  speakReadVerse(0);
+}
+
+function toggleChapterRead() {
+  if (!_readerActive) { startChapterRead(); return; }
+  if (_readerPaused) resumeChapterRead(); else pauseChapterRead();
 }
 
 // ---- vocabulary -----------------------------------------------------------
@@ -1243,6 +1379,8 @@ el.chapterSelect.addEventListener("change", (e) => {
 el.prevBtn.addEventListener("click", gotoPrevChapter);
 el.nextBtn.addEventListener("click", gotoNextChapter);
 el.speakBtn.addEventListener("click", speak);
+el.readBtn.addEventListener("click", toggleChapterRead);
+el.stopReadBtn.addEventListener("click", stopChapterRead);
 el.saveBtn.addEventListener("click", saveCurrent);
 el.vocabBtn.addEventListener("click", () => { refreshVocab(); openPanel("vocab"); });
 $("scopeAll").addEventListener("click", () => { _vocabScope = "all"; refreshVocab(); });

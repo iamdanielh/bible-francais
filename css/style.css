@@ -245,6 +245,18 @@ button:disabled {
   font-size: 0.82em;
   font-family: var(--sans);
 }
+.verse-text .verse { border-radius: 6px; }
+.verse-text .verse.reading {
+  background: var(--accent-soft);
+  box-shadow: inset 0 0 0 1px var(--accent);
+  border-radius: 6px;
+}
+#readBtn.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-fg);
+}
+#stopReadBtn:disabled { opacity: 0.4; }
 
 /* --- lookup drawer / panel --- */
 .scrim {
