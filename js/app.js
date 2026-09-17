@@ -276,6 +276,7 @@ async function loadData() {
 }
 
 function showLoadError(msg) {
+  clearTimeout(_hardResetTimer);
   el.loading.textContent = "";
   const p = document.createElement("p");
   p.textContent = msg;
@@ -321,30 +322,17 @@ function showLoadError(msg) {
   el.loading.appendChild(reset);
 }
 
-// Self-heal: if the Bible still hasn't loaded within ~25s and no error was
-// shown (a stale service worker can hang the data fetch silently on iOS),
-// discard every cache + SW and reload once. Prevents an eternal loading screen.
-let _hardResetAwaited = false;
+// Self-heal guard: if the Bible still hasn't loaded within ~25s, surface the
+// same Retry + cache-wipe error UI instead of reloading — an auto-reload would
+// just restart the slow/failing download and keep the loading screen forever.
+let _hardResetShown = false;
 const _hardResetTimer = setTimeout(() => {
-  if (_hardResetAwaited || bible.length) {
+  if (_hardResetShown || bible.length) {
     clearTimeout(_hardResetTimer);
     return;
   }
-  _hardResetAwaited = true;
-  (async () => {
-    try {
-      if ("serviceWorker" in navigator) {
-        const regs = await navigator.serviceWorker.getRegistrations();
-        await Promise.all(regs.map((r) => r.unregister()));
-      }
-      if ("caches" in window) {
-        const keys = await caches.keys();
-        await Promise.all(keys.map((k) => caches.delete(k)));
-      }
-    } catch (e) { /* proceed regardless */ }
-    if (bible.length) return;
-    location.reload();
-  })();
+  _hardResetShown = true;
+  showLoadError("La descarga tarda demasiado. Comprueba tu conexión.");
 }, 25000);
 
 // ---- rendering ------------------------------------------------------------

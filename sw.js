@@ -1,4 +1,4 @@
-const CACHE = "biblefr-v6";
+const CACHE = "biblefr-v7";
 const DATA_ASSETS = ["data/bible.json", "data/dict.json"];
 
 // Install: pre-cache the big immutable data files for offline use. Failures are
