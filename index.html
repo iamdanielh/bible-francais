@@ -7,7 +7,7 @@
   <title>Bible en français — Español</title>
   <link rel="manifest" href="manifest.webmanifest" />
   <link rel="apple-touch-icon" href="icon-180.png" />
-  <link rel="stylesheet" href="css/style.css?v=31" />
+  <link rel="stylesheet" href="css/style.css?v=32" />
 </head>
 <body>
   <script>
@@ -37,7 +37,7 @@
     </div>
   </header>
 
-  <div id="loading" class="loading">Cargando la Biblia… <span id="buildTag">v31</span><span id="bootTag"></span></div>
+  <div id="loading" class="loading">Cargando la Biblia… <span id="buildTag">v32</span><span id="bootTag"></span></div>
 
   <main class="layout">
     <section class="reader">
@@ -145,7 +145,37 @@
     </div>
   </div>
 
-  <script type="module" src="js/app.js?v=31"></script>
+  <script type="module" src="js/app.js?v=32"></script>
+
+  <script>
+    // Non-module trap (runs even if the module above fails to load or parse).
+    // Module load failures fire "error" on the <script> element; module
+    // evaluation errors surface as window "error" / "unhandledrejection".
+    (function () {
+      var m = document.querySelector("script[type=module]");
+      function show(kind, msg) {
+        var l = document.getElementById("loading");
+        if (!l) return;
+        var div = document.createElement("p");
+        div.style.color = "#e05252";
+        div.textContent = kind + ": " + msg;
+        l.appendChild(div);
+      }
+      if (m) {
+        m.addEventListener("error", function (ev) {
+          show("MÓDULO NO CARGÓ", ev.message || "no se pudo descargar js/app.js");
+        });
+      }
+      window.addEventListener("error", function (ev) {
+        if (typeof __APP_BOOTED__ !== "undefined") return;
+        show("ERROR JS", ev.message || String(ev.error || ev.reason || ev));
+      });
+      window.addEventListener("unhandledrejection", function (ev) {
+        if (typeof __APP_BOOTED__ !== "undefined") return;
+        show("PROMESA RECHAZADA", (ev.reason && ev.reason.message) || String(ev.reason));
+      });
+    })();
+  </script>
 
   <script>
     // Last-resort watchdog: if the module above never booted (old cached HTML
