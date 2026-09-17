@@ -16,6 +16,65 @@ let state = { book: 0, chapter: 0, vocab: [], scrollTop: 0, ai: { key: "", model
 
 // ---- DOM refs -------------------------------------------------------------
 const $ = (id) => document.getElementById(id);
+
+// Surface ANY error (incl. mid-module-evaluation throws that would otherwise
+// abort bootstrap and leave an eternal loading screen) on the load box with a
+// recovery path. Registered first so it never misses something below.
+(() => {
+  const show = (msg) => {
+    try {
+      const l = document.getElementById("loading");
+      if (!l) return;
+      l.textContent = "Error de inicio: " + msg;
+      const r = document.createElement("button");
+      r.textContent = "Borrar caché y recargar";
+      r.className = "primary-btn";
+      r.addEventListener("click", async () => {
+        try {
+          if ("serviceWorker" in navigator) {
+            const regs = await navigator.serviceWorker.getRegistrations();
+            await Promise.all(regs.map((x) => x.unregister()));
+          }
+          if ("caches" in window) {
+            const keys = await caches.keys();
+            await Promise.all(keys.map((k) => caches.delete(k)));
+          }
+        } catch (err) {}
+        location.reload();
+      });
+      l.appendChild(document.createElement("br"));
+      l.appendChild(r);
+    } catch (err) {}
+  };
+  window.addEventListener("error", (e) => show(e.message || String(e.error || e)));
+  window.addEventListener("unhandledrejection", (e) => show((e.reason && e.reason.message) || "promesa rechazada"));
+})();
+
+function _fatalBoot(e, label) {
+  const m = (label ? label + ": " : "") + (e && e.message ? e.message : String(e));
+  console.error("bootstrap fatal:", m);
+  const l = $("loading");
+  if (!l) return;
+  l.textContent = "Error de inicio: " + m;
+  const r = document.createElement("button");
+  r.textContent = "Borrar caché y recargar";
+  r.className = "primary-btn";
+  r.addEventListener("click", async () => {
+    try {
+      if ("serviceWorker" in navigator) {
+        const regs = await navigator.serviceWorker.getRegistrations();
+        await Promise.all(regs.map((x) => x.unregister()));
+      }
+      if ("caches" in window) {
+        const keys = await caches.keys();
+        await Promise.all(keys.map((k) => caches.delete(k)));
+      }
+    } catch (err) {}
+    location.reload();
+  });
+  l.appendChild(document.createElement("br"));
+  l.appendChild(r);
+}
 const el = {
   loading: $("loading"), bookSelect: $("bookSelect"), chapterSelect: $("chapterSelect"),
   prevBtn: $("prevBtn"), nextBtn: $("nextBtn"), vocabBtn: $("vocabBtn"),
@@ -1708,12 +1767,13 @@ el.readBtn.addEventListener("click", () => {
   if (_suppressReadClick) { _suppressReadClick = false; return; }
   toggleChapterRead();
 });
-$("rbPlay").addEventListener("click", toggleChapterRead);
-$("rbStop").addEventListener("click", stopChapterRead);
-$("rbPrev").addEventListener("click", () => { if (_readerActive) seekChapterRead(Math.max(0, (_readerIdx >= 0 ? _readerIdx : 0) - 1)); });
-$("rbNext").addEventListener("click", () => { if (_readerActive) seekChapterRead(_readerIdx + 1); });
-$("rbSpeed").addEventListener("click", cycleReaderRate);
-$("rbClose").addEventListener("click", stopChapterRead);
+const rbPlay = $("rbPlay"), rbStop = $("rbStop"), rbPrev = $("rbPrev"), rbNext = $("rbNext"), rbSpeed = $("rbSpeed"), rbClose = $("rbClose");
+if (rbPlay) rbPlay.addEventListener("click", toggleChapterRead);
+if (rbStop) rbStop.addEventListener("click", stopChapterRead);
+if (rbPrev) rbPrev.addEventListener("click", () => { if (_readerActive) seekChapterRead(Math.max(0, (_readerIdx >= 0 ? _readerIdx : 0) - 1)); });
+if (rbNext) rbNext.addEventListener("click", () => { if (_readerActive) seekChapterRead(_readerIdx + 1); });
+if (rbSpeed) rbSpeed.addEventListener("click", cycleReaderRate);
+if (rbClose) rbClose.addEventListener("click", stopChapterRead);
 el.saveBtn.addEventListener("click", saveCurrent);
 el.vocabBtn.addEventListener("click", () => { refreshVocab(); openPanel("vocab"); });
 $("scopeAll").addEventListener("click", () => { _vocabScope = "all"; refreshVocab(); });
@@ -2098,6 +2158,7 @@ async function init() {
 // loading screen is replaced. LoadData's Retry button re-invokes this directly.
 async function initApp() {
   el.loading.style.display = "none";
+  window.__APP_BOOTED__ = true;
   currentBookIndex = Math.min(Math.max(state.book, 0), bible.length - 1);
   currentChapter = state.chapter || 0;
   buildBookList();

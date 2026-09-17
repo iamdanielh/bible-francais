@@ -7,7 +7,7 @@
   <title>Bible en français — Español</title>
   <link rel="manifest" href="manifest.webmanifest" />
   <link rel="apple-touch-icon" href="icon-180.png" />
-  <link rel="stylesheet" href="css/style.css?v=28" />
+  <link rel="stylesheet" href="css/style.css?v=29" />
 </head>
 <body>
   <header class="topbar">
@@ -134,6 +134,37 @@
     </div>
   </div>
 
-  <script type="module" src="js/app.js?v=28"></script>
+  <script type="module" src="js/app.js?v=29"></script>
+
+  <script>
+    // Last-resort watchdog: if the module above never booted (old cached HTML
+    // paired with the new JS, a parse failure, etc.) the loading screen would
+    // sit forever. Detect that and offer a cache wipe + reload.
+    setTimeout(function () {
+      if (window.__APP_BOOTED__) return;
+      var l = document.getElementById("loading");
+      if (!l) return;
+      var p = document.createElement("p");
+      p.textContent = "La app no pudo iniciarse (posible versión antigua en caché).";
+      var b = document.createElement("button");
+      b.textContent = "Borrar caché y recargar";
+      b.className = "primary-btn";
+      b.addEventListener("click", async function () {
+        try {
+          if ("serviceWorker" in navigator) {
+            var regs = await navigator.serviceWorker.getRegistrations();
+            await Promise.all(regs.map(function (r) { return r.unregister(); }));
+          }
+          if ("caches" in window) {
+            var keys = await caches.keys();
+            await Promise.all(keys.map(function (k) { return caches.delete(k); }));
+          }
+        } catch (e) {}
+        location.reload();
+      });
+      l.appendChild(p);
+      l.appendChild(b);
+    }, 15000);
+  </script>
 </body>
 </html>
