@@ -1,4 +1,4 @@
-import { Dictionary, friendlyTense, friendlyForm, esInfinitive, esConjugado, esCompuesto } from "./dict.js?v=34";
+import { Dictionary, friendlyTense, friendlyForm, esInfinitive, esConjugado, esCompuesto } from "./dict.js?v=35";
 
 const BOOK_ALIASES = {
   "Évangile selon Matthieu": "Matthieu",
@@ -11,7 +11,6 @@ const BOOK_ALIASES = {
 };
 
 let bible = [];       // [{name, chapters:[[verseText,...],...]}]
-window.__MODULE_TOP__ = true;
 let dictionary = null;
 let state = { book: 0, chapter: 0, vocab: [], scrollTop: 0, ai: { key: "", model: "" } };
 
@@ -251,7 +250,6 @@ async function loadData() {
     new Promise((_, rej) => setTimeout(() => rej(new Error(`tiempo de espera agotado al cargar ${label}`)), ms)),
   ]);
   try {
-    try { $("bootTag").textContent = " descargando…"; } catch (e) {}
     const [raw, dict] = window.__DATA__
       ? [JSON.stringify(window.__DATA__.bible), window.__DATA__.dict]
       : await Promise.all([
@@ -279,6 +277,7 @@ async function loadData() {
 
 function showLoadError(msg) {
   clearTimeout(_hardResetTimer);
+  el.loading.hidden = false;
   el.loading.textContent = "";
   const p = document.createElement("p");
   p.textContent = msg;
@@ -902,11 +901,21 @@ function karaokeWordEls(i) {
   return v ? [...v.querySelectorAll(".word")] : [];
 }
 
-function startKaraoke(i) {
+// The rate the selected engine actually speaks at. The device voice is tuned
+// down slightly (×0.92) to sound natural, so the karaoke estimate must scale
+// with the same factor or the highlight creeps ahead of the audio.
+function effectiveReaderRate() {
+  if (_readerUseDevice) return Math.max(0.5, Math.min(2, _readerRate)) * 0.92;
+  return Math.max(0.5, _readerRate);
+}
+
+function startKaraoke(i, from) {
   clearKaraoke();
   const words = karaokeWordEls(i);
   if (!words.length) return;
   const gen = _readerGen;
+  const rate = effectiveReaderRate();
+  const startAt = from == null ? 0 : Math.max(0, Math.min(from, words.length - 1));
   const tick = (wi) => {
     if (!_readerActive || gen !== _readerGen) return;
     const w = words[wi];
@@ -917,11 +926,11 @@ function startKaraoke(i) {
     const next = wi + 1;
     const wait = next >= words.length
       ? 0
-      : (KARAOKE_GAP_MS + KARAOKE_CHAR_MS * Math.max(1, (w.textContent || "").length)) / Math.max(0.5, _readerRate);
+      : (KARAOKE_GAP_MS + KARAOKE_CHAR_MS * Math.max(1, (w.textContent || "").length)) / rate;
     if (next >= words.length) { _karaokeTimer = null; return; }
     _karaokeTimer = setTimeout(() => tick(next), wait);
   };
-  tick(0);
+  tick(startAt);
 }
 
 function highlightReadVerse(i) {
@@ -1125,7 +1134,9 @@ function stopChapterRead() {
 function pauseChapterRead() {
   if (!_readerActive || _readerPaused) return;
   _readerPaused = true;
+  const lastWord = Math.max(0, _karaokeIdx);
   clearKaraoke();
+  _karaokeIdx = lastWord;
   if (_readerUseDevice) { try { window.speechSynthesis.pause(); } catch (e) {} }
   else if (_readerAudio) { try { _readerAudio.pause(); } catch (e) {} }
   refreshReadButton();
@@ -1140,7 +1151,7 @@ function resumeChapterRead() {
   } else if (_readerAudio) {
     _readerAudio.play().catch(() => {});
   }
-  startKaraoke(Math.max(0, _readerIdx));
+  startKaraoke(Math.max(0, _readerIdx), Math.max(0, _karaokeIdx));
   refreshReadButton();
   refreshReaderBar();
 }
@@ -2188,12 +2199,15 @@ function setPanelFullscreen(full) {
 
 // ---- init -----------------------------------------------------------------
 async function init() {
-  try { $("bootTag").textContent = " js " + (window.__MODULE_OK__ = true) + " ✓"; } catch (e) {}
   loadState();
   // Build the DOM is dynamic, so the browser's own scroll restoration can't
   // know where to go — take the wheel and restore from localStorage instead.
   if ("scrollRestoration" in history) history.scrollRestoration = "manual";
-  el.loading.style.display = "block";
+  // The loader is hidden by default so a fast (cached) start shows no flash.
+  // Only reveal it if loading actually takes long enough to notice.
+  setTimeout(() => {
+    if (!window.__APP_BOOTED__) el.loading.hidden = false;
+  }, 300);
   try {
     await loadData();
   } catch (e) {
@@ -2209,7 +2223,7 @@ async function init() {
 // Everything that must run once the Bible + dictionary are in memory and the
 // loading screen is replaced. LoadData's Retry button re-invokes this directly.
 async function initApp() {
-  el.loading.style.display = "none";
+  el.loading.hidden = true;
   window.__APP_BOOTED__ = true;
   currentBookIndex = Math.min(Math.max(state.book, 0), bible.length - 1);
   currentChapter = state.chapter || 0;
