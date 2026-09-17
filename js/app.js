@@ -1,4 +1,4 @@
-import { Dictionary, friendlyTense, friendlyForm, esInfinitive, esConjugado, esCompuesto } from "./dict.js?v=32";
+import { Dictionary, friendlyTense, friendlyForm, esInfinitive, esConjugado, esCompuesto } from "./dict.js?v=33";
 
 const BOOK_ALIASES = {
   "Évangile selon Matthieu": "Matthieu",
@@ -1187,11 +1187,6 @@ function startChapterRead() {
       try { _readerVoice = pickFrVoice(window.speechSynthesis.getVoices()); } catch (e) {}
     }, 350);
   }
-}
-
-function toggleChapterRead() {
-  if (!_readerActive) { startChapterRead(); return; }
-  if (_readerPaused) resumeChapterRead(); else pauseChapterRead();
 }
 
 // ---- vocabulary -----------------------------------------------------------
