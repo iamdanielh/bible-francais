@@ -183,12 +183,19 @@ applyTheme();
 
 // ---- data loading ---------------------------------------------------------
 async function loadData() {
+  // A fetch that hangs (common with a flaky service worker on iOS when the PWA
+  // is reopened) must never leave the user staring at "Cargando la Biblia…".
+  // Race the data load against a timeout and surface a Retry button instead.
+  const withTimeout = (promise, label, ms) => Promise.race([
+    promise,
+    new Promise((_, rej) => setTimeout(() => rej(new Error(`tiempo de espera agotado al cargar ${label}`)), ms)),
+  ]);
   try {
     const [raw, dict] = window.__DATA__
       ? [JSON.stringify(window.__DATA__.bible), window.__DATA__.dict]
       : await Promise.all([
-          fetch("data/bible.json").then(r => r.text()),
-          fetch("data/dict.json").then(r => r.json()),
+          withTimeout(fetch("data/bible.json").then(r => r.text()), "bible.json", 20000),
+          withTimeout(fetch("data/dict.json").then(r => r.json()), "dict.json", 20000),
         ]);
     const rawBible = JSON.parse(raw.replace(/^\uFEFF/, ""));
     bible = [];
@@ -204,9 +211,34 @@ async function loadData() {
     }
     dictionary = new Dictionary(dict);
   } catch (e) {
-    el.loading.textContent = "Error al cargar los datos: " + e.message;
+    showLoadError("Error al cargar los datos: " + e.message);
     throw e;
   }
+}
+
+function showLoadError(msg) {
+  el.loading.textContent = "";
+  const p = document.createElement("p");
+  p.textContent = msg;
+  const hint = document.createElement("p");
+  hint.className = "load-hint";
+  hint.textContent = "Comprueba tu conexión e inténtalo otra vez.";
+  const btn = document.createElement("button");
+  btn.className = "primary-btn";
+  btn.textContent = "Reintentar";
+  btn.addEventListener("click", async () => {
+    btn.disabled = true;
+    el.loading.textContent = "Cargando la Biblia…";
+    try {
+      await loadData();
+      await initApp();
+    } catch (e) {
+      btn.disabled = false;
+    }
+  });
+  el.loading.appendChild(p);
+  el.loading.appendChild(hint);
+  el.loading.appendChild(btn);
 }
 
 // ---- rendering ------------------------------------------------------------
@@ -2003,7 +2035,21 @@ async function init() {
   // know where to go — take the wheel and restore from localStorage instead.
   if ("scrollRestoration" in history) history.scrollRestoration = "manual";
   el.loading.style.display = "block";
-  await loadData();
+  try {
+    await loadData();
+  } catch (e) {
+    return; // error + Retry already shown
+  }
+  await initApp();
+  // register service worker for offline/PWA
+  if ("serviceWorker" in navigator) {
+    try { await navigator.serviceWorker.register("sw.js", { updateViaCache: "none" }); } catch (e) { /* offline not critical to start */ }
+  }
+}
+
+// Everything that must run once the Bible + dictionary are in memory and the
+// loading screen is replaced. LoadData's Retry button re-invokes this directly.
+async function initApp() {
   el.loading.style.display = "none";
   currentBookIndex = Math.min(Math.max(state.book, 0), bible.length - 1);
   currentChapter = state.chapter || 0;
@@ -2021,11 +2067,6 @@ async function init() {
     setTimeout(() => setReaderScroll(state.scrollTop), 800);
   }
   refreshVocab();
-
-  // register service worker for offline/PWA
-  if ("serviceWorker" in navigator) {
-    try { await navigator.serviceWorker.register("sw.js", { updateViaCache: "none" }); } catch (e) { /* offline not critical to start */ }
-  }
 }
 
 init();

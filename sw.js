@@ -1,11 +1,13 @@
-const CACHE = "biblefr-v4";
+const CACHE = "biblefr-v5";
 const DATA_ASSETS = ["data/bible.json", "data/dict.json"];
 
-// Install: pre-cache the big immutable data files for offline use.
+// Install: pre-cache the big immutable data files for offline use. Failures are
+// tolerated — cache-first serve falls back to the network at runtime, and a
+// flaky fetch must never block this new version from activating.
 self.addEventListener("install", (event) => {
   event.waitUntil(
     caches.open(CACHE)
-      .then((cache) => Promise.all(DATA_ASSETS.map((a) => cache.add(a))))
+      .then((cache) => Promise.all(DATA_ASSETS.map((a) => cache.add(a).catch(() => {}))))
       .then(() => self.skipWaiting())
   );
 });
