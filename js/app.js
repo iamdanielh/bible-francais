@@ -705,16 +705,23 @@ async function speak() {
 }
 
 // ---- whole-chapter read-aloud ----------------------------------------------
-// Reads the current chapter verse by verse through speechSynthesis (the device
-// voice) so the reader can pause, resume, and stop freely, and so the verse
-// currently being spoken can be highlighted and kept in view. The single-shot
-// web voice (playViaAudio above) is not usable here: it plays through one
-// <audio> element with no verse granularity or clean pause/resume.
+// Reads the current chapter verse by verse. Off iOS it uses the same natural
+// Google voice as the word speaker, chained through a single <audio> element
+// (which supports pause/resume) — this is what actually makes sound on desktops
+// whose speechSynthesis has no voices installed. On iOS, where chained autoplay
+// is blocked, it uses the device voice. Either way the verse being spoken is
+// highlighted and scrolled into view.
 let _readerActive = false;
 let _readerPaused = false;
-let _readerGen = 0;   // bumped on stop/navigation so stale onend handlers give up
+let _readerGen = 0;   // bumped on stop/navigation so stale handlers give up
 let _readerIdx = -1;
 let _readerVoice = null;
+let _readerAudio = null;
+let _readerChunks = [];
+let _readerChunk = 0;
+let _readerUseDevice = IS_IOS;
+
+const READER_CHUNK = 180; // Google TTS tolerates ~200 chars per request
 
 function chapterVerses() {
   const book = bible[currentBookIndex];
@@ -761,12 +768,30 @@ function highlightReadVerse(i) {
   }
 }
 
+// Break a verse into <=READER_CHUNK chunks on word boundaries so each web-voice
+// request stays within the endpoint's limit while still sounding continuous.
+function readerChunks(text) {
+  const out = [];
+  let cur = "";
+  for (const w of text.split(/\s+/)) {
+    if (cur && cur.length + 1 + w.length > READER_CHUNK) { out.push(cur); cur = w; }
+    else cur = cur ? cur + " " + w : w;
+  }
+  if (cur) out.push(cur);
+  return out;
+}
+
+function stopReaderAudio() {
+  if (_readerAudio) { try { _readerAudio.pause(); _readerAudio.src = ""; } catch (e) {} _readerAudio = null; }
+}
+
 function stopChapterRead() {
   if (!_readerActive) { clearReadHighlight(); return; }
   _readerGen++;
   _readerActive = false;
   _readerPaused = false;
   _readerIdx = -1;
+  stopReaderAudio();
   try { window.speechSynthesis.cancel(); if (IS_IOS) window.speechSynthesis.resume(); } catch (e) {}
   clearReadHighlight();
   refreshReadButton();
@@ -776,15 +801,43 @@ function stopChapterRead() {
 function pauseChapterRead() {
   if (!_readerActive || _readerPaused) return;
   _readerPaused = true;
-  try { window.speechSynthesis.pause(); } catch (e) {}
+  if (_readerUseDevice) { try { window.speechSynthesis.pause(); } catch (e) {} }
+  else if (_readerAudio) { try { _readerAudio.pause(); } catch (e) {} }
   refreshReadButton();
 }
 
 function resumeChapterRead() {
   if (!_readerActive || !_readerPaused) return;
   _readerPaused = false;
-  try { window.speechSynthesis.resume(); if (IS_IOS) { window.speechSynthesis.pause(); window.speechSynthesis.resume(); } } catch (e) {}
+  if (_readerUseDevice) {
+    try { window.speechSynthesis.resume(); if (IS_IOS) { window.speechSynthesis.pause(); window.speechSynthesis.resume(); } } catch (e) {}
+  } else if (_readerAudio) {
+    _readerAudio.play().catch(() => {});
+  }
   refreshReadButton();
+}
+
+function playReadChunk() {
+  if (!_readerActive || _readerPaused) return;
+  if (_readerChunk >= _readerChunks.length) { speakReadVerse(_readerIdx + 1); return; }
+  const gen = _readerGen;
+  const audio = _readerAudio || new Audio();
+  _readerAudio = audio;
+  audio.onended = () => {
+    if (gen === _readerGen && _readerActive && !_readerPaused) { _readerChunk++; playReadChunk(); }
+  };
+  audio.onerror = () => { if (gen === _readerGen && _readerActive) readerUseDeviceFallback(_readerIdx); };
+  audio.src = TTS_URLS[0](_readerChunks[_readerChunk]);
+  audio.load();
+  audio.play().catch(() => { if (gen === _readerGen && _readerActive && !_readerPaused) readerUseDeviceFallback(_readerIdx); });
+}
+
+// The web voice can be unreachable (offline). If it can't play, hand the rest
+// of the chapter to the device voice rather than dying silently.
+function readerUseDeviceFallback(i) {
+  _readerUseDevice = true;
+  stopReaderAudio();
+  speakReadVerse(i);
 }
 
 function speakReadVerse(i) {
@@ -793,6 +846,12 @@ function speakReadVerse(i) {
   if (i >= verses.length) { stopChapterRead(); return; }
   _readerIdx = i;
   highlightReadVerse(i);
+  if (!_readerUseDevice) {
+    _readerChunks = readerChunks(verses[i]);
+    _readerChunk = 0;
+    playReadChunk();
+    return;
+  }
   const u = new SpeechSynthesisUtterance(verses[i]);
   u.lang = "fr-FR";
   u.rate = 0.9;
@@ -805,38 +864,36 @@ function speakReadVerse(i) {
 }
 
 function startChapterRead() {
-  if (!("speechSynthesis" in window)) return;
   const verses = chapterVerses();
   if (!verses.length) return;
   stopActiveAudio();
   _readerGen++;
-  if (_readerActive) { try { window.speechSynthesis.cancel(); } catch (e) {} }
+  if (_readerActive) { stopReaderAudio(); try { window.speechSynthesis.cancel(); } catch (e) {} }
   _readerActive = true;
   _readerPaused = false;
   _readerIdx = -1;
+  _readerChunks = [];
+  _readerChunk = 0;
+  _readerUseDevice = IS_IOS && ("speechSynthesis" in window);
   clearReadHighlight();
   refreshReadButton();
   showTopbar();
-  // Do NOT await anything before the first speak(): iOS only lets
-  // speechSynthesis start from inside the tap gesture, and deferring it (even
-  // by a promise) can leave it silent. Use whatever voice list is already
-  // populated now; if it's empty the engine falls back to its default voice
-  // and the verse still starts immediately.
+  // Nothing is awaited before the first speak/play: iOS only lets audio start
+  // from inside the tap gesture, and deferring it (even by a promise) leaves it
+  // silent.
   _readerVoice = null;
-  try {
-    const voices = window.speechSynthesis.getVoices();
-    _readerVoice = pickFrVoice(voices);
-  } catch (e) {}
+  if (_readerUseDevice) {
+    try { _readerVoice = pickFrVoice(window.speechSynthesis.getVoices()); } catch (e) {}
+  }
   speakReadVerse(0);
-  // Voices finish populating a moment later on some engines; pick up the
-  // French voice for the following verses once it lands.
-  setTimeout(() => {
-    if (!_readerActive || _readerVoice) return;
-    try {
-      const voices = window.speechSynthesis.getVoices();
-      _readerVoice = pickFrVoice(voices);
-    } catch (e) {}
-  }, 350);
+  // Device voices often populate a moment later; adopt the French one for the
+  // following verses once it lands.
+  if (_readerUseDevice) {
+    setTimeout(() => {
+      if (!_readerActive || _readerVoice) return;
+      try { _readerVoice = pickFrVoice(window.speechSynthesis.getVoices()); } catch (e) {}
+    }, 350);
+  }
 }
 
 function toggleChapterRead() {
