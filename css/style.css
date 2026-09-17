@@ -257,6 +257,73 @@ button:disabled {
   color: var(--accent-fg);
 }
 
+/* --- chapter reader bar (music-player style) --- */
+.reader-bar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 58;
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: saturate(1.6) blur(10px);
+  -webkit-backdrop-filter: saturate(1.6) blur(10px);
+  border-top: 1px solid var(--border);
+  padding: 8px 14px 12px;
+  box-shadow: var(--shadow-drawer);
+  transition: transform 0.26s ease, opacity 0.26s ease;
+}
+:root[data-theme="dark"] .reader-bar { background: rgba(30, 34, 46, 0.92); }
+.rb-progress {
+  height: 3px;
+  border-radius: 2px;
+  background: var(--border);
+  margin-bottom: 8px;
+  overflow: hidden;
+}
+.rb-progress i {
+  display: block;
+  height: 100%;
+  width: 0;
+  border-radius: 2px;
+  background: var(--accent);
+  transition: width 0.15s linear;
+}
+.rb-body {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+.rb-info { min-width: 0; flex: 0 1 auto; }
+.rb-title {
+  display: block;
+  font-weight: 600;
+  font-size: 0.85rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.rb-verse { font-size: 0.75rem; color: var(--muted); }
+.rb-controls { display: flex; align-items: center; gap: 6px; }
+.rb-right { display: flex; align-items: center; gap: 6px; }
+.speed-btn {
+  min-width: 54px;
+  border-radius: 999px;
+  font-variant-numeric: tabular-nums;
+}
+.reader-bar .icon-btn, .reader-bar .round-btn { width: 34px; height: 34px; font-size: 1rem; }
+/* keep the bottom of the text clear of the fixed bar while it's open */
+body.reader-bar-open .reader {
+  padding-bottom: calc(76px + env(safe-area-inset-bottom, 0px));
+}
+/* word-by-word highlight while reading */
+.verse-text .word.karaoke {
+  background: var(--accent);
+  color: var(--accent-fg);
+  border-radius: 5px;
+  box-shadow: 0 0 0 1px var(--accent);
+}
+
 /* --- lookup drawer / panel --- */
 .scrim {
   position: fixed;

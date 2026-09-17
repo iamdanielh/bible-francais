@@ -721,6 +721,9 @@ let _readerChunks = [];
 let _readerChunk = 0;
 let _readerUseDevice = IS_IOS;
 let _readerUtterances = []; // retained refs: iOS GCs untracked utterances
+let _readerRate = 1;        // playback/speech rate multiplier
+let _karaokeTimer = null;   // schedules the per-word highlight
+let _karaokeIdx = -1;       // word currently lit (per startDeviceRead onstart)
 
 const READER_CHUNK = 180; // Google TTS tolerates ~200 chars per request
 
@@ -753,6 +756,46 @@ function clearReadHighlight() {
   for (const v of currentVerseEls()) v.classList.remove("reading");
 }
 
+// Word-by-word karaoke. speechSynthesis exposes no word-boundary timing on
+// iOS (and Google's web voice returns whole-chunk audio), so the per-word rate
+// is estimated from text length at the current speed. Two engines, same look.
+const KARAOKE_CHAR_MS = 62; // rough ms per char at 1.0x, matches natural speech
+const KARAOKE_GAP_MS = 50;  // small pause between words
+
+function clearKaraoke() {
+  clearTimeout(_karaokeTimer);
+  _karaokeTimer = null;
+  _karaokeIdx = -1;
+  for (const w of el.verseText.querySelectorAll(".word.karaoke")) w.classList.remove("karaoke");
+}
+
+function karaokeWordEls(i) {
+  const v = currentVerseEls()[i];
+  return v ? [...v.querySelectorAll(".word")] : [];
+}
+
+function startKaraoke(i) {
+  clearKaraoke();
+  const words = karaokeWordEls(i);
+  if (!words.length) return;
+  const gen = _readerGen;
+  const tick = (wi) => {
+    if (!_readerActive || gen !== _readerGen) return;
+    const w = words[wi];
+    if (!w) return;
+    for (const prev of words) prev.classList.remove("karaoke");
+    w.classList.add("karaoke");
+    _karaokeIdx = wi;
+    const next = wi + 1;
+    const wait = next >= words.length
+      ? 0
+      : (KARAOKE_GAP_MS + KARAOKE_CHAR_MS * Math.max(1, (w.textContent || "").length)) / Math.max(0.5, _readerRate);
+    if (next >= words.length) { _karaokeTimer = null; return; }
+    _karaokeTimer = setTimeout(() => tick(next), wait);
+  };
+  tick(0);
+}
+
 function highlightReadVerse(i) {
   clearReadHighlight();
   const v = currentVerseEls()[i];
@@ -767,6 +810,88 @@ function highlightReadVerse(i) {
     readerEl.scrollTop = Math.max(0, target);
     setTimeout(() => { _programmaticScrolls = Math.max(0, _programmaticScrolls - 2); }, 120);
   }
+}
+
+// ---- reader bar (bottom, music-player style) -------------------------------
+const READER_RATES = [0.75, 1, 1.25, 1.5, 1.75, 2];
+
+function showReaderBar() {
+  document.body.classList.add("reader-bar-open");
+  const bar = $("readerBar");
+  if (bar) bar.hidden = false;
+  refreshReaderBar();
+}
+
+function hideReaderBar() {
+  document.body.classList.remove("reader-bar-open");
+  const bar = $("readerBar");
+  if (bar) bar.hidden = true;
+}
+
+function refreshReaderBar() {
+  const bar = $("readerBar");
+  if (!bar || bar.hidden) return;
+  const verses = chapterVerses();
+  const n = verses.length;
+  const play = $("rbPlay");
+  if (play) {
+    play.textContent = _readerActive && !_readerPaused ? "⏸" : "▶";
+    play.disabled = !n;
+  }
+  const title = $("rbTitle");
+  if (title) title.textContent = bible[currentBookIndex] ? `${bible[currentBookIndex].name} ${currentChapter + 1}` : "Capítulo";
+  const vinfo = $("rbVerse");
+  if (vinfo) vinfo.textContent = _readerActive && _readerIdx >= 0 ? `${Math.min(_readerIdx + 1, n)}/${n}` : `${Math.min(Math.max(_readerIdx + 1, 0), n)}/${n}`;
+  const fill = $("rbFill");
+  if (fill) fill.style.width = _readerActive && _readerIdx >= 0 ? `${((_readerIdx + 1) / n) * 100}%` : "0%";
+  const spd = $("rbSpeed");
+  if (spd) { spd.textContent = `${_readerRate}×`; spd.disabled = false; }
+  const close = $("rbClose");
+  if (close) close.disabled = false;
+  for (const id of ["rbPrev", "rbNext", "rbPlay", "rbStop"]) {
+    const b = $(id);
+    if (b) b.disabled = !_readerActive || !n;
+  }
+}
+
+function setReaderRate(r) {
+  _readerRate = Math.min(2, Math.max(0.5, r));
+  // apply live where possible
+  if (_readerAudio && !_readerUseDevice) { try { _readerAudio.playbackRate = _readerRate; } catch (e) {} }
+  refreshReaderBar();
+}
+
+function cycleReaderRate() {
+  const next = (READER_RATES.findIndex((r) => r === _readerRate) + 1) % READER_RATES.length;
+  setReaderRate(READER_RATES[next] || 1);
+  if (_readerActive) {
+    // restart at the current verse so the new speed visibly applies
+    seekChapterRead(_readerIdx >= 0 ? _readerIdx : 0);
+  }
+}
+
+function seekChapterRead(i) {
+  const verses = chapterVerses();
+  if (!verses.length || !_readerActive) return;
+  i = Math.max(0, Math.min(i, verses.length - 1));
+  _readerGen++;
+  const gen = _readerGen;
+  _readerPaused = false;
+  clearKaraoke();
+  if (_readerUseDevice) {
+    try { window.speechSynthesis.cancel(); } catch (e) {}
+    startDeviceRead(verses, gen, i);
+  } else {
+    stopReaderAudio();
+    speakReadVerse(i);
+  }
+  refreshReadButton();
+  refreshReaderBar();
+}
+
+function toggleChapterRead() {
+  if (!_readerActive) { startChapterRead(); return; }
+  if (_readerPaused) resumeChapterRead(); else pauseChapterRead();
 }
 
 // Break a verse into <=READER_CHUNK chunks on word boundaries so each web-voice
@@ -793,19 +918,24 @@ function stopChapterRead() {
   _readerPaused = false;
   _readerIdx = -1;
   _readerUtterances = [];
+  _readerAudio = null;
+  clearKaraoke();
   stopReaderAudio();
   try { window.speechSynthesis.cancel(); if (IS_IOS) window.speechSynthesis.resume(); } catch (e) {}
   clearReadHighlight();
   refreshReadButton();
+  hideReaderBar();
   showTopbar();
 }
 
 function pauseChapterRead() {
   if (!_readerActive || _readerPaused) return;
   _readerPaused = true;
+  clearKaraoke();
   if (_readerUseDevice) { try { window.speechSynthesis.pause(); } catch (e) {} }
   else if (_readerAudio) { try { _readerAudio.pause(); } catch (e) {} }
   refreshReadButton();
+  refreshReaderBar();
 }
 
 function resumeChapterRead() {
@@ -816,7 +946,9 @@ function resumeChapterRead() {
   } else if (_readerAudio) {
     _readerAudio.play().catch(() => {});
   }
+  startKaraoke(Math.max(0, _readerIdx));
   refreshReadButton();
+  refreshReaderBar();
 }
 
 function playReadChunk() {
@@ -825,6 +957,7 @@ function playReadChunk() {
   const gen = _readerGen;
   const audio = _readerAudio || new Audio();
   _readerAudio = audio;
+  audio.playbackRate = _readerRate;
   audio.onended = () => {
     if (gen === _readerGen && _readerActive && !_readerPaused) { _readerChunk++; playReadChunk(); }
   };
@@ -848,9 +981,11 @@ function speakReadVerse(i) {
   if (i >= verses.length) { stopChapterRead(); return; }
   _readerIdx = i;
   highlightReadVerse(i);
+  startKaraoke(i);
   _readerChunks = readerChunks(verses[i]);
   _readerChunk = 0;
   playReadChunk();
+  refreshReaderBar();
 }
 
 // Device-voice engine. Every verse is built into an utterance and the whole
@@ -867,10 +1002,15 @@ function startDeviceRead(verses, gen, from) {
     if (!verses[i]) continue;
     const u = new SpeechSynthesisUtterance(verses[i]);
     u.lang = "fr-FR";
-    u.rate = 0.9;
+    u.rate = Math.max(0.5, Math.min(2, _readerRate)) * 0.92;
     if (_readerVoice) { try { u.voice = _readerVoice; } catch (e) {} }
     u.onstart = () => {
-      if (gen === _readerGen && _readerActive) { _readerIdx = i; highlightReadVerse(i); }
+      if (gen === _readerGen && _readerActive) {
+        _readerIdx = i;
+        highlightReadVerse(i);
+        startKaraoke(i);
+        refreshReaderBar();
+      }
     };
     const last = i === verses.length - 1;
     u.onend = () => { if (last && gen === _readerGen && _readerActive) stopChapterRead(); };
@@ -899,6 +1039,7 @@ function startChapterRead() {
   _readerUseDevice = IS_IOS && ("speechSynthesis" in window);
   clearReadHighlight();
   refreshReadButton();
+  showReaderBar();
   showTopbar();
   // Nothing is awaited before the first speak/play: iOS only lets audio start
   // from inside the tap gesture, and deferring it (even by a promise) leaves it
@@ -1488,6 +1629,12 @@ el.readBtn.addEventListener("click", () => {
   if (_suppressReadClick) { _suppressReadClick = false; return; }
   toggleChapterRead();
 });
+$("rbPlay").addEventListener("click", toggleChapterRead);
+$("rbStop").addEventListener("click", stopChapterRead);
+$("rbPrev").addEventListener("click", () => { if (_readerActive) seekChapterRead(Math.max(0, (_readerIdx >= 0 ? _readerIdx : 0) - 1)); });
+$("rbNext").addEventListener("click", () => { if (_readerActive) seekChapterRead(_readerIdx + 1); });
+$("rbSpeed").addEventListener("click", cycleReaderRate);
+$("rbClose").addEventListener("click", stopChapterRead);
 el.saveBtn.addEventListener("click", saveCurrent);
 el.vocabBtn.addEventListener("click", () => { refreshVocab(); openPanel("vocab"); });
 $("scopeAll").addEventListener("click", () => { _vocabScope = "all"; refreshVocab(); });

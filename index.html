@@ -7,7 +7,7 @@
   <title>Bible en français — Español</title>
   <link rel="manifest" href="manifest.webmanifest" />
   <link rel="apple-touch-icon" href="icon-180.png" />
-  <link rel="stylesheet" href="css/style.css?v=25" />
+  <link rel="stylesheet" href="css/style.css?v=26" />
 </head>
 <body>
   <header class="topbar">
@@ -114,6 +114,26 @@
     <div class="scrim" id="scrim"></div>
   </main>
 
-  <script type="module" src="js/app.js?v=25"></script>
+  <div id="readerBar" class="reader-bar" hidden>
+    <div class="rb-progress"><i id="rbFill"></i></div>
+    <div class="rb-body">
+      <div class="rb-info">
+        <span id="rbTitle" class="rb-title">Capítulo</span>
+        <span id="rbVerse" class="rb-verse">—</span>
+      </div>
+      <div class="rb-controls">
+        <button id="rbPrev" class="icon-btn" title="Verso anterior" aria-label="Verso anterior">⏮</button>
+        <button id="rbPlay" class="round-btn" title="Reproducir / pausar" aria-label="Reproducir o pausar">▶</button>
+        <button id="rbNext" class="icon-btn" title="Verso siguiente" aria-label="Verso siguiente">⏭</button>
+        <button id="rbStop" class="icon-btn" title="Detener" aria-label="Detener">⏹</button>
+      </div>
+      <div class="rb-right">
+        <button id="rbSpeed" class="speed-btn" title="Velocidad de lectura" aria-label="Velocidad de lectura">1.0×</button>
+        <button id="rbClose" class="icon-btn" title="Cerrar" aria-label="Cerrar">✕</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="js/app.js?v=26"></script>
 </body>
 </html>
