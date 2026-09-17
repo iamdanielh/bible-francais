@@ -8954,6 +8954,37 @@ const _TENSE_FR = {
   "verbe 3e groupe ?": "un verbo del 3.er grupo (irregular)"
 };
 
+// Accent-insensitive companion to _VERB_IRREGULAR: readers often type
+// imparfait plurals without the accent («etaient», «l'etaient», «etaient pas»),
+// but the irregular table stores its keys with accents («étaient»). Building
+// this stripped lookup lets unaccented forms resolve like their accented twins.
+// Safe by construction: only forms whose accent-stripped spelling is UNIQUE in
+// the whole table are usable — e.g. «étaient»→«etaient» is the sole strip, so
+// unaccented «etaient» may fall back to it. Collisions (like «donne» =
+// présent of donner AND unaccented «donné») are skipped, because remapping
+// «donné» (participle) to the présent tense would corrupt tense-aware compound
+// detection; the exact accented key still wins first in _knownVerbForm.
+const _VERB_IRREGULAR_STRIPPED = {};
+{
+  const strippedCount = {};
+  for (const key of Object.keys(_VERB_IRREGULAR)) {
+    const s = key
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/[’‘]/g, "'");
+    strippedCount[s] = (strippedCount[s] || 0) + 1;
+  }
+  for (const [key, val] of Object.entries(_VERB_IRREGULAR)) {
+    const s = key
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/[’‘]/g, "'");
+    if (strippedCount[s] === 1) _VERB_IRREGULAR_STRIPPED[s] = val;
+  }
+}
+
 const _PARTICIPLE_FR = {
   "past participle": "participio pasado («-ado / -ido»)",
   "participe": "participio",
@@ -9977,7 +10008,17 @@ class Dictionary {
   }
 
   _knownVerbForm(cand) {
-    return _VERB_IRREGULAR[cand.toLowerCase().replace(/[’‘]/g, "'")] || null;
+    const key = cand.toLowerCase().replace(/[’‘]/g, "'");
+    const exact = _VERB_IRREGULAR[key];
+    if (exact) return exact;
+    // The accent-stripped rescue only applies to UNACCENTED typed forms
+    // («etaient», «l'etaient»…): an accented candidate like «donné» must keep
+    // flowing to its -er past-participle derivation instead of colliding with
+    // the stripped présent «donne», or tense-aware compound detection breaks
+    // («tu as donné» would stop being a compound).
+    const strippedKey = key.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    if (strippedKey === key) return _VERB_IRREGULAR_STRIPPED[key] || null;
+    return null;
   }
 
   // Curated overlay glosses are hand-picked and usually the intended primary
