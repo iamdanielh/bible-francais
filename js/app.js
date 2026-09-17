@@ -1,14 +1,36 @@
-import { Dictionary, friendlyTense, friendlyForm, esInfinitive, esConjugado, esCompuesto } from "./dict.js?v=38";
+import { Dictionary, friendlyTense, friendlyForm, esInfinitive, esConjugado, esCompuesto } from "./dict.js?v=39";
 
-const BOOK_ALIASES = {
-  "Évangile selon Matthieu": "Matthieu",
-  "Évangile selon Marc": "Marc",
-  "Évangile selon Luc": "Luc",
-  "Évangile selon Jean": "Jean",
-  "Actes des Apôtres": "Actes",
-  "Apocalypse": "Apocalypse",
-  "Genèse": "Genèse",
+// ---- language packs --------------------------------------------------------
+// Every language is a self-contained pack: which data files to fetch, how to
+// map the source book names, and which engine module handles that language.
+// Adding a language = adding one entry here + its data files. The FR engine is
+// `dict.js`; a future TR engine would slot into `makeEngine()` the same way.
+const LANGS = {
+  fr: {
+    label: "Français",
+    flag: "🇫🇷",
+    bibleUrl: "data/bible.json",
+    dictUrl: "data/dict.json",
+    aliases: {
+      "Évangile selon Matthieu": "Matthieu",
+      "Évangile selon Marc": "Marc",
+      "Évangile selon Luc": "Luc",
+      "Évangile selon Jean": "Jean",
+      "Actes des Apôtres": "Actes",
+      "Apocalypse": "Apocalypse",
+      "Genèse": "Genèse",
+    },
+  },
 };
+const LANG_ORDER = ["fr"];
+let lang = "fr";
+
+// Build the engine for a language. dict.js is French→Spanish; a second pack
+// (e.g. Turkish) would bring its own engine module and branch here.
+function makeEngine(langCode, dict) {
+  if (langCode === "fr") return new Dictionary(dict);
+  throw new Error("motor no disponible para " + langCode);
+}
 
 let bible = [];       // [{name, chapters:[[verseText,...],...]}]
 let dictionary = null;
@@ -245,6 +267,7 @@ async function loadData() {
   // A fetch that hangs (common with a flaky service worker on iOS when the PWA
   // is reopened) must never leave the user staring at "Cargando la Biblia…".
   // Race the data load against a timeout and surface a Retry button instead.
+  const pack = LANGS[lang] || LANGS.fr;
   const withTimeout = (promise, label, ms) => Promise.race([
     promise,
     new Promise((_, rej) => setTimeout(() => rej(new Error(`tiempo de espera agotado al cargar ${label}`)), ms)),
@@ -253,14 +276,14 @@ async function loadData() {
     const [raw, dict] = window.__DATA__
       ? [JSON.stringify(window.__DATA__.bible), window.__DATA__.dict]
       : await Promise.all([
-          withTimeout(fetch("data/bible.json").then(r => r.text()), "bible.json", 20000),
-          withTimeout(fetch("data/dict.json").then(r => r.json()), "dict.json", 20000),
+          withTimeout(fetch(pack.bibleUrl).then(r => r.text()), "bible.json", 20000),
+          withTimeout(fetch(pack.dictUrl).then(r => r.json()), "dict.json", 20000),
         ]);
     const rawBible = JSON.parse(raw.replace(/^\uFEFF/, ""));
     bible = [];
     for (const testament of rawBible.Testaments || []) {
       for (const book of testament.Books || []) {
-        const name = (BOOK_ALIASES[book.Text] || book.Text || "").trim();
+        const name = (pack.aliases[book.Text] || book.Text || "").trim();
         const chapters = [];
         for (const chapter of book.Chapters || []) {
           chapters.push((chapter.Verses || []).map(v => v.Text || ""));
@@ -268,7 +291,7 @@ async function loadData() {
         bible.push({ name, chapters });
       }
     }
-    dictionary = new Dictionary(dict);
+    dictionary = makeEngine(lang, dict);
   } catch (e) {
     showLoadError("Error al cargar los datos: " + e.message);
     throw e;
@@ -349,6 +372,27 @@ function buildBookList() {
     el.bookSelect.appendChild(opt);
   });
 }
+
+function buildLangList() {
+  el.langSelect.innerHTML = "";
+  LANG_ORDER.forEach((code) => {
+    const p = LANGS[code];
+    if (!p) return;
+    const opt = document.createElement("option");
+    opt.value = code;
+    opt.textContent = `${p.flag} ${p.label}`;
+    el.langSelect.appendChild(opt);
+  });
+  el.langSelect.value = lang;
+}
+
+el.langSelect.addEventListener("change", async () => {
+  const next = el.langSelect.value;
+  if (next === lang || !LANGS[next]) return;
+  lang = next;
+  await loadData();
+  await initApp();
+});
 
 function buildChapterList() {
   const book = bible[currentBookIndex];
@@ -2363,6 +2407,7 @@ async function initApp() {
   window.__APP_BOOTED__ = true;
   currentBookIndex = Math.min(Math.max(state.book, 0), bible.length - 1);
   currentChapter = state.chapter || 0;
+  buildLangList();
   buildBookList();
   el.bookSelect.value = currentBookIndex;
   buildChapterList();

@@ -142,6 +142,10 @@ button:disabled {
   font-size: 1.15rem;
   line-height: 1;
 }
+.lang-select {
+  padding: 7px 8px;
+  max-width: 96px;
+}
 #speakBtn { font-size: 1.15rem; }
 .round-btn:disabled, .icon-btn:disabled { opacity: 0.4; }
 
