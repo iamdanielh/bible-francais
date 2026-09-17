@@ -1,7 +1,7 @@
 {
-  "name": "Bible en français — Español",
-  "short_name": "Bible FR-ES",
-  "description": "Lee la Biblia en francés y toca cualquier palabra para ver su traducción al español, nota gramatical y pronunciación.",
+  "name": "BiblioLingo — La Biblia en tu idioma",
+  "short_name": "BiblioLingo",
+  "description": "Aprende idiomas leyendo, oyendo y estudiando la Biblia, la Palabra de Dios.",
   "start_url": ".",
   "display": "standalone",
   "background_color": "#f6f1e7",
