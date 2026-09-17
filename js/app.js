@@ -1,4 +1,4 @@
-import { Dictionary, friendlyTense, friendlyForm, esInfinitive, esConjugado, esCompuesto } from "./dict.js?v=35";
+import { Dictionary, friendlyTense, friendlyForm, esInfinitive, esConjugado, esCompuesto } from "./dict.js?v=36";
 
 const BOOK_ALIASES = {
   "Évangile selon Matthieu": "Matthieu",
@@ -851,6 +851,7 @@ let _readerUtterances = []; // retained refs: iOS GCs untracked utterances
 let _readerRate = 1;        // playback/speech rate multiplier
 let _karaokeTimer = null;   // schedules the per-word highlight
 let _karaokeIdx = -1;       // word currently lit (per startDeviceRead onstart)
+let _readerTtsTry = 0;      // TTS endpoint retry counter for the current chunk
 
 const READER_CHUNK = 180; // Google TTS tolerates ~200 chars per request
 
@@ -902,13 +903,79 @@ function karaokeWordEls(i) {
 }
 
 // The rate the selected engine actually speaks at. The device voice is tuned
-// down slightly (×0.92) to sound natural, so the karaoke estimate must scale
-// with the same factor or the highlight creeps ahead of the audio.
+// down slightly (×0.92) to sound natural, so timing estimates must scale with
+// the same factor or the highlight creeps ahead of the audio.
 function effectiveReaderRate() {
   if (_readerUseDevice) return Math.max(0.5, Math.min(2, _readerRate)) * 0.92;
   return Math.max(0.5, _readerRate);
 }
 
+// Light just one word (by DOM index within the current verse).
+function setKaraokeWord(words, wi) {
+  const w = words[wi];
+  if (!w) return false;
+  for (const prev of words) prev.classList.remove("karaoke");
+  w.classList.add("karaoke");
+  _karaokeIdx = wi;
+  return true;
+}
+
+// ---- web-voice karaoke: glued to the real audio position -------------------
+// Google's voice returns a whole chunk of audio. Instead of racing a char-based
+// timer, we map the chunk's words onto the audio element's ACTUAL timeline and
+// re-read currentTime every frame, so the highlight tracks whatever the audio
+// really does — no highlight until audio is actually playing, no drift, and no
+// "thinks for a second" desync. The per-word weight is only a proportional
+// split of the real chunk duration.
+let _readerChunkWordStart = []; // per chunk: index (in the verse) of its first word
+
+function buildChunkWordStarts(chunks) {
+  const starts = [];
+  let wi = 0;
+  for (const c of chunks) {
+    starts.push(wi);
+    wi += c.trim().split(/\s+/).length;
+  }
+  return starts;
+}
+
+function startChunkKaraoke(chunkIdx) {
+  clearKaraoke();
+  const all = karaokeWordEls(_readerIdx);
+  const base = _readerChunkWordStart[chunkIdx] || 0;
+  const end = chunkIdx + 1 < _readerChunkWordStart.length ? _readerChunkWordStart[chunkIdx + 1] : all.length;
+  const words = all.slice(base, end);
+  if (!words.length) return;
+  const gen = _readerGen;
+  // cumulative proportional weights (chars+gap) within this chunk
+  let acc = 0;
+  const cum = words.map((w) => {
+    acc += KARAOKE_GAP_MS + KARAOKE_CHAR_MS * Math.max(1, (w.textContent || "").length);
+    return acc;
+  });
+  const total = acc || 1;
+  const tick = () => {
+    if (_readerPaused) return; // frozen while paused; resumed elsewhere
+    if (!_readerActive || gen !== _readerGen) return;
+    const a = _readerAudio;
+    if (!a) return;
+    const dur = a.duration;
+    if (!(dur > 0) || !isFinite(dur)) { _karaokeTimer = setTimeout(tick, 100); return; }
+    const p = Math.min(1, Math.max(0, a.currentTime / dur));
+    let wi = 0;
+    for (let k = 0; k < cum.length; k++) {
+      if (cum[k] / total <= p) wi = k; else break;
+    }
+    setKaraokeWord(words, wi);
+    _karaokeTimer = setTimeout(tick, 90);
+  };
+  _karaokeTimer = setTimeout(tick, 120);
+}
+
+// ---- device-voice karaoke: estimate, delayed to speech onset ---------------
+// iOS speechSynthesis gives NO word-boundary events, so this is necessarily an
+// estimate (char length × the effective rate). Browsers that DO fire "word"
+// boundary events (desktop Chrome/Edge) override it for near-exact sync.
 function startKaraoke(i, from) {
   clearKaraoke();
   const words = karaokeWordEls(i);
@@ -918,19 +985,30 @@ function startKaraoke(i, from) {
   const startAt = from == null ? 0 : Math.max(0, Math.min(from, words.length - 1));
   const tick = (wi) => {
     if (!_readerActive || gen !== _readerGen) return;
-    const w = words[wi];
-    if (!w) return;
-    for (const prev of words) prev.classList.remove("karaoke");
-    w.classList.add("karaoke");
-    _karaokeIdx = wi;
+    if (!setKaraokeWord(words, wi)) return;
     const next = wi + 1;
     const wait = next >= words.length
       ? 0
-      : (KARAOKE_GAP_MS + KARAOKE_CHAR_MS * Math.max(1, (w.textContent || "").length)) / rate;
+      : (KARAOKE_GAP_MS + KARAOKE_CHAR_MS * Math.max(1, (words[wi].textContent || "").length)) / rate;
     if (next >= words.length) { _karaokeTimer = null; return; }
     _karaokeTimer = setTimeout(() => tick(next), wait);
   };
   tick(startAt);
+}
+
+// Map a speechSynthesis "word" boundary charIndex to the DOM word index of the
+// verse, so boundary-aware engines highlight exactly the word being spoken.
+function karaokeWordIndexAtChar(i, charIndex) {
+  if (typeof charIndex !== "number" || charIndex < 0) return -1;
+  const v = currentVerseEls()[i];
+  if (!v) return -1;
+  const words = [...v.querySelectorAll(".word")];
+  let pos = 0;
+  for (let wi = 0; wi < words.length; wi++) {
+    if (charIndex >= pos && charIndex < pos + (words[wi].textContent || "").length) return wi;
+    pos += (words[wi].textContent || "").length + 1; // +1 for the space
+  }
+  return words.length - 1;
 }
 
 function highlightReadVerse(i) {
@@ -1151,7 +1229,8 @@ function resumeChapterRead() {
   } else if (_readerAudio) {
     _readerAudio.play().catch(() => {});
   }
-  startKaraoke(Math.max(0, _readerIdx), Math.max(0, _karaokeIdx));
+  if (_readerUseDevice) startKaraoke(Math.max(0, _readerIdx), Math.max(0, _karaokeIdx));
+  else startChunkKaraoke(_readerChunk);
   refreshReadButton();
   refreshReaderBar();
 }
@@ -1160,16 +1239,27 @@ function playReadChunk() {
   if (!_readerActive || _readerPaused) return;
   if (_readerChunk >= _readerChunks.length) { speakReadVerse(_readerIdx + 1); return; }
   const gen = _readerGen;
+  // Rotate through the TTS endpoints for this chunk before ever involving the
+  // device voice, so a single flaky request doesn't switch voices mid-chapter.
+  const tryIdx = (_readerTtsTry || 0) % TTS_URLS.length;
   const audio = _readerAudio || new Audio();
   _readerAudio = audio;
   audio.playbackRate = _readerRate;
+  audio.onplaying = () => { _readerTtsTry = 0; startChunkKaraoke(_readerChunk); };
   audio.onended = () => {
-    if (gen === _readerGen && _readerActive && !_readerPaused) { _readerChunk++; playReadChunk(); }
+    if (gen === _readerGen && _readerActive && !_readerPaused) { _readerChunk++; _readerTtsTry = 0; playReadChunk(); }
   };
-  audio.onerror = () => { if (gen === _readerGen && _readerActive) readerUseDeviceFallback(_readerIdx); };
-  audio.src = TTS_URLS[0](_readerChunks[_readerChunk]);
+  const fail = () => {
+    if (gen !== _readerGen || !_readerActive) return;
+    _readerTtsTry = (parseInt(audio.dataset.try, 10) || 0) + 1;
+    audio.dataset.try = _readerTtsTry;
+    if (_readerTtsTry < TTS_URLS.length) { playReadChunk(); }
+    else readerUseDeviceFallback(_readerIdx);
+  };
+  audio.onerror = fail;
+  audio.src = TTS_URLS[tryIdx](_readerChunks[_readerChunk]);
   audio.load();
-  audio.play().catch(() => { if (gen === _readerGen && _readerActive && !_readerPaused) readerUseDeviceFallback(_readerIdx); });
+  audio.play().catch(fail);
 }
 
 // The web voice can be unreachable (offline). If it can't play, hand the rest
@@ -1186,9 +1276,13 @@ function speakReadVerse(i) {
   if (i >= verses.length) { stopChapterRead(); return; }
   _readerIdx = i;
   highlightReadVerse(i);
-  startKaraoke(i);
+  // The word highlight is NOT started here — the audio element's own playing
+  // event drives it, so the highlight waits for the audio and stays locked to
+  // its real position instead of racing a timer.
   _readerChunks = readerChunks(verses[i]);
+  _readerChunkWordStart = buildChunkWordStarts(_readerChunks);
   _readerChunk = 0;
+  _readerTtsTry = 0;
   playReadChunk();
   refreshReaderBar();
 }
@@ -1215,6 +1309,20 @@ function startDeviceRead(verses, gen, from) {
         highlightReadVerse(i);
         startKaraoke(i);
         refreshReaderBar();
+      }
+    };
+    // Chrome/Edge fire per-word "boundary" events; iOS does not. When they do,
+    // snap the highlight to the exact spoken word instead of trusting the
+    // char-based estimate.
+    u.onboundary = (e) => {
+      if (gen !== _readerGen || !_readerActive) return;
+      if (!e || e.name !== "word") return;
+      const wi = karaokeWordIndexAtChar(i, e.charIndex);
+      if (wi < 0) return;
+      const words = karaokeWordEls(i);
+      if (setKaraokeWord(words, wi)) {
+        clearTimeout(_karaokeTimer);
+        _karaokeTimer = null;
       }
     };
     const last = i === verses.length - 1;
