@@ -7,9 +7,20 @@
   <title>Bible en français — Español</title>
   <link rel="manifest" href="manifest.webmanifest" />
   <link rel="apple-touch-icon" href="icon-180.png" />
-  <link rel="stylesheet" href="css/style.css?v=30" />
+  <link rel="stylesheet" href="css/style.css?v=31" />
 </head>
 <body>
+  <script>
+    // Boot breadcrumbs: prove that inline JS on this page actually executes on
+    // this device, and show it in the loader. If v31 is visible but this marker
+    // is not, then NO JavaScript runs at all on the device.
+    document.addEventListener("DOMContentLoaded", function () {
+      var tag = document.getElementById("bootTag");
+      if (tag) tag.textContent = " html+js ✓";
+      var l = document.getElementById("loading");
+      if (l && l.dataset.boot === undefined) { /* keep original text */ }
+    });
+  </script>
   <header class="topbar">
     <div class="topbar-title">
       <span class="brand">📖</span>
@@ -26,7 +37,7 @@
     </div>
   </header>
 
-  <div id="loading" class="loading">Cargando la Biblia… <span id="buildTag">v30</span></div>
+  <div id="loading" class="loading">Cargando la Biblia… <span id="buildTag">v31</span><span id="bootTag"></span></div>
 
   <main class="layout">
     <section class="reader">
@@ -134,7 +145,7 @@
     </div>
   </div>
 
-  <script type="module" src="js/app.js?v=30"></script>
+  <script type="module" src="js/app.js?v=31"></script>
 
   <script>
     // Last-resort watchdog: if the module above never booted (old cached HTML

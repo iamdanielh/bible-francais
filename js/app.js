@@ -11,6 +11,7 @@ const BOOK_ALIASES = {
 };
 
 let bible = [];       // [{name, chapters:[[verseText,...],...]}]
+window.__MODULE_TOP__ = true;
 let dictionary = null;
 let state = { book: 0, chapter: 0, vocab: [], scrollTop: 0, ai: { key: "", model: "" } };
 
@@ -250,6 +251,7 @@ async function loadData() {
     new Promise((_, rej) => setTimeout(() => rej(new Error(`tiempo de espera agotado al cargar ${label}`)), ms)),
   ]);
   try {
+    try { $("bootTag").textContent = " descargando…"; } catch (e) {}
     const [raw, dict] = window.__DATA__
       ? [JSON.stringify(window.__DATA__.bible), window.__DATA__.dict]
       : await Promise.all([
@@ -2125,6 +2127,7 @@ function setPanelFullscreen(full) {
 
 // ---- init -----------------------------------------------------------------
 async function init() {
+  try { $("bootTag").textContent = " js " + (window.__MODULE_OK__ = true) + " ✓"; } catch (e) {}
   loadState();
   // Build the DOM is dynamic, so the browser's own scroll restoration can't
   // know where to go — take the wheel and restore from localStorage instead.
