@@ -804,7 +804,7 @@ function speakReadVerse(i) {
   if (IS_IOS) { try { window.speechSynthesis.pause(); window.speechSynthesis.resume(); } catch (e) {} }
 }
 
-async function startChapterRead() {
+function startChapterRead() {
   if (!("speechSynthesis" in window)) return;
   const verses = chapterVerses();
   if (!verses.length) return;
@@ -817,13 +817,26 @@ async function startChapterRead() {
   clearReadHighlight();
   refreshReadButton();
   showTopbar();
-  // gather the French voice; some engines need a moment (the same wait the
-  // single-word path uses), so resolve it before queueing the first verse.
-  await waitForVoices();
-  if (!_readerActive) return; // stopped while waiting
-  const voices = (() => { try { return window.speechSynthesis.getVoices(); } catch (e) { return []; } })();
-  _readerVoice = pickFrVoice(voices);
+  // Do NOT await anything before the first speak(): iOS only lets
+  // speechSynthesis start from inside the tap gesture, and deferring it (even
+  // by a promise) can leave it silent. Use whatever voice list is already
+  // populated now; if it's empty the engine falls back to its default voice
+  // and the verse still starts immediately.
+  _readerVoice = null;
+  try {
+    const voices = window.speechSynthesis.getVoices();
+    _readerVoice = pickFrVoice(voices);
+  } catch (e) {}
   speakReadVerse(0);
+  // Voices finish populating a moment later on some engines; pick up the
+  // French voice for the following verses once it lands.
+  setTimeout(() => {
+    if (!_readerActive || _readerVoice) return;
+    try {
+      const voices = window.speechSynthesis.getVoices();
+      _readerVoice = pickFrVoice(voices);
+    } catch (e) {}
+  }, 350);
 }
 
 function toggleChapterRead() {
