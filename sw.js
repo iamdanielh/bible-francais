@@ -1,21 +1,29 @@
-const CACHE = "biblefr-v11";
+// Versioned cache for the app shell (HTML/JS/CSS/icons). Bumped per release.
+const CACHE = "biblefr-v12";
+// The data files never change version → once downloaded they survive every SW
+// update, so the app opens instantly on subsequent visits instead of
+// re-downloading 18MB each time a new release ships.
+const DATA_CACHE = "biblefr-data";
 const DATA_ASSETS = ["data/bible.json", "data/dict.json"];
 
-// Install: pre-cache the big immutable data files for offline use. Failures are
-// tolerated — network-first serve repairs the cache at runtime, and a flaky
-// fetch must never block this new version from activating.
+// Install: pre-cache the app shell and the big immutable data files for offline
+// use. Failures are tolerated — stale-while-revalidate below repairs the cache
+// at runtime, and a flaky fetch must never block this version from activating.
 self.addEventListener("install", (event) => {
   event.waitUntil(
-    caches.open(CACHE)
-      .then((cache) => Promise.all(DATA_ASSETS.map((a) => cache.add(a).catch(() => {}))))
-      .then(() => self.skipWaiting())
+    Promise.all([
+      caches.open(CACHE).then((cache) => cache.addAll(["./", "index.html", "css/style.css?v=34", "js/app.js?v=34", "js/dict.js?v=34", "manifest.webmanifest"]).catch(() => {})),
+      caches.open(DATA_CACHE).then((cache) => Promise.all(DATA_ASSETS.map((a) => cache.add(a).catch(() => {})))),
+    ]).then(() => self.skipWaiting())
   );
 });
 
+// Activate: delete old app-shell caches (never the permanent data cache) and
+// take control immediately.
 self.addEventListener("activate", (event) => {
   event.waitUntil(
     caches.keys()
-      .then((keys) => Promise.all(keys.filter((k) => k !== CACHE).map((k) => caches.delete(k))))
+      .then((keys) => Promise.all(keys.filter((k) => k !== CACHE && k !== DATA_CACHE).map((k) => caches.delete(k))))
       .then(() => self.clients.claim())
   );
 });
@@ -24,17 +32,15 @@ self.addEventListener("fetch", (event) => {
   const url = new URL(event.request.url);
   const path = url.pathname;
 
-  // Data JSONs: stale-while-revalidate. Serve the cached copy IMMEDIATELY so
-  // the app opens as fast as before (no 18MB re-download on every visit), then
-  // refresh the cache in the background. On the very first visit there is no
-  // cache yet, so it falls through to the network exactly once.
+  // Data JSONs: stale-while-revalidate against the permanent data cache. Serve
+  // the cached copy IMMEDIATELY (instant app open), refresh in the background.
   if (DATA_ASSETS.some((a) => path.endsWith(a))) {
     event.respondWith(
-      caches.match(event.request).then((cached) => {
+      caches.match(event.request, { cacheName: DATA_CACHE }).then((cached) => {
         const fresh = fetch(event.request, { cache: "no-store" }).then((resp) => {
           if (resp.ok) {
             const copy = resp.clone();
-            caches.open(CACHE).then((c) => c.put(event.request, copy));
+            caches.open(DATA_CACHE).then((c) => c.put(event.request, copy));
           }
           return resp;
         }).catch(() => cached);
