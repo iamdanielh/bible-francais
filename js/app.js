@@ -1,4 +1,4 @@
-import { Dictionary, friendlyTense, friendlyForm, esInfinitive, esConjugado, esCompuesto } from "./dict.js?v=36";
+import { Dictionary, friendlyTense, friendlyForm, esInfinitive, esConjugado, esCompuesto } from "./dict.js?v=37";
 
 const BOOK_ALIASES = {
   "Évangile selon Matthieu": "Matthieu",
@@ -890,6 +890,26 @@ function clearReadHighlight() {
 const KARAOKE_CHAR_MS = 62; // rough ms per char at 1.0x, matches natural speech
 const KARAOKE_GAP_MS = 50;  // small pause between words
 
+// ---- self-calibration for the device (iPhone) voice ------------------------
+// iOS exposes no per-word timing, so the only honest way to track its actual
+// narration is to LEARN its real pace: each time a verse finishes, we divide
+// the measured speaking time by our char estimate to get a calibration factor
+// for this device's voice at this rate, then apply it to the next verses.
+// EMA-smoothed so one odd verse can't throw it off.
+let _deviceCalFactor = 1;
+function resetDeviceCalibration() { _deviceCalFactor = 1; }
+
+function calibrateDeviceFromMeasure(verseText, ms) {
+  if (!verseText || !(ms > 0)) return;
+  const rate = effectiveReaderRate();
+  if (!(rate > 0)) return;
+  const est = (KARAOKE_GAP_MS * verseText.trim().split(/\s+/).length + KARAOKE_CHAR_MS * verseText.length) / rate;
+  if (!(est > 0)) return;
+  const f = ms / est;
+  if (f < 0.3 || f > 3) return; // reject garbage (pauses, glitches)
+  _deviceCalFactor = _deviceCalFactor === 1 ? f : _deviceCalFactor * 0.6 + f * 0.4;
+}
+
 function clearKaraoke() {
   clearTimeout(_karaokeTimer);
   _karaokeTimer = null;
@@ -973,15 +993,17 @@ function startChunkKaraoke(chunkIdx) {
 }
 
 // ---- device-voice karaoke: estimate, delayed to speech onset ---------------
-// iOS speechSynthesis gives NO word-boundary events, so this is necessarily an
-// estimate (char length × the effective rate). Browsers that DO fire "word"
-// boundary events (desktop Chrome/Edge) override it for near-exact sync.
+// iOS speechSynthesis gives NO word-boundary events, so this is an estimate
+// (char length × the effective rate) scaled by the learned calibration factor
+// so the highlight tracks the iPhone voice's actual pace. Browsers that DO fire
+// "word" boundary events (desktop Chrome/Edge) override it for near-exact sync.
 function startKaraoke(i, from) {
   clearKaraoke();
   const words = karaokeWordEls(i);
   if (!words.length) return;
   const gen = _readerGen;
   const rate = effectiveReaderRate();
+  const cal = _readerUseDevice ? Math.max(_deviceCalFactor, 0.25) : 1;
   const startAt = from == null ? 0 : Math.max(0, Math.min(from, words.length - 1));
   const tick = (wi) => {
     if (!_readerActive || gen !== _readerGen) return;
@@ -989,7 +1011,7 @@ function startKaraoke(i, from) {
     const next = wi + 1;
     const wait = next >= words.length
       ? 0
-      : (KARAOKE_GAP_MS + KARAOKE_CHAR_MS * Math.max(1, (words[wi].textContent || "").length)) / rate;
+      : (KARAOKE_GAP_MS + KARAOKE_CHAR_MS * Math.max(1, (words[wi].textContent || "").length)) * cal / rate;
     if (next >= words.length) { _karaokeTimer = null; return; }
     _karaokeTimer = setTimeout(() => tick(next), wait);
   };
@@ -1303,7 +1325,9 @@ function startDeviceRead(verses, gen, from) {
     u.lang = "fr-FR";
     u.rate = Math.max(0.5, Math.min(2, _readerRate)) * 0.92;
     if (_readerVoice) { try { u.voice = _readerVoice; } catch (e) {} }
+    let spokenMs = 0; // actual wall-clock speaking time of this verse
     u.onstart = () => {
+      spokenMs = Date.now();
       if (gen === _readerGen && _readerActive) {
         _readerIdx = i;
         highlightReadVerse(i);
@@ -1326,7 +1350,10 @@ function startDeviceRead(verses, gen, from) {
       }
     };
     const last = i === verses.length - 1;
-    u.onend = () => { if (last && gen === _readerGen && _readerActive) stopChapterRead(); };
+    u.onend = () => {
+      if (spokenMs) calibrateDeviceFromMeasure(verses[i], Date.now() - spokenMs);
+      if (last && gen === _readerGen && _readerActive) stopChapterRead();
+    };
     u.onerror = () => { if (last && gen === _readerGen && _readerActive) stopChapterRead(); };
     _readerUtterances.push(u);
   }
@@ -1358,6 +1385,7 @@ function startChapterRead() {
   // from inside the tap gesture, and deferring it (even by a promise) leaves it
   // silent.
   _readerVoice = null;
+  resetDeviceCalibration();
   if (_readerUseDevice) {
     try { _readerVoice = pickFrVoice(window.speechSynthesis.getVoices()); } catch (e) {}
     startDeviceRead(verses, _readerGen, 0);
