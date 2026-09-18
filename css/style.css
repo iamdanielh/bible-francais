@@ -143,8 +143,14 @@ button:disabled {
   line-height: 1;
 }
 .lang-select {
-  padding: 7px 8px;
-  max-width: 96px;
+  padding: 5px 8px;
+  max-width: 118px;
+  font-family: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin-left: 8px;
+  border-radius: 999px;
+  background: var(--surface2);
 }
 #speakBtn { font-size: 1.15rem; }
 .round-btn:disabled, .icon-btn:disabled { opacity: 0.4; }
