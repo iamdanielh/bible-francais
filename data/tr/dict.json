@@ -1,1 +1,1011 @@
-{}
+{
+  "at": [
+    "padre",
+    "antepasado",
+    "progenitor"
+  ],
+  "ata": [
+    "padre",
+    "antepasado",
+    "progenitor"
+  ],
+  "atanın": [
+    "del padre",
+    "del antepasado"
+  ],
+  "atalar": [
+    "los padres",
+    "los antepasados"
+  ],
+  "ataların": [
+    "de los padres",
+    "de los antepasados"
+  ],
+  "ataları": [
+    "sus padres",
+    "sus antepasados"
+  ],
+  "atalarını": [
+    "a sus padres",
+    "a sus antepasados"
+  ],
+  "atalarının": [
+    "de sus padres",
+    "de sus antepasados"
+  ],
+  "atalarımıza": [
+    "a nuestros padres",
+    "a nuestros antepasados"
+  ],
+  "atar": [
+    "antepasado",
+    "padre"
+  ],
+  "oğul": [
+    "hijo"
+  ],
+  "oğlu": [
+    "hijo",
+    "su hijo"
+  ],
+  "oğlunu": [
+    "a su hijo",
+    "su hijo"
+  ],
+  "oğlun": [
+    "tu hijo",
+    "su hijo"
+  ],
+  "oğlunun": [
+    "de su hijo",
+    "de tu hijo"
+  ],
+  "oğluna": [
+    "a su hijo",
+    "a tu hijo"
+  ],
+  "oğlundan": [
+    "de su hijo",
+    "de su hijo"
+  ],
+  "oğullar": [
+    "los hijos"
+  ],
+  "oğulları": [
+    "sus hijos",
+    "los hijos"
+  ],
+  "oğulların": [
+    "de los hijos"
+  ],
+  "oğullarını": [
+    "a sus hijos",
+    "sus hijos"
+  ],
+  "oğullarının": [
+    "de sus hijos"
+  ],
+  "oğullarına": [
+    "a sus hijos"
+  ],
+  "oğullarından": [
+    "de sus hijos",
+    "de entre sus hijos"
+  ],
+  "oğlum": [
+    "mi hijo"
+  ],
+  "oğullarım": [
+    "mis hijos"
+  ],
+  "kız": [
+    "hija",
+    "muchacha"
+  ],
+  "kızı": [
+    "su hija",
+    "la hija"
+  ],
+  "kızlar": [
+    "las hijas"
+  ],
+  "kızları": [
+    "sus hijas",
+    "las hijas"
+  ],
+  "kızlarını": [
+    "a sus hijas"
+  ],
+  "kızının": [
+    "de su hija",
+    "de la hija"
+  ],
+  "kızını": [
+    "a su hija"
+  ],
+  "adam": [
+    "hombre",
+    "varón"
+  ],
+  "adamın": [
+    "del hombre"
+  ],
+  "adamlar": [
+    "los hombres"
+  ],
+  "adamları": [
+    "a los hombres",
+    "los hombres"
+  ],
+  "adama": [
+    "al hombre"
+  ],
+  "erkek": [
+    "varón",
+    "hombre"
+  ],
+  "erkekler": [
+    "los varones",
+    "los hombres"
+  ],
+  "erkekleri": [
+    "a los varones"
+  ],
+  "kadın": [
+    "mujer",
+    "esposa"
+  ],
+  "kadının": [
+    "de la mujer"
+  ],
+  "kadına": [
+    "a la mujer"
+  ],
+  "kadınlar": [
+    "las mujeres"
+  ],
+  "kadınların": [
+    "de las mujeres"
+  ],
+  "kadınları": [
+    "a las mujeres"
+  ],
+  "baba": [
+    "padre"
+  ],
+  "babası": [
+    "su padre",
+    "el padre"
+  ],
+  "babasının": [
+    "de su padre"
+  ],
+  "babasını": [
+    "a su padre"
+  ],
+  "babana": [
+    "a tu padre"
+  ],
+  "anne": [
+    "madre"
+  ],
+  "annesi": [
+    "su madre",
+    "la madre"
+  ],
+  "kardeş": [
+    "hermano",
+    "pariente"
+  ],
+  "kardeşi": [
+    "su hermano"
+  ],
+  "kardeşini": [
+    "a su hermano"
+  ],
+  "kardeşleri": [
+    "sus hermanos"
+  ],
+  "kardeşler": [
+    "los hermanos"
+  ],
+  "tanrı": [
+    "Dios"
+  ],
+  "tanrı'nın": [
+    "de Dios"
+  ],
+  "tanrının": [
+    "de Dios"
+  ],
+  "tanrıya": [
+    "a Dios"
+  ],
+  "tanrı'dan": [
+    "de Dios"
+  ],
+  "rab": [
+    "Señor"
+  ],
+  "rab'bin": [
+    "del Señor"
+  ],
+  "rabbin": [
+    "del Señor"
+  ],
+  "rab'be": [
+    "al Señor"
+  ],
+  "rabbe": [
+    "al Señor"
+  ],
+  "rab'den": [
+    "del Señor"
+  ],
+  "i̇sa": [
+    "Jesús"
+  ],
+  "İsa": [
+    "Jesús"
+  ],
+  "i̇sa'nın": [
+    "de Jesús"
+  ],
+  "İsa'nın": [
+    "de Jesús"
+  ],
+  "i̇sa'ya": [
+    "a Jesús"
+  ],
+  "İsa'ya": [
+    "a Jesús"
+  ],
+  "mesih": [
+    "Mesías"
+  ],
+  "mesih'in": [
+    "del Mesías"
+  ],
+  "mesihin": [
+    "del Mesías"
+  ],
+  "günah": [
+    "pecado"
+  ],
+  "günahı": [
+    "el pecado",
+    "su pecado"
+  ],
+  "günahını": [
+    "su pecado"
+  ],
+  "günahlar": [
+    "los pecados"
+  ],
+  "günahları": [
+    "sus pecados",
+    "los pecados"
+  ],
+  "günahlarını": [
+    "sus pecados"
+  ],
+  "günahların": [
+    "de los pecados"
+  ],
+  "günahlarının": [
+    "de sus pecados"
+  ],
+  "köle": [
+    "siervo",
+    "esclavo"
+  ],
+  "köleler": [
+    "los siervos",
+    "los esclavos"
+  ],
+  "kul": [
+    "siervo"
+  ],
+  "kulun": [
+    "su siervo",
+    "tu siervo"
+  ],
+  "kulu": [
+    "el siervo",
+    "su siervo"
+  ],
+  "kulları": [
+    "sus siervos",
+    "los siervos"
+  ],
+  "kral": [
+    "rey"
+  ],
+  "kralın": [
+    "del rey"
+  ],
+  "kralı": [
+    "al rey",
+    "el rey"
+  ],
+  "krala": [
+    "al rey"
+  ],
+  "krallar": [
+    "los reyes"
+  ],
+  "kralların": [
+    "de los reyes"
+  ],
+  "kralları": [
+    "a los reyes"
+  ],
+  "hükümdar": [
+    "soberano"
+  ],
+  "şehir": [
+    "ciudad"
+  ],
+  "şehri": [
+    "la ciudad",
+    "su ciudad"
+  ],
+  "şehrin": [
+    "de la ciudad"
+  ],
+  "şehre": [
+    "a la ciudad"
+  ],
+  "kent": [
+    "ciudad"
+  ],
+  "kentin": [
+    "de la ciudad"
+  ],
+  "ev": [
+    "casa"
+  ],
+  "evi": [
+    "su casa",
+    "la casa"
+  ],
+  "evine": [
+    "a su casa"
+  ],
+  "evinde": [
+    "en su casa"
+  ],
+  "evin": [
+    "de la casa"
+  ],
+  "evde": [
+    "en casa"
+  ],
+  "evleri": [
+    "sus casas"
+  ],
+  "halk": [
+    "pueblo"
+  ],
+  "halkın": [
+    "del pueblo"
+  ],
+  "halkı": [
+    "el pueblo",
+    "su pueblo"
+  ],
+  "ulus": [
+    "nación"
+  ],
+  "ulusun": [
+    "de la nación"
+  ],
+  "uluslar": [
+    "las naciones"
+  ],
+  "ulusların": [
+    "de las naciones"
+  ],
+  "aile": [
+    "familia"
+  ],
+  "aileler": [
+    "las familias"
+  ],
+  "söz": [
+    "palabra"
+  ],
+  "sözü": [
+    "la palabra",
+    "su palabra"
+  ],
+  "sözler": [
+    "las palabras"
+  ],
+  "sözlerini": [
+    "sus palabras"
+  ],
+  "sözünü": [
+    "su palabra"
+  ],
+  "sözcük": [
+    "palabra"
+  ],
+  "yer": [
+    "lugar",
+    "tierra"
+  ],
+  "yerin": [
+    "de la tierra",
+    "del lugar"
+  ],
+  "yerde": [
+    "en el lugar",
+    "en la tierra"
+  ],
+  "yeryüzü": [
+    "la tierra"
+  ],
+  "yeryüzünün": [
+    "de la tierra"
+  ],
+  "toprak": [
+    "tierra",
+    "suelo"
+  ],
+  "toprağı": [
+    "la tierra",
+    "su tierra"
+  ],
+  "toprağa": [
+    "a la tierra"
+  ],
+  "dünya": [
+    "mundo"
+  ],
+  "dünyanın": [
+    "del mundo"
+  ],
+  "gök": [
+    "cielo"
+  ],
+  "gökler": [
+    "los cielos"
+  ],
+  "göklerde": [
+    "en los cielos"
+  ],
+  "gökyüzü": [
+    "el cielo"
+  ],
+  "yıldız": [
+    "estrella"
+  ],
+  "yıldızlar": [
+    "las estrellas"
+  ],
+  "güneş": [
+    "sol"
+  ],
+  "ay": [
+    "luna",
+    "mes"
+  ],
+  "ışık": [
+    "luz"
+  ],
+  "ışığı": [
+    "la luz",
+    "su luz"
+  ],
+  "karanlık": [
+    "tinieblas",
+    "oscuridad"
+  ],
+  "karanlığı": [
+    "las tinieblas"
+  ],
+  "su": [
+    "agua"
+  ],
+  "suyu": [
+    "el agua",
+    "su agua"
+  ],
+  "sular": [
+    "las aguas"
+  ],
+  "suları": [
+    "las aguas"
+  ],
+  "deniz": [
+    "mar"
+  ],
+  "denizi": [
+    "el mar",
+    "su mar"
+  ],
+  "denize": [
+    "al mar"
+  ],
+  "el": [
+    "mano"
+  ],
+  "eli": [
+    "su mano",
+    "la mano"
+  ],
+  "elini": [
+    "su mano"
+  ],
+  "eller": [
+    "las manos"
+  ],
+  "elleri": [
+    "sus manos"
+  ],
+  "ellerini": [
+    "sus manos"
+  ],
+  "göz": [
+    "ojo"
+  ],
+  "gözü": [
+    "su ojo",
+    "el ojo"
+  ],
+  "gözleri": [
+    "sus ojos"
+  ],
+  "gözlerini": [
+    "sus ojos"
+  ],
+  "ağız": [
+    "boca"
+  ],
+  "ağzı": [
+    "su boca",
+    "la boca"
+  ],
+  "yüz": [
+    "cara",
+    "rostro",
+    "cien"
+  ],
+  "yüzü": [
+    "su rostro",
+    "la cara"
+  ],
+  "yüzünü": [
+    "su rostro"
+  ],
+  "kulak": [
+    "oído",
+    "oreja"
+  ],
+  "kulağı": [
+    "su oído"
+  ],
+  "ayak": [
+    "pie"
+  ],
+  "ayağı": [
+    "su pie",
+    "el pie"
+  ],
+  "ayakları": [
+    "sus pies"
+  ],
+  "baş": [
+    "cabeza"
+  ],
+  "başı": [
+    "la cabeza",
+    "su cabeza"
+  ],
+  "başına": [
+    "sobre la cabeza"
+  ],
+  "kalp": [
+    "corazón"
+  ],
+  "kalbi": [
+    "su corazón"
+  ],
+  "yürek": [
+    "corazón"
+  ],
+  "yüreği": [
+    "su corazón"
+  ],
+  "ruh": [
+    "espíritu"
+  ],
+  "ruhu": [
+    "el espíritu",
+    "su espíritu"
+  ],
+  "can": [
+    "alma",
+    "vida"
+  ],
+  "canı": [
+    "su alma",
+    "la vida"
+  ],
+  "canlı": [
+    "viviente"
+  ],
+  "canlıları": [
+    "los seres vivientes"
+  ],
+  "ölüm": [
+    "muerte"
+  ],
+  "ölümü": [
+    "la muerte",
+    "su muerte"
+  ],
+  "ölümün": [
+    "de la muerte"
+  ],
+  "yaşam": [
+    "vida"
+  ],
+  "yaşamı": [
+    "la vida",
+    "su vida"
+  ],
+  "hayat": [
+    "vida"
+  ],
+  "hayatı": [
+    "la vida",
+    "su vida"
+  ],
+  "yemek": [
+    "comida",
+    "comer"
+  ],
+  "yemeği": [
+    "la comida"
+  ],
+  "kurban": [
+    "ofrenda",
+    "sacrificio"
+  ],
+  "kurbanı": [
+    "la ofrenda"
+  ],
+  "sunak": [
+    "altar"
+  ],
+  "sunağa": [
+    "al altar"
+  ],
+  "seçti": [
+    "escogió"
+  ],
+  "seçildi": [
+    "fue escogido"
+  ],
+  "geldi": [
+    "vino"
+  ],
+  "geldiler": [
+    "vinieron"
+  ],
+  "gidip": [
+    "fue y",
+    "yendo"
+  ],
+  "gitti": [
+    "se fue",
+    "fue"
+  ],
+  "gittiler": [
+    "se fueron"
+  ],
+  "gör": [
+    "ver"
+  ],
+  "gördü": [
+    "vio"
+  ],
+  "gördüm": [
+    "vi"
+  ],
+  "görüyor": [
+    "ve",
+    "está viendo"
+  ],
+  "işit": [
+    "oír"
+  ],
+  "işitti": [
+    "oyó"
+  ],
+  "işitin": [
+    "oíd"
+  ],
+  "verdi": [
+    "dio"
+  ],
+  "ver": [
+    "da",
+    "dar"
+  ],
+  "verir": [
+    "da"
+  ],
+  "veren": [
+    "el que da"
+  ],
+  "aldı": [
+    "tomó"
+  ],
+  "al": [
+    "toma",
+    "tomar"
+  ],
+  "söyle": [
+    "decir"
+  ],
+  "söyledi": [
+    "dijo"
+  ],
+  "söyleyecek": [
+    "dirá"
+  ],
+  "söz verdi": [
+    "prometió"
+  ],
+  "sev": [
+    "amar"
+  ],
+  "sevdi": [
+    "amó"
+  ],
+  "seven": [
+    "el que ama"
+  ],
+  "sevgi": [
+    "amor"
+  ],
+  "sevgisi": [
+    "su amor"
+  ],
+  "sevgilis": [
+    "amado",
+    "amada"
+  ],
+  "biliyorum": [
+    "sé",
+    "conozco"
+  ],
+  "bilmem": [
+    "no sé"
+  ],
+  "bilmeyen": [
+    "el que no sabe"
+  ],
+  "istedi": [
+    "pidió"
+  ],
+  "istiyor": [
+    "quiere",
+    "pide"
+  ],
+  "ister": [
+    "quiere",
+    "pide"
+  ],
+  "gerek": [
+    "necesita"
+  ],
+  "gel": [
+    "ven"
+  ],
+  "çağır": [
+    "llamar"
+  ],
+  "çağırdı": [
+    "llamó"
+  ],
+  "inandı": [
+    "creyó"
+  ],
+  "inanın": [
+    "creed"
+  ],
+  "iman": [
+    "fe"
+  ],
+  "gün": [
+    "día"
+  ],
+  "günü": [
+    "el día",
+    "su día"
+  ],
+  "gündüz": [
+    "día",
+    "de día"
+  ],
+  "gece": [
+    "noche"
+  ],
+  "geceyi": [
+    "la noche"
+  ],
+  "yıl": [
+    "año"
+  ],
+  "yıllar": [
+    "los años"
+  ],
+  "sabah": [
+    "mañana"
+  ],
+  "akşam": [
+    "tarde",
+    "noche"
+  ],
+  "evet": [
+    "sí"
+  ],
+  "hayır": [
+    "no"
+  ],
+  "ve": [
+    "y"
+  ],
+  "da": [
+    "también",
+    "y"
+  ],
+  "de": [
+    "también",
+    "y"
+  ],
+  "ama": [
+    "pero"
+  ],
+  "fakat": [
+    "pero"
+  ],
+  "çünkü": [
+    "porque"
+  ],
+  "olarak": [
+    "como",
+    "en calidad de"
+  ],
+  "için": [
+    "para",
+    "por"
+  ],
+  "gibi": [
+    "como",
+    "semejante a"
+  ],
+  "kadar": [
+    "hasta",
+    "como"
+  ],
+  "sonra": [
+    "después"
+  ],
+  "önce": [
+    "antes"
+  ],
+  "şimdi": [
+    "ahora"
+  ],
+  "beri": [
+    "desde"
+  ],
+  "arasında": [
+    "entre"
+  ],
+  "içinde": [
+    "dentro de",
+    "en"
+  ],
+  "üzerinde": [
+    "sobre"
+  ],
+  "altında": [
+    "debajo de"
+  ],
+  "yanında": [
+    "junto a"
+  ],
+  "önünde": [
+    "delante de"
+  ],
+  "arkasında": [
+    "detrás de"
+  ],
+  "çok": [
+    "mucho",
+    "muy"
+  ],
+  "az": [
+    "poco"
+  ],
+  "büyük": [
+    "grande"
+  ],
+  "küçük": [
+    "pequeño"
+  ],
+  "iyi": [
+    "bueno",
+    "bien"
+  ],
+  "kötü": [
+    "malo",
+    "mal"
+  ],
+  "doğru": [
+    "recto",
+    "verdadero"
+  ],
+  "kutsal": [
+    "santo"
+  ],
+  "temiz": [
+    "limpio"
+  ],
+  "kirli": [
+    "sucio"
+  ],
+  "başka": [
+    "otro",
+    "además"
+  ],
+  "çeşitli": [
+    "diverso",
+    "variado"
+  ],
+  "hep": [
+    "todos",
+    "siempre"
+  ],
+  "yeni": [
+    "nuevo"
+  ],
+  "eski": [
+    "viejo",
+    "antiguo"
+  ],
+  "uzun": [
+    "largo"
+  ],
+  "kısa": [
+    "corto"
+  ],
+  "geniş": [
+    "ancho",
+    "amplio"
+  ],
+  "ölü": [
+    "muerto"
+  ],
+  "tam": [
+    "completo",
+    "entero"
+  ],
+  "ancak": [
+    "solo",
+    "pero"
+  ],
+  "daha": [
+    "más"
+  ],
+  "en": [
+    "el más",
+    "lo más"
+  ]
+}
