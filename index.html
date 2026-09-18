@@ -8,14 +8,13 @@
   <title>BiblioLingo — La Biblia en tu idioma</title>
   <link rel="manifest" href="manifest.webmanifest" />
   <link rel="apple-touch-icon" href="icon-180.png" />
-  <link rel="stylesheet" href="css/style.css?v=41" />
+  <link rel="stylesheet" href="css/style.css?v=42" />
 </head>
 <body>
   <header class="topbar">
     <div class="topbar-title">
       <span class="brand">📖</span>
       <span>BiblioLingo</span>
-      <select id="langSelect" class="lang-select" aria-label="Idioma"></select>
     </div>
     <div class="topbar-controls">
       <select id="bookSelect" aria-label="Libro"></select>
@@ -25,6 +24,7 @@
       <button id="readBtn" title="Leer todo el capítulo">▶</button>
       <button id="vocabBtn" title="Ver vocabulario">⭐</button>
       <button id="aiBtn" title="Preguntar a la IA">✨</button>
+      <select id="langSelect" class="lang-select" aria-label="Idioma"></select>
     </div>
   </header>
 
@@ -140,7 +140,7 @@
     </div>
   </div>
 
-  <script type="module" src="js/app.js?v=41"></script>
+  <script type="module" src="js/app.js?v=42"></script>
 
   <script>
     // Non-module trap (runs even if the module above fails to load or parse).
