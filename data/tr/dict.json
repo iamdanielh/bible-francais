@@ -1007,5 +1007,1299 @@
   "en": [
     "el más",
     "lo más"
+  ],
+  "yamadan": [
+    "de remiendo",
+    "de parche"
+  ],
+  "yamayı": [
+    "el remiendo",
+    "el parche"
+  ],
+  "iğne": [
+    "aguja"
+  ],
+  "iğnenin": [
+    "de la aguja"
+  ],
+  "iplik": [
+    "hilo",
+    "hebra"
+  ],
+  "ipliği": [
+    "el hilo",
+    "su hilo"
+  ],
+  "kumaş": [
+    "tela",
+    "paño"
+  ],
+  "kumaşı": [
+    "la tela",
+    "el paño"
+  ],
+  "bez": [
+    "lienzo",
+    "tela",
+    "paño"
+  ],
+  "bezi": [
+    "el lienzo",
+    "el paño"
+  ],
+  "giysi": [
+    "vestido",
+    "ropa"
+  ],
+  "giysiyi": [
+    "el vestido",
+    "la ropa"
+  ],
+  "giysisini": [
+    "su vestido",
+    "su ropa"
+  ],
+  "giysilerini": [
+    "sus vestidos",
+    "sus ropas"
+  ],
+  "giydi": [
+    "se vistió",
+    "vistió"
+  ],
+  "giyindi": [
+    "se vistió"
+  ],
+  "giyinip": [
+    "se vistió y",
+    "y se vistió"
+  ],
+  "soyun": [
+    "desnudarse",
+    "desvestirse"
+  ],
+  "soyundu": [
+    "se desnudó",
+    "se despojó"
+  ],
+  "kuşak": [
+    "cinturón",
+    "generación"
+  ],
+  "kuşağı": [
+    "su cinturón",
+    "la generación"
+  ],
+  "kuşan": [
+    "ceñir",
+    "ponerse"
+  ],
+  "kuşandı": [
+    "se ciñó",
+    "se puso"
+  ],
+  "sarın": [
+    "envolver",
+    "ceñir"
+  ],
+  "sarmaladı": [
+    "envolvió",
+    "arropó"
+  ],
+  "beşik": [
+    "cuna"
+  ],
+  "beşiğe": [
+    "en la cuna",
+    "a la cuna"
+  ],
+  "peçe": [
+    "velo",
+    "tocado"
+  ],
+  "peçesini": [
+    "su velo"
+  ],
+  "örtü": [
+    "cobertura",
+    "velo",
+    "tapa"
+  ],
+  "örtüsü": [
+    "su cobertura",
+    "el velo"
+  ],
+  "kuruladı": [
+    "secó",
+    "enjugó"
+  ],
+  "sil": [
+    "limpiar",
+    "enjugar"
+  ],
+  "silÜp": [
+    "limpió y",
+    "enjugó y"
+  ],
+  "duvak": [
+    "velo de novia"
+  ],
+  "sabun": [
+    "jabón"
+  ],
+  "sabunla": [
+    "con jabón"
+  ],
+  "çağ": [
+    "tiempo",
+    "época",
+    "edad"
+  ],
+  "çağda": [
+    "en el tiempo",
+    "en la época"
+  ],
+  "kuşak boyunca": [
+    "por generaciones"
+  ],
+  "nesil": [
+    "generación",
+    "descendencia"
+  ],
+  "nesiller": [
+    "las generaciones"
+  ],
+  "nesillier": [
+    "las generaciones"
+  ],
+  "kuşaktan kuşağa": [
+    "de generación en generación"
+  ],
+  "hesap": [
+    "cuenta",
+    "cálculo"
+  ],
+  "hesabı": [
+    "la cuenta",
+    "su cuenta"
+  ],
+  "hesabını": [
+    "su cuenta",
+    "cuenta de él"
+  ],
+  "hesap verecek": [
+    "rendirá cuentas"
+  ],
+  "borç": [
+    "deuda",
+    "débito"
+  ],
+  "borcu": [
+    "la deuda",
+    "su deuda"
+  ],
+  "borçlu": [
+    "deudor",
+    "debiendo"
+  ],
+  "borçlusun": [
+    "eres deudor"
+  ],
+  "alacaklı": [
+    "acreedor"
+  ],
+  "ödünç": [
+    "préstamo"
+  ],
+  "ödünç ver": [
+    "prestar"
+  ],
+  "faiz": [
+    "interés",
+    "usura"
+  ],
+  "faizle": [
+    "con usura",
+    "con interés"
+  ],
+  "tapu": [
+    "título",
+    "escritura"
+  ],
+  "kalem": [
+    "pluma",
+    "lapicero"
+  ],
+  "mühür": [
+    "sello"
+  ],
+  "mührü": [
+    "el sello",
+    "su sello"
+  ],
+  "mühürü": [
+    "el sello",
+    "su sello"
+  ],
+  "mühürle": [
+    "sellar"
+  ],
+  "mühürledi": [
+    "sello",
+    "puso su sello"
+  ],
+  "antlaş(ma)": [
+    "pacto",
+    "alianza"
+  ],
+  "vasiyet": [
+    "testamento",
+    "pacto"
+  ],
+  "vasiyeti": [
+    "el testamento",
+    "su pacto"
+  ],
+  "miras": [
+    "herencia"
+  ],
+  "mirası": [
+    "la herencia",
+    "su herencia"
+  ],
+  "mirasın": [
+    "de la herencia"
+  ],
+  "mirasa": [
+    "a la herencia"
+  ],
+  "mülk": [
+    "propiedad",
+    "posesión"
+  ],
+  "mülkü": [
+    "la propiedad",
+    "su propiedad"
+  ],
+  "mülkünü": [
+    "su propiedad"
+  ],
+  "emlak": [
+    "propiedades",
+    "bienes raíces"
+  ],
+  "servet": [
+    "riqueza",
+    "fortuna"
+  ],
+  "servetini": [
+    "su riqueza",
+    "su fortuna"
+  ],
+  "hazine": [
+    "tesoro"
+  ],
+  "hazinesi": [
+    "su tesoro",
+    "el tesoro"
+  ],
+  "hazinede": [
+    "en el tesoro"
+  ],
+  "hazineyi": [
+    "el tesoro"
+  ],
+  "mal": [
+    "bien",
+    "posesión",
+    "propiedad"
+  ],
+  "malı": [
+    "su bien",
+    "la posesión"
+  ],
+  "malları": [
+    "sus bienes",
+    "las posesiones"
+  ],
+  "mallarını": [
+    "sus bienes"
+  ],
+  "varlık": [
+    "ser",
+    "existencia",
+    "bienes"
+  ],
+  "varlığını": [
+    "su ser",
+    "su existencia"
+  ],
+  "yoksul": [
+    "pobre"
+  ],
+  "yoksulu": [
+    "al pobre",
+    "el pobre"
+  ],
+  "yoksullar": [
+    "los pobres"
+  ],
+  "yoksullara": [
+    "a los pobres"
+  ],
+  "fakir": [
+    "pobre"
+  ],
+  "fakiri": [
+    "al pobre",
+    "el pobre"
+  ],
+  "fakirlere": [
+    "a los pobres"
+  ],
+  "muhtaç": [
+    "necesitado",
+    "menesteroso"
+  ],
+  "muhtaca": [
+    "al necesitado"
+  ],
+  "zengin": [
+    "rico"
+  ],
+  "zenginleri": [
+    "a los ricos",
+    "los ricos"
+  ],
+  "zenginlere": [
+    "a los ricos"
+  ],
+  "kraliyet": [
+    "real",
+    "de la realeza"
+  ],
+  "taht": [
+    "trono"
+  ],
+  "tahta": [
+    "al trono",
+    "el trono"
+  ],
+  "tahtın": [
+    "del trono"
+  ],
+  "tahtında": [
+    "en su trono"
+  ],
+  "tahtına": [
+    "a su trono"
+  ],
+  "tahtını": [
+    "su trono"
+  ],
+  "asası": [
+    "su cetro",
+    "su vara"
+  ],
+  "asa": [
+    "cetro",
+    "vara",
+    "bastón"
+  ],
+  "cömert": [
+    "generoso"
+  ],
+  "cömertçe": [
+    "generosamente"
+  ],
+  "dürüst": [
+    "honesto",
+    "recto"
+  ],
+  "dürüstçe": [
+    "honestamente"
+  ],
+  "adalet": [
+    "justicia"
+  ],
+  "adaleti": [
+    "la justicia",
+    "su justicia"
+  ],
+  "adaletin": [
+    "de la justicia"
+  ],
+  "sadık": [
+    "fiel"
+  ],
+  "sadakati": [
+    "su fidelidad"
+  ],
+  "sadakat": [
+    "fidelidad",
+    "lealtad"
+  ],
+  "nefret": [
+    "odio"
+  ],
+  "nefreti": [
+    "el odio",
+    "su odio"
+  ],
+  "nefret eden": [
+    "el que odia",
+    "los que odian"
+  ],
+  "nefret ettim": [
+    "abominé",
+    "odié"
+  ],
+  "öfke": [
+    "ira",
+    "cólera"
+  ],
+  "öfkesi": [
+    "su ira",
+    "la ira"
+  ],
+  "öfkeli": [
+    "airado",
+    "enfurecido"
+  ],
+  "öfkeyle": [
+    "con ira",
+    "airadamente"
+  ],
+  "kızgın": [
+    "airado",
+    "enojado"
+  ],
+  "kızınca": [
+    "cuando se enoja",
+    "como se enoja"
+  ],
+  "gazab": [
+    "ira",
+    "furor"
+  ],
+  "gazabı": [
+    "su ira",
+    "la ira"
+  ],
+  "sabr": [
+    "paciencia"
+  ],
+  "sabır": [
+    "paciencia"
+  ],
+  "sabrı": [
+    "la paciencia",
+    "su paciencia"
+  ],
+  "güven": [
+    "confianza",
+    "seguridad"
+  ],
+  "güveni": [
+    "la confianza",
+    "su confianza"
+  ],
+  "güvenin": [
+    "de la confianza"
+  ],
+  "emanet": [
+    "confianza",
+    "depósito"
+  ],
+  "emaneti": [
+    "el depósito",
+    "lo encomendado"
+  ],
+  "umut": [
+    "esperanza"
+  ],
+  "umudu": [
+    "la esperanza",
+    "su esperanza"
+  ],
+  "ümidini": [
+    "su esperanza"
+  ],
+  "ümit": [
+    "esperanza"
+  ],
+  "korku": [
+    "temor",
+    "miedo"
+  ],
+  "korkusu": [
+    "su temor",
+    "el temor"
+  ],
+  "korkunç": [
+    "terrible",
+    "espantoso"
+  ],
+  "korkunçtu": [
+    "era terrible"
+  ],
+  "korkunun": [
+    "del temor"
+  ],
+  "dehşet": [
+    "terror",
+    "espanto"
+  ],
+  "dehşeti": [
+    "el terror",
+    "su terror"
+  ],
+  "şaşkın": [
+    "asombrado",
+    "pasmado"
+  ],
+  "şaşkınlık": [
+    "asombro",
+    "pasmo"
+  ],
+  "şaşkınlığa": [
+    "en el asombro"
+  ],
+  "şaşarak": [
+    "con asombro"
+  ],
+  "şaşıver": [
+    "quedarse pasmado"
+  ],
+  "hayran": [
+    "admirado",
+    "maravillado"
+  ],
+  "hayranlık": [
+    "admiración"
+  ],
+  "düşün": [
+    "pensar"
+  ],
+  "düşünce": [
+    "pensamiento"
+  ],
+  "düşüncesini": [
+    "su pensamiento"
+  ],
+  "düşünceleri": [
+    "sus pensamientos"
+  ],
+  "düşündü": [
+    "pensó",
+    "reflexionó"
+  ],
+  "düşünüp": [
+    "pensó y",
+    "reflexionó y"
+  ],
+  "düşünme": [
+    "no pienses",
+    "pensamiento"
+  ],
+  "anlam": [
+    "sentido",
+    "significado"
+  ],
+  "anlamı": [
+    "el significado",
+    "su sentido"
+  ],
+  "anlamına": [
+    "con el sentido de",
+    "en el sentido de"
+  ],
+  "özlem": [
+    "anhelo",
+    "añoranza"
+  ],
+  "özlemi": [
+    "su anhelo"
+  ],
+  "arzu": [
+    "deseo",
+    "anhelo"
+  ],
+  "arzusu": [
+    "su deseo"
+  ],
+  "istek": [
+    "deseo",
+    "petición"
+  ],
+  "isteği": [
+    "su deseo",
+    "la petición"
+  ],
+  "iştah": [
+    "apetito"
+  ],
+  "açlık": [
+    "hambre"
+  ],
+  "açlıktan": [
+    "de hambre"
+  ],
+  "susuzluk": [
+    "sed"
+  ],
+  "yoksunluk": [
+    "privación",
+    "carencia"
+  ],
+  "hoşnut": [
+    "satisfecho",
+    "contento"
+  ],
+  "hoşnutluk": [
+    "satisfacción",
+    "contentamiento"
+  ],
+  "ihtiyaç": [
+    "necesidad"
+  ],
+  "ihtiyacı": [
+    "su necesidad",
+    "la necesidad"
+  ],
+  "ihtiyaçlarını": [
+    "sus necesidades"
+  ],
+  "yarar": [
+    "provecho",
+    "beneficio"
+  ],
+  "yararı": [
+    "su provecho",
+    "el beneficio"
+  ],
+  "yararlı": [
+    "provechoso",
+    "útil"
+  ],
+  "çaba": [
+    "esfuerzo"
+  ],
+  "çabası": [
+    "su esfuerzo"
+  ],
+  "emek": [
+    "trabajo",
+    "esfuerzo"
+  ],
+  "emeği": [
+    "el trabajo",
+    "su esfuerzo"
+  ],
+  "engel": [
+    "obstáculo",
+    "impedimento"
+  ],
+  "engeli": [
+    "el obstáculo",
+    "su impedimento"
+  ],
+  "engelle": [
+    "impedir",
+    "obstaculizar"
+  ],
+  "kolaylık": [
+    "facilidad",
+    "comodidad"
+  ],
+  "güçlük": [
+    "dificultad"
+  ],
+  "güçlüğü": [
+    "la dificultad"
+  ],
+  "zorluk": [
+    "dificultad"
+  ],
+  "zorluğu": [
+    "la dificultad"
+  ],
+  "belirsizlik": [
+    "incertidumbre"
+  ],
+  "gölge": [
+    "sombra"
+  ],
+  "gölgesi": [
+    "su sombra",
+    "la sombra"
+  ],
+  "gölgesinde": [
+    "bajo su sombra",
+    "a la sombra"
+  ],
+  "ufuk": [
+    "horizonte"
+  ],
+  "ufkunda": [
+    "en su horizonte"
+  ],
+  "kıyı": [
+    "orilla",
+    "costa"
+  ],
+  "kıyısında": [
+    "en la orilla",
+    "en la costa"
+  ],
+  "kıyıya": [
+    "a la orilla"
+  ],
+  "sahil": [
+    "costa",
+    "orilla"
+  ],
+  "sahilde": [
+    "en la costa"
+  ],
+  "vadi": [
+    "valle"
+  ],
+  "vadide": [
+    "en el valle"
+  ],
+  "vadiyi": [
+    "el valle",
+    "al valle"
+  ],
+  "vadinin": [
+    "del valle"
+  ],
+  "vadiler": [
+    "los valles"
+  ],
+  "ova": [
+    "llanura"
+  ],
+  "ovada": [
+    "en la llanura"
+  ],
+  "düzlük": [
+    "llanura",
+    "plano"
+  ],
+  "yayla": [
+    "con el arco"
+  ],
+  "tepe": [
+    "colina",
+    "cerro"
+  ],
+  "tepede": [
+    "en la colina"
+  ],
+  "tepenin": [
+    "de la colina"
+  ],
+  "tepelere": [
+    "a las colinas"
+  ],
+  "dağ": [
+    "monte"
+  ],
+  "dağı": [
+    "el monte",
+    "su monte"
+  ],
+  "dağda": [
+    "en el monte"
+  ],
+  "dağın": [
+    "del monte"
+  ],
+  "dağa": [
+    "al monte"
+  ],
+  "dağlar": [
+    "los montes"
+  ],
+  "dağların": [
+    "de los montes"
+  ],
+  "dağlara": [
+    "a los montes"
+  ],
+  "kaya": [
+    "peña",
+    "roca"
+  ],
+  "kayayı": [
+    "la peña",
+    "la roca"
+  ],
+  "kayanın": [
+    "de la peña"
+  ],
+  "kayalara": [
+    "a las peñas"
+  ],
+  "dağlık": [
+    "montañoso"
+  ],
+  "çöl": [
+    "desierto"
+  ],
+  "çölü": [
+    "el desierto",
+    "su desierto"
+  ],
+  "çölün": [
+    "del desierto"
+  ],
+  "çöle": [
+    "al desierto"
+  ],
+  "çöllerde": [
+    "en los desiertos"
+  ],
+  "yaban": [
+    "salvaje",
+    "desierto"
+  ],
+  "ıssız": [
+    "desolado"
+  ],
+  "bozkır": [
+    "estepa"
+  ],
+  "çayır": [
+    "pradera",
+    "pastizal"
+  ],
+  "çayırda": [
+    "en la pradera"
+  ],
+  "meyve": [
+    "fruto"
+  ],
+  "ağaçlık": [
+    "arboleda",
+    "bosque"
+  ],
+  "koru": [
+    "bosquecillo",
+    "arboleda"
+  ],
+  "koruda": [
+    "en el bosquecillo"
+  ],
+  "bağ": [
+    "viña"
+  ],
+  "bağı": [
+    "la viña",
+    "su viña"
+  ],
+  "bağa": [
+    "a la viña"
+  ],
+  "bağın": [
+    "de la viña"
+  ],
+  "üzüm": [
+    "uva"
+  ],
+  "üzümü": [
+    "la uva",
+    "su uva"
+  ],
+  "üzümler": [
+    "las uvas"
+  ],
+  "üzüm bağı": [
+    "viña"
+  ],
+  "bahçe": [
+    "huerto",
+    "jardín"
+  ],
+  "bahçede": [
+    "en el huerto"
+  ],
+  "bahçeyi": [
+    "el huerto",
+    "al huerto"
+  ],
+  "bahçenin": [
+    "del huerto"
+  ],
+  "bostan": [
+    "huerta"
+  ],
+  "hububat": [
+    "grano",
+    "cereal"
+  ],
+  "tahıl": [
+    "grano",
+    "cereal"
+  ],
+  "tahılı": [
+    "el grano"
+  ],
+  "buğday": [
+    "trigo"
+  ],
+  "buğdayı": [
+    "el trigo",
+    "su trigo"
+  ],
+  "buğdayın": [
+    "del trigo"
+  ],
+  "arpa": [
+    "cebada"
+  ],
+  "arpayı": [
+    "la cebada"
+  ],
+  "çavdar": [
+    "centeno"
+  ],
+  "saman": [
+    "paja"
+  ],
+  "samanı": [
+    "la paja"
+  ],
+  "ekin": [
+    "mies",
+    "sementera"
+  ],
+  "ekini": [
+    "la mies"
+  ],
+  "hasat": [
+    "cosecha"
+  ],
+  "hasadı": [
+    "la cosecha"
+  ],
+  "hasadın": [
+    "de la cosecha"
+  ],
+  "biçim": [
+    "siega",
+    "forma"
+  ],
+  "orak": [
+    "hoz"
+  ],
+  "orakla": [
+    "con la hoz"
+  ],
+  "ordu": [
+    "ejército"
+  ],
+  "ordusu": [
+    "su ejército",
+    "el ejército"
+  ],
+  "ordunun": [
+    "del ejército"
+  ],
+  "orduları": [
+    "sus ejércitos",
+    "los ejércitos"
+  ],
+  "savaş": [
+    "guerra"
+  ],
+  "savaşı": [
+    "la guerra",
+    "su guerra"
+  ],
+  "savaşta": [
+    "en la guerra"
+  ],
+  "savaşçı": [
+    "guerrero"
+  ],
+  "savaşçıları": [
+    "sus guerreros"
+  ],
+  "çarpışma": [
+    "combate",
+    "batalla"
+  ],
+  "çatışma": [
+    "conflicto",
+    "combate"
+  ],
+  "zafer": [
+    "victoria"
+  ],
+  "zaferi": [
+    "la victoria"
+  ],
+  "yenilgi": [
+    "derrota"
+  ],
+  "yenilgiyi": [
+    "la derrota",
+    "su derrota"
+  ],
+  "silahlar": [
+    "las armas"
+  ],
+  "silah": [
+    "arma"
+  ],
+  "silahı": [
+    "el arma",
+    "su arma"
+  ],
+  "silahsız": [
+    "sin armas"
+  ],
+  "ok": [
+    "flecha"
+  ],
+  "oku": [
+    "la flecha",
+    "su flecha"
+  ],
+  "oklar": [
+    "las flechas"
+  ],
+  "okları": [
+    "sus flechas"
+  ],
+  "yay": [
+    "arco"
+  ],
+  "yayı": [
+    "el arco",
+    "su arco"
+  ],
+  "mızrak": [
+    "lanza"
+  ],
+  "mızrağı": [
+    "la lanza",
+    "su lanza"
+  ],
+  "kılıç": [
+    "espada"
+  ],
+  "kılıcı": [
+    "la espada",
+    "su espada"
+  ],
+  "kılıcını": [
+    "su espada"
+  ],
+  "kılıca": [
+    "a la espada"
+  ],
+  "kılıçlar": [
+    "las espadas"
+  ],
+  "kılıçları": [
+    "sus espadas"
+  ],
+  "kalkan": [
+    "escudo"
+  ],
+  "kalkanı": [
+    "el escudo",
+    "su escudo"
+  ],
+  "kalkanlar": [
+    "los escudos"
+  ],
+  "zırh": [
+    "armadura"
+  ],
+  "zırhı": [
+    "la armadura",
+    "su armadura"
+  ],
+  "miğfer": [
+    "yelmo",
+    "casco"
+  ],
+  "miğferini": [
+    "su yelmo"
+  ],
+  "tolga": [
+    "yelmo"
+  ],
+  "kale": [
+    "fortaleza",
+    "castillo"
+  ],
+  "kaleyi": [
+    "la fortaleza"
+  ],
+  "kalede": [
+    "en la fortaleza"
+  ],
+  "kaleler": [
+    "las fortalezas"
+  ],
+  "sur": [
+    "muralla"
+  ],
+  "surları": [
+    "sus murallas"
+  ],
+  "surlar": [
+    "las murallas"
+  ],
+  "duvarlar": [
+    "los muros",
+    "las paredes"
+  ],
+  "kapı": [
+    "puerta"
+  ],
+  "kapıyı": [
+    "la puerta"
+  ],
+  "kapının": [
+    "de la puerta"
+  ],
+  "kapıya": [
+    "a la puerta"
+  ],
+  "kapılar": [
+    "las puertas"
+  ],
+  "kapıları": [
+    "sus puertas"
+  ],
+  "kapısı": [
+    "su puerta"
+  ],
+  "kapısında": [
+    "en su puerta"
+  ],
+  "açıklık": [
+    "claro",
+    "espacio abierto"
+  ],
+  "avlu": [
+    "patio",
+    "atrio"
+  ],
+  "avluda": [
+    "en el patio"
+  ],
+  "avlunun": [
+    "del patio"
+  ],
+  "avluyu": [
+    "el patio"
+  ],
+  "eşik": [
+    "umbral"
+  ],
+  "eşiğinde": [
+    "en el umbral"
+  ],
+  "eşiğe": [
+    "al umbral"
+  ],
+  "merdiven": [
+    "escalera"
+  ],
+  "merdiveni": [
+    "la escalera",
+    "su escalera"
+  ],
+  "çatlı": [
+    "techo"
+  ],
+  "tavan": [
+    "techo",
+    "cielo raso"
+  ],
+  "tavanı": [
+    "el techo"
+  ],
+  "dam": [
+    "tejado",
+    "azotea"
+  ],
+  "damda": [
+    "en el tejado",
+    "en la azotea"
+  ],
+  "damını": [
+    "su techo"
+  ],
+  "çat": [
+    "techo"
+  ],
+  "çatı": [
+    "el techo",
+    "su techo"
+  ],
+  "çatıda": [
+    "en el techo"
+  ],
+  "taban": [
+    "suelo",
+    "base"
+  ],
+  "zemín": [
+    "suelo"
+  ],
+  "basamak": [
+    "escalón",
+    "grada"
+  ],
+  "basamakta": [
+    "en el escalón"
+  ],
+  "seviye": [
+    "nivel"
+  ],
+  "yükseklik": [
+    "altura"
+  ],
+  "yüksekliği": [
+    "la altura",
+    "su altura"
+  ],
+  "zirve": [
+    "cima",
+    "cumbre"
+  ],
+  "doruğa": [
+    "a la cumbre"
+  ],
+  "derinlik": [
+    "profundidad"
+  ],
+  "derinliği": [
+    "la profundidad"
+  ],
+  "dib": [
+    "fondo"
+  ],
+  "dibinde": [
+    "en el fondo"
+  ],
+  "dibine": [
+    "al fondo"
+  ],
+  "uçurum": [
+    "precipicio",
+    "abismo"
+  ],
+  "uçuruma": [
+    "al precipicio"
   ]
 }
