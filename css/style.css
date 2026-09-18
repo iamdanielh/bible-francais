@@ -89,6 +89,11 @@ body.topbar-hidden .topbar {
   font-size: 1.1rem;
   font-weight: 700;
   letter-spacing: 0.2px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: 1;
+  min-width: 0;
 }
 .brand { margin-right: 6px; }
 
@@ -143,7 +148,8 @@ button:disabled {
   line-height: 1;
 }
 .lang-select {
-  padding: 5px 8px;
+  margin-left: auto;
+  padding: 5px 10px;
   max-width: 118px;
   font-family: inherit;
   font-size: 0.85rem;
