@@ -1,10 +1,10 @@
 // Versioned cache for the app shell (HTML/JS/CSS/icons). Bumped per release.
-const CACHE = "biblefr-v21";
+const CACHE = "biblefr-v22";
 // The data files never change version → once downloaded they survive every SW
 // update, so the app opens instantly on subsequent visits instead of
 // re-downloading 18MB each time a new release ships.
 const DATA_CACHE = "biblefr-data";
-const DATA_ASSETS = ["data/bible.json", "data/dict.json"];
+const DATA_ASSETS = ["data/bible.json", "data/dict.json", "data/tr/bible.json", "data/tr/dict.json"];
 
 // Install: pre-cache the app shell and the big immutable data files for offline
 // use. Failures are tolerated — stale-while-revalidate below repairs the cache
@@ -12,7 +12,7 @@ const DATA_ASSETS = ["data/bible.json", "data/dict.json"];
 self.addEventListener("install", (event) => {
   event.waitUntil(
     Promise.all([
-      caches.open(CACHE).then((cache) => cache.addAll(["./", "index.html", "css/style.css?v=43", "js/app.js?v=43", "js/dict.js?v=43", "manifest.webmanifest"]).catch(() => {})),
+      caches.open(CACHE).then((cache) => cache.addAll(["./", "index.html", "css/style.css?v=44", "js/app.js?v=44", "js/dict.js?v=44", "js/tr-engine.js?v=44", "manifest.webmanifest"]).catch(() => {})),
       caches.open(DATA_CACHE).then((cache) => Promise.all(DATA_ASSETS.map((a) => cache.add(a).catch(() => {})))),
     ]).then(() => self.skipWaiting())
   );

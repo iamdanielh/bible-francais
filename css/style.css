@@ -803,3 +803,22 @@ html.touch .scrim.show { opacity: 0; }
   .reader { padding-bottom: 110px; }
   .topbar-title { font-size: 1rem; }
 }
+
+/* --- footer / attributions --- */
+.app-footer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 18px;
+  padding: 10px 16px 14px;
+  font-size: 0.72rem;
+  line-height: 1.5;
+  color: var(--muted);
+  border-top: 1px solid var(--border);
+}
+.app-footer a {
+  color: var(--accent);
+  text-decoration: none;
+}
+.app-footer a:hover {
+  text-decoration: underline;
+}

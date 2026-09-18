@@ -1,16 +1,17 @@
-import { Dictionary, friendlyTense, friendlyForm, esInfinitive, esConjugado, esCompuesto } from "./dict.js?v=43";
+import { Dictionary, friendlyTense, friendlyForm, esInfinitive, esConjugado, esCompuesto } from "./dict.js?v=44";
+import { TrEngine } from "./tr-engine.js?v=44";
 
 // ---- language packs --------------------------------------------------------
 // Every language is a self-contained pack: which data files to fetch, how to
 // map the source book names, and which engine module handles that language.
-// Adding a language = adding one entry here + its data files. The FR engine is
-// `dict.js`; a future TR engine would slot into `makeEngine()` the same way.
+// Adding a language = adding one entry here + its data files.
 const LANGS = {
   fr: {
     label: "Français",
     flag: "🇫🇷",
     bibleUrl: "data/bible.json",
     dictUrl: "data/dict.json",
+    tts: { lang: "fr-FR", voice: pickFrVoice },
     aliases: {
       "Évangile selon Matthieu": "Matthieu",
       "Évangile selon Marc": "Marc",
@@ -21,14 +22,23 @@ const LANGS = {
       "Genèse": "Genèse",
     },
   },
+  tr: {
+    label: "Türkçe",
+    flag: "🇹🇷",
+    bibleUrl: "data/tr/bible.json",
+    dictUrl: "data/tr/dict.json",
+    tts: { lang: "tr-TR", voice: pickTrVoice },
+    aliases: {},
+  },
 };
-const LANG_ORDER = ["fr"];
+const LANG_ORDER = ["fr", "tr"];
 let lang = "fr";
 
-// Build the engine for a language. dict.js is French→Spanish; a second pack
-// (e.g. Turkish) would bring its own engine module and branch here.
+// Build the engine for a language. dict.js is French→Spanish; tr-engine.js
+// is the Turkish engine (suffix analysis lands in Fase 1, TR→ES dict in Fase 2).
 function makeEngine(langCode, dict) {
   if (langCode === "fr") return new Dictionary(dict);
+  if (langCode === "tr") return new TrEngine(dict);
   throw new Error("motor no disponible para " + langCode);
 }
 
@@ -729,11 +739,16 @@ document.addEventListener("pointerdown", unlockIOSAudio, { once: true });
 // restrictions. Each attempt has a stall guard so a dead endpoint never leaves
 // the speaker button silent for long. The device voice is the fallback.
 const TTS_URLS = [
-  (q) => "https://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob&tl=fr&q=" +
+  (q) => "https://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob&tl=" + ttsLangParam() + "&q=" +
     encodeURIComponent(q.slice(0, 200)),
-  (q) => "https://translate.googleapis.com/translate_tts?client=tw-ob&tl=fr&q=" +
+  (q) => "https://translate.googleapis.com/translate_tts?client=tw-ob&tl=" + ttsLangParam() + "&q=" +
     encodeURIComponent(q.slice(0, 200)),
 ];
+function ttsLangParam() {
+  const tts = packTTS();
+  const code = (tts.lang || "fr-FR").split("-")[0].toLowerCase();
+  return code === "tr" ? "tr" : "fr";
+}
 let _activeAudio = null;
 
 function playViaAudio(url, guardMs) {
@@ -772,6 +787,15 @@ function pickFrVoice(voices) {
   if (IS_IOS) return null; // let the OS-chosen default voice win
   return fr.find((v) => !BAD_VOICES.test(v.name)) || fr[0];
 }
+function pickTrVoice(voices) {
+  const tr = (voices || []).filter((v) => /^(tr|tur)/i.test(v.lang));
+  if (!tr.length) return null;
+  const polite = tr.find((v) => /(turkish|tolga|emel|dilay|ipek|selin|ayşe|mert)/i.test(v.name));
+  if (polite) return polite;
+  if (IS_IOS) return null; // let the OS-chosen default voice win
+  return tr.find((v) => !BAD_VOICES.test(v.name)) || tr[0];
+}
+const packTTS = () => (LANGS[lang] && LANGS[lang].tts) || { lang: "fr-FR", voice: pickFrVoice };
 
 function startLocal() {
   // Device voice. On iOS this must run synchronously from the user gesture:
@@ -784,10 +808,11 @@ function startLocal() {
   if (!voices || !voices.length) return null;
   if (_activeAudio) { try { _activeAudio.pause(); _activeAudio = null; } catch (e) {} }
   try { window.speechSynthesis.cancel(); if (IS_IOS) window.speechSynthesis.resume(); } catch (e) {}
-  const frVoice = pickFrVoice(voices);
+  const tts = packTTS();
+  const langVoice = tts.voice(voices);
   const u = new SpeechSynthesisUtterance(currentKey);
-  u.lang = "fr-FR";
-  try { if (frVoice) u.voice = frVoice; } catch (e) {} // rare invalid voice object
+  u.lang = tts.lang;
+  try { if (langVoice) u.voice = langVoice; } catch (e) {} // rare invalid voice object
   u.rate = 0.9;
   window.speechSynthesis.speak(u);
   // Classic iOS kick: some versions queue the utterance but never start it
@@ -1366,7 +1391,7 @@ function startDeviceRead(verses, gen, from) {
   for (let i = from || 0; i < verses.length; i++) {
     if (!verses[i]) continue;
     const u = new SpeechSynthesisUtterance(verses[i]);
-    u.lang = "fr-FR";
+    u.lang = packTTS().lang;
     u.rate = Math.max(0.5, Math.min(2, _readerRate)) * 0.92;
     if (_readerVoice) { try { u.voice = _readerVoice; } catch (e) {} }
     let spokenMs = 0; // actual wall-clock speaking time of this verse
@@ -1431,17 +1456,17 @@ function startChapterRead() {
   _readerVoice = null;
   resetDeviceCalibration();
   if (_readerUseDevice) {
-    try { _readerVoice = pickFrVoice(window.speechSynthesis.getVoices()); } catch (e) {}
+    try { _readerVoice = packTTS().voice(window.speechSynthesis.getVoices()); } catch (e) {}
     startDeviceRead(verses, _readerGen, 0);
     return;
   }
   speakReadVerse(0);
-  // Device voices often populate a moment later; adopt the French one for the
+  // Device voices often populate a moment later; adopt the right one for the
   // following verses once it lands.
   if (_readerUseDevice) {
     setTimeout(() => {
       if (!_readerActive || _readerVoice) return;
-      try { _readerVoice = pickFrVoice(window.speechSynthesis.getVoices()); } catch (e) {}
+      try { _readerVoice = packTTS().voice(window.speechSynthesis.getVoices()); } catch (e) {}
     }, 350);
   }
 }
