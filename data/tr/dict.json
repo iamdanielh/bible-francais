@@ -488,8 +488,7 @@
     "sol"
   ],
   "ay": [
-    "luna",
-    "mes"
+    "mes ; mes"
   ],
   "ışık": [
     "luz"
@@ -825,8 +824,7 @@
     "día"
   ],
   "günü": [
-    "el día",
-    "su día"
+    "el día ; el día"
   ],
   "gündüz": [
     "día",
@@ -845,11 +843,10 @@
     "los años"
   ],
   "sabah": [
-    "mañana"
+    "mañana ; de mañana"
   ],
   "akşam": [
-    "tarde",
-    "noche"
+    "tarde ; noche ; anochecer"
   ],
   "evet": [
     "sí"
@@ -882,57 +879,52 @@
     "en calidad de"
   ],
   "için": [
-    "para",
-    "por"
+    "para ; por ; a causa de"
   ],
   "gibi": [
-    "como",
-    "semejante a"
+    "como ; semejante a ; igual que"
   ],
   "kadar": [
-    "hasta",
-    "como"
+    "hasta ; tanto como ; como"
   ],
   "sonra": [
-    "después"
+    "después ; luego ; más tarde"
   ],
   "önce": [
-    "antes"
+    "antes ; antes de"
   ],
   "şimdi": [
-    "ahora"
+    "ahora ; ya"
   ],
   "beri": [
-    "desde"
+    "desde ; desde hace"
   ],
   "arasında": [
     "entre"
   ],
   "içinde": [
-    "dentro de",
-    "en"
+    "dentro de ; en ; adentro de"
   ],
   "üzerinde": [
-    "sobre"
+    "sobre ; encima de"
   ],
   "altında": [
-    "debajo de"
+    "debajo de ; bajo"
   ],
   "yanında": [
-    "junto a"
+    "junto a ; al lado de"
   ],
   "önünde": [
-    "delante de"
+    "delante de ; ante ; frente a"
   ],
   "arkasında": [
-    "detrás de"
+    "detrás de ; tras"
   ],
   "çok": [
-    "mucho",
-    "muy"
+    "mucho ; muy ; mucho, muchos"
   ],
   "az": [
-    "poco"
+    "poco ; poca , poco"
   ],
   "büyük": [
     "grande"
@@ -962,16 +954,14 @@
     "sucio"
   ],
   "başka": [
-    "otro",
-    "además"
+    "otro"
   ],
   "çeşitli": [
     "diverso",
     "variado"
   ],
   "hep": [
-    "todos",
-    "siempre"
+    "todo ; siempre"
   ],
   "yeni": [
     "nuevo"
@@ -2301,5 +2291,617 @@
   ],
   "uçuruma": [
     "al precipicio"
+  ],
+  "on": [
+    "él ; ella ; eso ; aquel ; aquello"
+  ],
+  "onu": [
+    "a él ; a ella ; le ; lo"
+  ],
+  "ona": [
+    "a él ; a ella ; le"
+  ],
+  "onun": [
+    "de él ; de ella ; suyo ; su"
+  ],
+  "onları": [
+    "a ellos ; a ellas ; los ; las"
+  ],
+  "onların": [
+    "de ellos ; de ellas ; sus"
+  ],
+  "onlara": [
+    "a ellos ; a ellas ; les"
+  ],
+  "onlarla": [
+    "con ellos ; con ellas"
+  ],
+  "onlardan": [
+    "de ellos ; de ellas ; de entre ellos"
+  ],
+  "onlarına": [
+    "a ellos ; a ellas"
+  ],
+  "o": [
+    "él ; ella ; eso ; aquel , aquella"
+  ],
+  "bu": [
+    "este ; esta ; esto"
+  ],
+  "bunu": [
+    "esto ; este ; esta ; eso"
+  ],
+  "buna": [
+    "a esto ; a este ; a esta"
+  ],
+  "bunun": [
+    "de esto ; de este ; de esta"
+  ],
+  "bunla": [
+    "con esto ; con este"
+  ],
+  "bundan": [
+    "de esto ; de esto ; esto"
+  ],
+  "bunları": [
+    "estos ; estas ; estas cosas"
+  ],
+  "bunların": [
+    "de estos ; de estos ; estos"
+  ],
+  "bunlara": [
+    "a estos ; a estas"
+  ],
+  "bunlar": [
+    "estos ; estas ; estas cosas"
+  ],
+  "ben": [
+    "yo"
+  ],
+  "beni": [
+    "a mí ; me"
+  ],
+  "bana": [
+    "a mí ; me"
+  ],
+  "benim": [
+    "mío ; de mí ; mi"
+  ],
+  "benimle": [
+    "conmigo"
+  ],
+  "bende": [
+    "en mí"
+  ],
+  "benden": [
+    "de mí"
+  ],
+  "benimki": [
+    "lo mío ; el mío"
+  ],
+  "sen": [
+    "tú"
+  ],
+  "seni": [
+    "a ti ; te"
+  ],
+  "sana": [
+    "a ti ; te"
+  ],
+  "senin": [
+    "tuyo ; de ti ; tu"
+  ],
+  "seninle": [
+    "contigo"
+  ],
+  "senden": [
+    "de ti"
+  ],
+  "sende": [
+    "en ti"
+  ],
+  "sizi": [
+    "a vosotros ; a ustedes ; os"
+  ],
+  "size": [
+    "a vosotros ; a ustedes ; os"
+  ],
+  "sizin": [
+    "vuestro ; suyo ; de vosotros"
+  ],
+  "siz": [
+    "vosotros ; ustedes"
+  ],
+  "biz": [
+    "nosotros"
+  ],
+  "bizi": [
+    "a nosotros ; nos"
+  ],
+  "bize": [
+    "a nosotros ; nos"
+  ],
+  "bizim": [
+    "nuestro ; nuestro"
+  ],
+  "bizimle": [
+    "con nosotros"
+  ],
+  "bizden": [
+    "de nosotros"
+  ],
+  "kendini": [
+    "a sí mismo ; a sí misma ; a sí"
+  ],
+  "kendine": [
+    "a sí mismo ; para sí"
+  ],
+  "kendisi": [
+    "él mismo ; ella misma ; sí mismo"
+  ],
+  "kendilerini": [
+    "a sí mismos ; a sí mismas"
+  ],
+  "kendileri": [
+    "ellos mismos ; ellas mismas"
+  ],
+  "şu": [
+    "ese ; esa ; aquel ; aquella ; este ; esto"
+  ],
+  "şunu": [
+    "eso ; esto ; aquello"
+  ],
+  "şuna": [
+    "a eso ; a esto"
+  ],
+  "şunun": [
+    "de eso ; de esto"
+  ],
+  "şunları": [
+    "esos ; esas ; estas cosas"
+  ],
+  "şunlar": [
+    "esos ; esas"
+  ],
+  "hangi": [
+    "cuál ; cuáles ; cuál de"
+  ],
+  "hangisi": [
+    "cuál de ellos ; cuál ; cuáles"
+  ],
+  "kimi": [
+    "a quién ; a algunos ; a algunos"
+  ],
+  "kim": [
+    "quién"
+  ],
+  "kimin": [
+    "de quién ; de quiénes"
+  ],
+  "kime": [
+    "a quién"
+  ],
+  "kimse": [
+    "nadie ; alguien ; alguno"
+  ],
+  "kimseler": [
+    "algunos ; quienes"
+  ],
+  "hiç": [
+    "nada ; ningún ; nada de"
+  ],
+  "hiçbir": [
+    "ningún ; ninguno ; nada"
+  ],
+  "hiçbiri": [
+    "ninguno de ; ninguno"
+  ],
+  "hiçbirini": [
+    "a ninguno ; a ninguno de"
+  ],
+  "hiçbirinde": [
+    "en ninguno ; en nada"
+  ],
+  "hiçbirine": [
+    "a ninguno"
+  ],
+  "hiçbirinin": [
+    "de ninguno ; de ninguno de"
+  ],
+  "hiçbirimiz": [
+    "ninguno de nosotros ; nadie de nosotros"
+  ],
+  "hiçbir zaman": [
+    "nunca ; jamás"
+  ],
+  "tek": [
+    "solo ; único ; uno solo"
+  ],
+  "teki": [
+    "el único ; el solo ; el único"
+  ],
+  "tekini": [
+    "al único"
+  ],
+  "yalın": [
+    "solo ; puro ; simple"
+  ],
+  "sadece": [
+    "solamente ; solo ; únicamente"
+  ],
+  "biricik": [
+    "único"
+  ],
+  "çoğu": [
+    "la mayoría ; muchos ; la mayor parte"
+  ],
+  "çoğunu": [
+    "la mayoría de ; a la mayoría"
+  ],
+  "çoğunun": [
+    "de la mayoría ; de la mayor parte"
+  ],
+  "çoğuma": [
+    "a la mayoría"
+  ],
+  "çoğunluğu": [
+    "la mayoría ; la mayor parte"
+  ],
+  "çoğunluk": [
+    "mayoría"
+  ],
+  "artık": [
+    "ya ; de aquí en adelante ; en adelante"
+  ],
+  "daima": [
+    "siempre"
+  ],
+  "sürekli": [
+    "continuamente"
+  ],
+  "gitgide": [
+    "cada vez más ; cada vez"
+  ],
+  "giderek": [
+    "cada vez más ; gradualmente"
+  ],
+  "devamlı": [
+    "continuamente ; constantemente"
+  ],
+  "bir ara": [
+    "por un tiempo ; una vez ; en un momento"
+  ],
+  "sırada": [
+    "en el momento en que ; mientras ; cuando"
+  ],
+  "sırasında": [
+    "durante ; en el transcurso de"
+  ],
+  "o sırada": [
+    "en ese momento ; por entonces"
+  ],
+  "zaman": [
+    "tiempo ; época ; momento"
+  ],
+  "zamanda": [
+    "en el tiempo : en el momento"
+  ],
+  "zamanı": [
+    "el tiempo ; el momento"
+  ],
+  "zamanın": [
+    "del tiempo ; del momento"
+  ],
+  "zamana": [
+    "al tiempo"
+  ],
+  "zamanlar": [
+    "los tiempos"
+  ],
+  "zamanlarda": [
+    "en los tiempos"
+  ],
+  "zamanların": [
+    "de los tiempos"
+  ],
+  "anında": [
+    "en el momento ; al instante"
+  ],
+  "hemen": [
+    "en seguida ; inmediatamente ; luego"
+  ],
+  "derhal": [
+    "de inmediato ; en seguida"
+  ],
+  "şimdiye": [
+    "hasta ahora"
+  ],
+  "yarın": [
+    "mañana"
+  ],
+  "yarına": [
+    "para mañana"
+  ],
+  "öğle": [
+    "mediodía"
+  ],
+  "öğleyin": [
+    "al mediodía"
+  ],
+  "yılında": [
+    "en el año"
+  ],
+  "yılın": [
+    "del año"
+  ],
+  "yılı": [
+    "el año ; el año"
+  ],
+  "yıllarca": [
+    "por años ; durante años"
+  ],
+  "ayında": [
+    "en el mes"
+  ],
+  "aylar": [
+    "los meses"
+  ],
+  "hafta": [
+    "semana"
+  ],
+  "haftası": [
+    "la semana"
+  ],
+  "gününde": [
+    "en el día"
+  ],
+  "gününü": [
+    "su día ; el día"
+  ],
+  "günlerce": [
+    "por días ; durante días"
+  ],
+  "akşamı": [
+    "la tarde ; el anochecer"
+  ],
+  "akşama": [
+    "hacia la tarde"
+  ],
+  "sabaha": [
+    "hacia la mañana"
+  ],
+  "ertesi": [
+    "el siguiente ; al siguiente"
+  ],
+  "ertesi gün": [
+    "el día siguiente ; al día siguiente"
+  ],
+  "karşısında": [
+    "frente a ; delante de ; ante"
+  ],
+  "karşısına": [
+    "frente a ; delante de"
+  ],
+  "önüne": [
+    "delante de ; ante"
+  ],
+  "önünden": [
+    "de delante de ; desde delante"
+  ],
+  "önünüzde": [
+    "delante de vosotros ; ante vosotros"
+  ],
+  "arkasından": [
+    "detrás de ; después de ; tras"
+  ],
+  "altına": [
+    "debajo de ; bajo"
+  ],
+  "altından": [
+    "de debajo de ; desde debajo"
+  ],
+  "üstünde": [
+    "sobre ; encima de"
+  ],
+  "üstüne": [
+    "sobre ; encima de"
+  ],
+  "üzerine": [
+    "sobre ; encima de"
+  ],
+  "üzerinden": [
+    "de sobre ; por encima de"
+  ],
+  "yanına": [
+    "junto a ; al lado de ; cerca de"
+  ],
+  "yanından": [
+    "de junto a ; de al lado"
+  ],
+  "ortasında": [
+    "en medio de ; en el medio de"
+  ],
+  "ortasına": [
+    "al medio de ; en el centro de"
+  ],
+  "içine": [
+    "dentro de ; hacia dentro de"
+  ],
+  "içinden": [
+    "de dentro de ; desde dentro ; del interior"
+  ],
+  "arasına": [
+    "entre ; en medio de"
+  ],
+  "arasından": [
+    "de entre ; de en medio de"
+  ],
+  "ötesinde": [
+    "al otro lado de ; más allá de"
+  ],
+  "ötesine": [
+    "más allá de ; al otro lado"
+  ],
+  "sonraya": [
+    "después ; a después"
+  ],
+  "sonradan": [
+    "después ; más tarde ; luego"
+  ],
+  "önceden": [
+    "de antemano ; antes"
+  ],
+  "önceki": [
+    "anterior ; antes"
+  ],
+  "kadarında": [
+    "en cuanto a ; hasta donde"
+  ],
+  "kadarını": [
+    "tanto de"
+  ],
+  "göre": [
+    "según ; conforme a"
+  ],
+  "yakın": [
+    "cerca ; cercano"
+  ],
+  "yakında": [
+    "cerca ; pronto"
+  ],
+  "yakınında": [
+    "cerca de ; junto a"
+  ],
+  "yaklaşık": [
+    "aproximadamente ; cerca de"
+  ],
+  "uzak": [
+    "lejos"
+  ],
+  "uzakta": [
+    "lejos ; a lo lejos"
+  ],
+  "uzaktan": [
+    "de lejos"
+  ],
+  "tüm": [
+    "todo ; entero ; todo el"
+  ],
+  "tümünü": [
+    "todo ; todo ello ; la totalidad de"
+  ],
+  "tümünün": [
+    "de todo ; de la totalidad"
+  ],
+  "tümüyle": [
+    "enteramente ; por completo"
+  ],
+  "bütün": [
+    "todo ; entero ; todos los"
+  ],
+  "bütüne": [
+    "a todo"
+  ],
+  "bütünü": [
+    "el todo ; la totalidad"
+  ],
+  "bütünüyle": [
+    "enteramente"
+  ],
+  "hepsi": [
+    "todo ; todos ; la totalidad"
+  ],
+  "hepsini": [
+    "todo ; a todos ; todos"
+  ],
+  "hepsinin": [
+    "de todos ; de todo ; de todos ellos"
+  ],
+  "hepsine": [
+    "a todos ; a todo"
+  ],
+  "her": [
+    "cada ; todo ; todos los"
+  ],
+  "herkes": [
+    "todos ; todo el mundo ; cada uno"
+  ],
+  "herkesi": [
+    "a todos ; a todo el mundo"
+  ],
+  "herkesin": [
+    "de todos ; de todo el mundo"
+  ],
+  "birbiriniz": [
+    "unos a otros ; los unos a los otros"
+  ],
+  "birbirinizi": [
+    "unos a otros"
+  ],
+  "birbirinize": [
+    "unos a otros"
+  ],
+  "birbirin": [
+    "unos a otros"
+  ],
+  "birbirine": [
+    "unos a otros"
+  ],
+  "birbirleriyle": [
+    "unos con otros"
+  ],
+  "birbirlerine": [
+    "unos a otros"
+  ],
+  "birbirlerini": [
+    "unos a otros"
+  ],
+  "başkası": [
+    "otro ; otra ; otro"
+  ],
+  "başkasının": [
+    "de otro ; de otro ; de los demás"
+  ],
+  "başkasına": [
+    "a otro ; a otra"
+  ],
+  "başkalarını": [
+    "a otros ; a los demás"
+  ],
+  "başkaları": [
+    "otros ; los demás"
+  ],
+  "diğer": [
+    "otro ; otros ; demás"
+  ],
+  "öbür": [
+    "el otro ; el otro"
+  ],
+  "bazı": [
+    "algunos"
+  ],
+  "bazıları": [
+    "algunos ; algunos de ellos"
+  ],
+  "bazılarını": [
+    "a algunos ; a algunos de ellos"
+  ],
+  "birkaç": [
+    "unos cuantos"
+  ],
+  "az sonra": [
+    "poco después ; al poco rato"
+  ],
+  "çok az": [
+    "muy poco"
+  ],
+  "birçok": [
+    "muchos ; numerosos"
+  ],
+  "bir sürü": [
+    "una multitud ; un montón"
+  ],
+  "çok sayıda": [
+    "numerosos ; en gran número"
   ]
 }
