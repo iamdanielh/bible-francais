@@ -270,7 +270,7 @@
     "del Mesías"
   ],
   "günah": [
-    "pecado"
+    "el pecado"
   ],
   "günahı": [
     "el pecado",
@@ -296,11 +296,9 @@
     "de sus pecados"
   ],
   "köle": [
-    "siervo",
     "esclavo"
   ],
   "köleler": [
-    "los siervos",
     "los esclavos"
   ],
   "kul": [
@@ -460,7 +458,7 @@
     "a la tierra"
   ],
   "dünya": [
-    "mundo"
+    "el mundo"
   ],
   "dünyanın": [
     "del mundo"
@@ -627,13 +625,13 @@
     "la vida"
   ],
   "canlı": [
-    "viviente"
+    "vivo ; viviente"
   ],
   "canlıları": [
     "los seres vivientes"
   ],
   "ölüm": [
-    "muerte"
+    "la muerte"
   ],
   "ölümü": [
     "la muerte",
@@ -643,14 +641,14 @@
     "de la muerte"
   ],
   "yaşam": [
-    "vida"
+    "la vida"
   ],
   "yaşamı": [
     "la vida",
     "su vida"
   ],
   "hayat": [
-    "vida"
+    "la vida"
   ],
   "hayatı": [
     "la vida",
@@ -762,7 +760,7 @@
     "el que ama"
   ],
   "sevgi": [
-    "amor"
+    "el amor"
   ],
   "sevgisi": [
     "su amor"
@@ -811,7 +809,7 @@
     "creed"
   ],
   "iman": [
-    "fe"
+    "la fe"
   ],
   "gün": [
     "día"
@@ -938,7 +936,7 @@
     "verdadero"
   ],
   "kutsal": [
-    "santo"
+    "santo ; sagrado"
   ],
   "temiz": [
     "limpio"
@@ -1396,8 +1394,7 @@
     "generosamente"
   ],
   "dürüst": [
-    "honesto",
-    "recto"
+    "honrado ; honesto"
   ],
   "dürüstçe": [
     "honestamente"
@@ -1499,7 +1496,7 @@
     "lo encomendado"
   ],
   "umut": [
-    "esperanza"
+    "la esperanza"
   ],
   "umudu": [
     "la esperanza",
@@ -1512,8 +1509,7 @@
     "esperanza"
   ],
   "korku": [
-    "temor",
-    "miedo"
+    "el temor ; el miedo"
   ],
   "korkusu": [
     "su temor",
@@ -3103,5 +3099,269 @@
   ],
   "adak": [
     "ofrenda ; voto"
+  ],
+  "rum": [
+    "Roma ; los romanos"
+  ],
+  "roma": [
+    "Roma"
+  ],
+  "romalı": [
+    "romano ; romana"
+  ],
+  "romalılar": [
+    "los romanos"
+  ],
+  "italya": [
+    "Italia"
+  ],
+  "yunan": [
+    "Grecia"
+  ],
+  "yunanistan": [
+    "Grecia"
+  ],
+  "yunanlı": [
+    "griego ; griega"
+  ],
+  "yunus": [
+    "Jonás"
+  ],
+  "yona": [
+    "Jonás"
+  ],
+  "amand": [
+    "Amand ; Amán"
+  ],
+  "aman": [
+    "Amán"
+  ],
+  "esther": [
+    "Ester"
+  ],
+  "ester": [
+    "Ester"
+  ],
+  "mordekay": [
+    "Mardoqueo"
+  ],
+  "mordoheç": [
+    "Mardoqueo"
+  ],
+  "haman": [
+    "Hamán"
+  ],
+  "nehemya": [
+    "Nehemías"
+  ],
+  "ezra": [
+    "Esdras"
+  ],
+  "danyal": [
+    "Daniel"
+  ],
+  "daniyal": [
+    "Daniel"
+  ],
+  "daniel": [
+    "Daniel"
+  ],
+  "hezekiel": [
+    "Ezequiel"
+  ],
+  "hezekiyel": [
+    "Ezequiel"
+  ],
+  "hoşea": [
+    "Oseas"
+  ],
+  "amok": [
+    "Amoc"
+  ],
+  "amos": [
+    "Amós"
+  ],
+  "mika": [
+    "Miqueas"
+  ],
+  "mihail": [
+    "Micael"
+  ],
+  "mikail": [
+    "Micael"
+  ],
+  "yoel": [
+    "Joel"
+  ],
+  "avdiyya": [
+    "Abdías"
+  ],
+  "ovadya": [
+    "Abdías"
+  ],
+  "ovadı": [
+    "Abdías"
+  ],
+  "hakemler": [
+    "los jueces"
+  ],
+  "kitaplar": [
+    "los libros"
+  ],
+  "kitab": [
+    "libro"
+  ],
+  "leviilliler": [
+    "Levítico"
+  ],
+  "tarihler": [
+    "Crónicas"
+  ],
+  "tarih": [
+    "historia ; crónicas"
+  ],
+  "mezmurlar": [
+    "Salmos"
+  ],
+  "yasanın": [
+    "de la Ley"
+  ],
+  "tevrat": [
+    "la Torá ; la Ley"
+  ],
+  "vaiz": [
+    "Eclesiastés ; el Predicador"
+  ],
+  "eyüp": [
+    "Job"
+  ],
+  "eyüb": [
+    "Job"
+  ],
+  "süleyman": [
+    "Salomón"
+  ],
+  "süleymanın": [
+    "de Salomón"
+  ],
+  "matta": [
+    "Mateo"
+  ],
+  "markos": [
+    "Marcos"
+  ],
+  "luka": [
+    "Lucas"
+  ],
+  "yuhanna": [
+    "Juan"
+  ],
+  "elçiler": [
+    "Hechos de los Apóstoles"
+  ],
+  "elçi": [
+    "apóstol ; mensajero"
+  ],
+  "havariler": [
+    "los apóstoles"
+  ],
+  "yargıç": [
+    "juez"
+  ],
+  "yargıçlar": [
+    "los jueces"
+  ],
+  "kıyamet": [
+    "el fin de los tiempos ; el juicio final"
+  ],
+  "diriliş": [
+    "la resurrección"
+  ],
+  "ölüler": [
+    "los muertos"
+  ],
+  "diri": [
+    "vivo"
+  ],
+  "ölümsüz": [
+    "inmortal"
+  ],
+  "sonsuz": [
+    "eterno ; infinito"
+  ],
+  "sonsuzluk": [
+    "la eternidad"
+  ],
+  "ebedi": [
+    "eterno"
+  ],
+  "ebediye": [
+    "para siempre ; eternamente"
+  ],
+  "evren": [
+    "el universo"
+  ],
+  "sevinç": [
+    "gozo ; alegría"
+  ],
+  "aşk": [
+    "el amor"
+  ],
+  "inanc": [
+    "la fe"
+  ],
+  "inanç": [
+    "la fe"
+  ],
+  "imanlı": [
+    "fiel ; creyente"
+  ],
+  "mukaddes": [
+    "santo ; sagrado"
+  ],
+  "aziz": [
+    "santo"
+  ],
+  "günahsız": [
+    "sin pecado"
+  ],
+  "suç": [
+    "culpa ; delito"
+  ],
+  "görev": [
+    "deber ; misión"
+  ],
+  "ödev": [
+    "deber"
+  ],
+  "emir": [
+    "mandamiento"
+  ],
+  "emirler": [
+    "los mandamientos"
+  ],
+  "buyruk": [
+    "orden ; mandamiento"
+  ],
+  "yasak": [
+    "prohibición"
+  ],
+  "özgür": [
+    "libre"
+  ],
+  "özgürlük": [
+    "la libertad"
+  ],
+  "efendi": [
+    "señor ; amo"
+  ],
+  "bey": [
+    "señor"
+  ],
+  "hanım": [
+    "señora ; ama"
+  ],
+  "emin": [
+    "seguro ; fiel"
   ]
 }
