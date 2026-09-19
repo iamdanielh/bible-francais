@@ -432,8 +432,7 @@
     "palabra"
   ],
   "yer": [
-    "lugar",
-    "tierra"
+    "lugar ; tierra"
   ],
   "yerin": [
     "de la tierra",
@@ -444,7 +443,7 @@
     "en la tierra"
   ],
   "yeryüzü": [
-    "la tierra"
+    "la tierra ; el mundo"
   ],
   "yeryüzünün": [
     "de la tierra"
@@ -476,7 +475,7 @@
     "en los cielos"
   ],
   "gökyüzü": [
-    "el cielo"
+    "el firmamento ; el cielo"
   ],
   "yıldız": [
     "estrella"
@@ -488,7 +487,7 @@
     "sol"
   ],
   "ay": [
-    "mes ; mes"
+    "luna"
   ],
   "ışık": [
     "luz"
@@ -498,7 +497,6 @@
     "su luz"
   ],
   "karanlık": [
-    "tinieblas",
     "oscuridad"
   ],
   "karanlığı": [
@@ -567,9 +565,7 @@
     "la boca"
   ],
   "yüz": [
-    "cara",
-    "rostro",
-    "cien"
+    "cara ; faz"
   ],
   "yüzü": [
     "su rostro",
@@ -579,8 +575,7 @@
     "su rostro"
   ],
   "kulak": [
-    "oído",
-    "oreja"
+    "oído"
   ],
   "kulağı": [
     "su oído"
@@ -625,8 +620,7 @@
     "su espíritu"
   ],
   "can": [
-    "alma",
-    "vida"
+    "alma ; vida"
   ],
   "canı": [
     "su alma",
@@ -670,8 +664,7 @@
     "la comida"
   ],
   "kurban": [
-    "ofrenda",
-    "sacrificio"
+    "sacrificio ; ofrenda"
   ],
   "kurbanı": [
     "la ofrenda"
@@ -1795,7 +1788,7 @@
     "a las colinas"
   ],
   "dağ": [
-    "monte"
+    "montaña"
   ],
   "dağı": [
     "el monte",
@@ -1811,7 +1804,7 @@
     "al monte"
   ],
   "dağlar": [
-    "los montes"
+    "las montañas"
   ],
   "dağların": [
     "de los montes"
@@ -2903,5 +2896,212 @@
   ],
   "çok sayıda": [
     "numerosos ; en gran número"
+  ],
+  "şa": [
+    "Şa (dios egipcio)"
+  ],
+  "rahab": [
+    "Rahab"
+  ],
+  "boaz": [
+    "Boaz"
+  ],
+  "naomi": [
+    "Naomi ; Noemí"
+  ],
+  "rut": [
+    "Rut"
+  ],
+  "orpa": [
+    "Orfa ; Orfa"
+  ],
+  "moav": [
+    "Moab"
+  ],
+  "moavlı": [
+    "moabita"
+  ],
+  "moavlılar": [
+    "los moabitas"
+  ],
+  "amon": [
+    "Amón"
+  ],
+  "ammon": [
+    "Amón"
+  ],
+  "ammonlu": [
+    "amonita"
+  ],
+  "ammonlular": [
+    "los amonitas"
+  ],
+  "edom": [
+    "Edom"
+  ],
+  "babil": [
+    "Babilonia"
+  ],
+  "babilonya": [
+    "Babilonia"
+  ],
+  "asur": [
+    "Asiria"
+  ],
+  "aşur": [
+    "Asiria"
+  ],
+  "kenan": [
+    "Canaán ; Kenaan"
+  ],
+  "kanaana": [
+    "Canaán"
+  ],
+  "kanaa": [
+    "Canaán"
+  ],
+  "mısır": [
+    "Egipto"
+  ],
+  "mısırlı": [
+    "egipcio"
+  ],
+  "mısırlılar": [
+    "los egipcios"
+  ],
+  "israil": [
+    "Israel"
+  ],
+  "israilli": [
+    "israelita"
+  ],
+  "israilliler": [
+    "los israelitas"
+  ],
+  "yahuda": [
+    "Judá"
+  ],
+  "yahudi": [
+    "judío"
+  ],
+  "yahudiler": [
+    "los judíos"
+  ],
+  "yehuda": [
+    "Judá"
+  ],
+  "yehudil": [
+    "judío"
+  ],
+  "yeruşalem": [
+    "Jerusalén"
+  ],
+  "yerushalaim": [
+    "Jerusalén"
+  ],
+  "siyon": [
+    "Sión"
+  ],
+  "denizler": [
+    "los mares"
+  ],
+  "ırma": [
+    "río"
+  ],
+  "ırmak": [
+    "río"
+  ],
+  "nehir": [
+    "río"
+  ],
+  "yılduz": [
+    "estrella"
+  ],
+  "ateş": [
+    "fuego"
+  ],
+  "ocak": [
+    "altar ; horno"
+  ],
+  "ekmek": [
+    "pan"
+  ],
+  "şarap": [
+    "vino"
+  ],
+  "yağ": [
+    "aceite"
+  ],
+  "bal": [
+    "miel"
+  ],
+  "süt": [
+    "leche"
+  ],
+  "et": [
+    "carne"
+  ],
+  "kan": [
+    "sangre"
+  ],
+  "kemik": [
+    "hueso"
+  ],
+  "kemikler": [
+    "los huesos"
+  ],
+  "gözler": [
+    "los ojos"
+  ],
+  "ayaklar": [
+    "los pies"
+  ],
+  "kafa": [
+    "cabeza"
+  ],
+  "yürekler": [
+    "los corazones"
+  ],
+  "ruhlar": [
+    "los espíritus"
+  ],
+  "melek": [
+    "ángel"
+  ],
+  "melekler": [
+    "los ángeles"
+  ],
+  "şeytan": [
+    "Satanás"
+  ],
+  "cin": [
+    "demonio"
+  ],
+  "cinler": [
+    "los demonios"
+  ],
+  "şah": [
+    "rey"
+  ],
+  "kım": [
+    "estepa"
+  ],
+  "çadır": [
+    "tienda"
+  ],
+  "tapınak": [
+    "templo"
+  ],
+  "tapına": [
+    "templo"
+  ],
+  "mabet": [
+    "templo"
+  ],
+  "mezbah": [
+    "altar"
+  ],
+  "adak": [
+    "ofrenda ; voto"
   ]
 }
