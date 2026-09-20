@@ -485,7 +485,7 @@
     "sol"
   ],
   "ay": [
-    "luna"
+    "la luna"
   ],
   "ışık": [
     "luz"
@@ -812,7 +812,7 @@
     "la fe"
   ],
   "gün": [
-    "día"
+    "el día"
   ],
   "günü": [
     "el día ; el día"
@@ -822,7 +822,7 @@
     "de día"
   ],
   "gece": [
-    "noche"
+    "la noche"
   ],
   "geceyi": [
     "la noche"
@@ -879,10 +879,10 @@
     "hasta ; tanto como ; hasta que"
   ],
   "sonra": [
-    "después ; luego ; más tarde"
+    "después"
   ],
   "önce": [
-    "antes ; antes de ; primero"
+    "antes"
   ],
   "şimdi": [
     "ahora"
@@ -915,7 +915,7 @@
     "mucho"
   ],
   "az": [
-    "poco ; poca cosa ; un poco"
+    "poco"
   ],
   "büyük": [
     "grande"
@@ -952,7 +952,7 @@
     "variado"
   ],
   "hep": [
-    "siempre ; todos ; enteramente"
+    "siempre"
   ],
   "yeni": [
     "nuevo"
@@ -3563,5 +3563,137 @@
   ],
   "yahve": [
     "Yahve ; el Señor"
+  ],
+  "yeşu": [
+    "Josué"
+  ],
+  "yeşu'nun": [
+    "de Josué"
+  ],
+  "yeşu'ya": [
+    "a Josué"
+  ],
+  "yeşu'yu": [
+    "a Josué"
+  ],
+  "moşe": [
+    "Moisés"
+  ],
+  "moşe'ye": [
+    "a Moisés"
+  ],
+  "moşe'nin": [
+    "de Moisés"
+  ],
+  "moşe'yi": [
+    "a Moisés"
+  ],
+  "yeruşalem'e": [
+    "a Jerusalén"
+  ],
+  "yeruşalem'de": [
+    "en Jerusalén"
+  ],
+  "yeruşalem'den": [
+    "de Jerusalén"
+  ],
+  "yeruşalem'in": [
+    "de Jerusalén"
+  ],
+  "mısır'a": [
+    "a Egipto"
+  ],
+  "mısır'da": [
+    "en Egipto"
+  ],
+  "mısır'dan": [
+    "de Egipto"
+  ],
+  "mısır'ın": [
+    "de Egipto"
+  ],
+  "yahuda'ya": [
+    "a Judá"
+  ],
+  "yahuda'nın": [
+    "de Judá"
+  ],
+  "yosef": [
+    "José"
+  ],
+  "yosef'e": [
+    "a José"
+  ],
+  "yosef'in": [
+    "de José"
+  ],
+  "yakov": [
+    "Jacob"
+  ],
+  "yakov'a": [
+    "a Jacob"
+  ],
+  "yakov'un": [
+    "de Jacob"
+  ],
+  "saul": [
+    "Saúl"
+  ],
+  "saul'a": [
+    "a Saúl"
+  ],
+  "saul'un": [
+    "de Saúl"
+  ],
+  "aron": [
+    "Aarón"
+  ],
+  "aron'la": [
+    "con Aarón"
+  ],
+  "aron'un": [
+    "de Aarón"
+  ],
+  "levi": [
+    "Leví"
+  ],
+  "levi'nin": [
+    "de Leví"
+  ],
+  "davi": [
+    "David"
+  ],
+  "davi'ye": [
+    "a David"
+  ],
+  "davi'nin": [
+    "de David"
+  ],
+  "david": [
+    "David"
+  ],
+  "david'in": [
+    "de David"
+  ],
+  "avraham": [
+    "Abraham"
+  ],
+  "avraham'a": [
+    "a Abraham"
+  ],
+  "avraham'ın": [
+    "de Abraham"
+  ],
+  "avram": [
+    "Abram"
+  ],
+  "avram'ın": [
+    "de Abram"
+  ],
+  "efraim": [
+    "Efraín"
+  ],
+  "kez": [
+    "la vez"
   ]
 }
