@@ -544,7 +544,14 @@ export class TrEngine {
         return [[bare], { root: bare, form: "referencia bíblica", isReference: true, suffixes: [] }];
       }
     }
-    if (!trTurkish(bare)) return [null, {}];
+    // Capitalized hyphenated/compound names («Beer-Şeva») are not in the
+    // Turkish alphabet check; keep them as proper names.
+    if (!trTurkish(bare)) {
+      if (trIsCapitalized(word)) {
+        return [[word], { isName: true, root: bare, form: "nombre propio", suffixes: [] }];
+      }
+      return [null, {}];
+    }
     // A known root wins before any stripping (also handles "Tanrı'nın").
     const direct = this.lookup(w) || this.lookup(bare);
     if (direct) return [direct, { root: bare, form: "", isBare: true, suffixes: [] }];
@@ -595,6 +602,9 @@ export class TrEngine {
           suffixes: a.chain.map((c) => ({ name: c.name, surface: c.surface, es: c.es })),
         }];
       }
+      // Fallback: a capitalized token that is neither a real word nor in the
+      // curated name table is a proper name; keep it and flag it as such.
+      return [[word], { isName: true, root: bare, form: "nombre propio", suffixes: [] }];
     }
     const info = {
       root: chosen.stem,
@@ -606,11 +616,26 @@ export class TrEngine {
 
   segment(text) {
     const out = [];
+    const push = (w) => {
+      const [m, info] = this.resolve(w);
+      out.push([w, m, info]);
+    };
     for (const tok of String(text).split(/\s+/)) {
       const w = tok.replace(/^[\-.,;:!?…«»"'“”‘’()\[\]{}*\u2013\u2014—]+|[\-.,;:!?…«»"'“”‘’()\[\]{}*\u2013\u2014—]+$/g, "");
       if (!w) continue;
-      const [m, info] = this.resolve(w);
-      out.push([w, m, info]);
+      // YTC sometimes glues a chapter:verse citation to the preceding word
+      // («seveceksin10:27», «David’in7:42»): split it off.
+      const ns = w.search(/\d/);
+      if (ns > 0) {
+        const word = w.slice(0, ns).replace(/[.\u2019\u201D'"”’‘]+$/, "");
+        const ref = w.slice(ns);
+        if (word && /[A-Za-zÇĞİÖŞÜçğıöşü]/.test(word) && TR_REFERENCE.test(ref)) {
+          push(word);
+          push(ref);
+          continue;
+        }
+      }
+      push(w);
     }
     return out;
   }
