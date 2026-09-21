@@ -369,13 +369,156 @@ function trForm(stem, chain) {
   return "«" + stem + "» + " + parts.join(" + ");
 }
 
+function trIsCapitalized(word) {
+  const c = [...String(word)][0];
+  return !!c && c !== c.toLocaleLowerCase("tr-TR") && c === c.toLocaleUpperCase("tr-TR");
+}
+
+// Spanish rendering of a capitalized proper name: curated name (nominative)
+// plus the Turkish case suffix, so «Yotam'ın» → «de Yotam», «Filistliler» →
+// «filisteos», «Yotam'a» → «a Yotam».
+function trNameCase(es, chain) {
+  let out = es;
+  let prefix = "";
+  let plural = false;
+  for (const c of chain) {
+    const n = c.name;
+    if (n === "-lAr" || n === "-lArI") {
+      plural = true;
+    } else if (n === "-Un" || n === "-(n)Un") {
+      prefix = "de " + prefix;
+    } else if (n === "-(y)A" || n === "-nA") {
+      prefix = "a " + prefix;
+    } else if (n === "-DA" || n === "-nDA") {
+      prefix = "en " + prefix;
+    } else if (n === "-DAn" || n === "-nDAn") {
+      prefix = "desde " + prefix;
+    } else if (n === "-(y)U" || n === "-nU") {
+      prefix = "a " + prefix;
+    } else if (n === "-(y)lA") {
+      prefix = "con " + prefix;
+    }
+  }
+  if (plural) out = /[aeiouáéíóú]$/i.test(out) ? out + "s" : out + "es";
+  return prefix + out;
+}
+
+// Spanish cardinals/ordinals for the TR numeric resolver.
+const TR_ES_CARD = {
+  0: "cero", 1: "uno", 2: "dos", 3: "tres", 4: "cuatro", 5: "cinco",
+  6: "seis", 7: "siete", 8: "ocho", 9: "nueve", 10: "diez", 11: "once",
+  12: "doce", 13: "trece", 14: "catorce", 15: "quince", 16: "dieciséis",
+  17: "diecisiete", 18: "dieciocho", 19: "diecinueve", 20: "veinte",
+  21: "veintiuno", 22: "veintidós", 23: "veintitrés", 24: "veinticuatro",
+  25: "veinticinco", 26: "veintiséis", 27: "veintisiete", 28: "veintiocho",
+  29: "veintinueve", 30: "treinta", 40: "cuarenta", 50: "cincuenta",
+  60: "sesenta", 70: "setenta", 80: "ochenta", 90: "noventa",
+};
+const TR_ES_HUND = {
+  2: "doscientos", 3: "trescientos", 4: "cuatrocientos", 5: "quinientos",
+  6: "seiscientos", 7: "setecientos", 8: "ochocientos", 9: "novecientos",
+};
+const TR_ES_ORD = {
+  1: "primero", 2: "segundo", 3: "tercero", 4: "cuarto", 5: "quinto",
+  6: "sexto", 7: "séptimo", 8: "octavo", 9: "noveno", 10: "décimo",
+  20: "vigésimo", 30: "trigésimo", 40: "cuadragésimo", 50: "quincuagésimo",
+  60: "sexagésimo", 70: "septuagésimo", 80: "octogésimo", 90: "nonagésimo",
+  100: "centésimo",
+};
+function trEsCardinal(n) {
+  if (n <= 99) {
+    const t = Math.floor(n / 10) * 10;
+    if (n === t && TR_ES_CARD[t] !== undefined) return TR_ES_CARD[t];
+    if (n <= 29) return TR_ES_CARD[n];
+    return TR_ES_CARD[t] + " y " + TR_ES_CARD[n - t];
+  }
+  if (n < 1000) {
+    const h = Math.floor(n / 100), r = n % 100;
+    if (h === 1) return r === 0 ? "cien" : "ciento " + trEsCardinal(r);
+    return TR_ES_HUND[h] + (r ? " " + trEsCardinal(r) : "");
+  }
+  if (n < 1000000) {
+    const m = Math.floor(n / 1000), r = n % 1000;
+    const mw = m === 1 ? "mil" : trEsCardinal(m).replace(/veintiuno$/, "veintiún").replace(/ uno$/, " un") + " mil";
+    return r ? mw + " " + trEsCardinal(r) : mw;
+  }
+  const mi = Math.floor(n / 1000000), r = n % 1000000;
+  const miw = mi === 1 ? "un millón" : trEsCardinal(mi) + " millones";
+  return r ? miw + " " + trEsCardinal(r) : miw;
+}
+function trEsOrdinal(n) {
+  if (n <= 19) return TR_ES_ORD[n];
+  if (n <= 99) {
+    const t = Math.floor(n / 10) * 10, u = n % 10;
+    const tw = TR_ES_ORD[t] || trEsCardinal(t);
+    return u ? tw + " " + TR_ES_ORD[u] : tw;
+  }
+  if (n < 1000) {
+    const h = Math.floor(n / 100);
+    return h === 1 ? "centésimo" + (n % 100 ? " " + trEsOrdinal(n % 100) : "") : TR_ES_ORD[h];
+  }
+  return "milésimo";
+}
+const TR_NUM = {
+  "sıfır": 0, "bir": 1, "iki": 2, "üç": 3, "dört": 4, "beş": 5, "altı": 6,
+  "yedi": 7, "sekiz": 8, "dokuz": 9, "on": 10, "yirmi": 20, "otuz": 30,
+  "kırk": 40, "elli": 50, "altmış": 60, "yetmiş": 70, "seksen": 80,
+  "doksan": 90, "yüz": 100, "bin": 1000, "milyon": 1000000, "milyar": 1000000000,
+};
+const TR_ORD = {
+  "birinci": 1, "ikinci": 2, "üçüncü": 3, "dördüncü": 4, "beşinci": 5,
+  "altıncı": 6, "yedinci": 7, "sekizinci": 8, "dokuzuncu": 9, "onuncu": 10,
+  "yirminci": 20, "otuzuncu": 30, "kırkıncı": 40, "ellinci": 50,
+  "altmışıncı": 60, "yetmişinci": 70, "sekseninci": 80, "doksanıncı": 90,
+  "yüzüncü": 100, "bininci": 1000,
+};
+const TR_ORD_SUF = /(?:inci|ıncı|uncu|üncü)$/;
+function trNumberEs(word) {
+  const low = normalizeTr(word).replace(/\./g, "");
+  if (/^\d+(?:,\d+)?$/.test(low)) {
+    if (low.includes(",")) return low.replace(",", ",");
+    const n = Number(low);
+    return Number.isFinite(n) ? trEsCardinal(n) : null;
+  }
+  const parts = low.split(/\s+/).filter(Boolean);
+  if (!parts.length) return null;
+  const values = [];
+  let ordinal = false;
+  for (const p of parts) {
+    if (TR_ORD[p] !== undefined) { values.push(TR_ORD[p]); ordinal = true; continue; }
+    if (TR_NUM[p] !== undefined) { values.push(TR_NUM[p]); continue; }
+    if (TR_ORD_SUF.test(p)) {
+      const base = p.replace(TR_ORD_SUF, "");
+      if (TR_NUM[base] !== undefined) { values.push(TR_NUM[base]); ordinal = true; continue; }
+    }
+    return null;
+  }
+  if (!values.length) return null;
+  let total = 0, cur = 0;
+  for (const v of values) {
+    if (v >= 1000) { cur = (cur === 0 ? 1 : cur) * v; total += cur; cur = 0; }
+    else if (v === 100) { cur = (cur === 0 ? 1 : cur) * v; }
+    else { cur += v; }
+  }
+  const num = total + cur;
+  return ordinal ? trEsOrdinal(num) : trEsCardinal(num);
+}
+// Bible cross-references embedded in the YTC text («19:18», «20:13-15,17»).
+const TR_REFERENCE = /^\d+(?::\d+)?(?:[-,]\d+)*$/;
+
 export class TrEngine {
-  constructor(map) {
+  constructor(map, names) {
     this._map = map || {};
     // Index the Turkish dict with Turkish-aware lowercase keys so İ/I/ı match.
     this._index = new Map();
     for (const [k, v] of Object.entries(this._map)) {
       this._index.set(normalizeTr(k), v);
+    }
+    // Proper-name table (TR root → Spanish name). Always capitalized keys.
+    this._names = names || {};
+    this._nameIndex = new Map();
+    for (const [k, v] of Object.entries(this._names)) {
+      this._nameIndex.set(normalizeTr(k), v);
     }
   }
 
@@ -390,7 +533,18 @@ export class TrEngine {
   resolve(word, _opts = {}) {
     const w = normalizeTr(word).replace(/’/g, "'");
     const bare = w.replace(/'/g, "");
-    if (!bare || !trTurkish(bare)) return [null, {}];
+    if (!bare) return [null, {}];
+    // Digits are not in TR_ALPHABET: a bare number becomes a Spanish cardinal,
+    // a chapter:verse citation is kept as a bible reference.
+    if (/^[0-9][0-9.,:\-]*$/.test(bare)) {
+      if (!/[:\-,]/.test(bare)) {
+        const es = trNumberEs(bare);
+        if (es) return [[es], { root: bare, form: "número", isNumber: true, suffixes: [] }];
+      } else {
+        return [[bare], { root: bare, form: "referencia bíblica", isReference: true, suffixes: [] }];
+      }
+    }
+    if (!trTurkish(bare)) return [null, {}];
     // A known root wins before any stripping (also handles "Tanrı'nın").
     const direct = this.lookup(w) || this.lookup(bare);
     if (direct) return [direct, { root: bare, form: "", isBare: true, suffixes: [] }];
@@ -414,6 +568,32 @@ export class TrEngine {
           meanings = m.slice();
           break;
         }
+      }
+    }
+    // Turkish number words/ordinals not present in the real dictionary.
+    if (!meanings) {
+      const es = trNumberEs(bare);
+      if (es) return [[es], { root: bare, form: "número", isNumber: true, suffixes: [] }];
+    }
+    // Proper names: a capitalized token whose stem is in the name table and is
+    // not a real word. «Yotam'ın» → «de Yotam», «Filistliler» → «filisteos».
+    if (!meanings && trIsCapitalized(word)) {
+      const cand = [];
+      const bareKey = normalizeTr(bare);
+      if (this._nameIndex.has(bareKey)) cand.push({ stem: bare, chain: [] });
+      for (const a of analyses) {
+        const key = normalizeTr(a.stem);
+        if (this._nameIndex.has(key) && !cand.some((x) => normalizeTr(x.stem) === key)) cand.push(a);
+      }
+      if (cand.length) {
+        const a = cand[0];
+        const es = this._nameIndex.get(normalizeTr(a.stem));
+        return [[trNameCase(es, a.chain)], {
+          isName: true,
+          root: a.stem,
+          form: "nombre propio",
+          suffixes: a.chain.map((c) => ({ name: c.name, surface: c.surface, es: c.es })),
+        }];
       }
     }
     const info = {

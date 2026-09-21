@@ -21,6 +21,17 @@ node /tmp/opencode/es-audit.mjs          # auditoría de cobertura (5.000 versos
 - Línea base: HEAD `47b5ca0` ("Agree number in passive participles..."). Arriba están
   `50433cb`, `b8eeea1`, `c2794ec` (los commits previos del feature español).
 
+## Fase TR (turco→español) — plan vivo en `CONTINUE.md`
+
+Ver `CONTINUE.md` para el plan a 100% (nombres + léxico real + números). Reglas TR:
+- Verificación TR por lote: `node /tmp/opencode/tr-apply.mjs` → `tr-fixture.mjs` →
+  `tr-gap-v2.mjs` (cobertura REAL con el motor). `lotes/` y `CONTINUE.md` son untracked.
+- 0 dross, glosas reales en español, sin puntuación ni token turco en la glosa, claves sin
+  espacio; el merge debe reportar `overwrote-existing: 0`.
+- `data/tr/names.json` (TR raíz → nombre ES): el motor TR lo usa para marcar `isName`.
+  `data/tr/dict.json` es el léxico real (única salida versionada por lote).
+- El motor `js/tr-engine.js` resuelve números y nombres (nunca "sin traducción").
+
 ## Arquitectura del feature español (sucinta)
 
 - `js/dict.js` ~9400–10330: `esInfinitive` (FR→INF es + derivación inversa de formas

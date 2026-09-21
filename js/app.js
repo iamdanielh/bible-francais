@@ -27,6 +27,7 @@ const LANGS = {
     flag: "🇹🇷",
     bibleUrl: "data/tr/bible.json",
     dictUrl: "data/tr/dict.json",
+    namesUrl: "data/tr/names.json",
     tts: { lang: "tr-TR", voice: pickTrVoice },
     aliases: {},
   },
@@ -36,9 +37,9 @@ let lang = "fr";
 
 // Build the engine for a language. dict.js is French→Spanish; tr-engine.js
 // is the Turkish engine (suffix analysis lands in Fase 1, TR→ES dict in Fase 2).
-function makeEngine(langCode, dict) {
+function makeEngine(langCode, dict, names) {
   if (langCode === "fr") return new Dictionary(dict);
-  if (langCode === "tr") return new TrEngine(dict);
+  if (langCode === "tr") return new TrEngine(dict, names);
   throw new Error("motor no disponible para " + langCode);
 }
 
@@ -283,11 +284,14 @@ async function loadData() {
     new Promise((_, rej) => setTimeout(() => rej(new Error(`tiempo de espera agotado al cargar ${label}`)), ms)),
   ]);
   try {
-    const [raw, dict] = window.__DATA__
-      ? [JSON.stringify(window.__DATA__.bible), window.__DATA__.dict]
+    const [raw, dict, names] = window.__DATA__
+      ? [JSON.stringify(window.__DATA__.bible), window.__DATA__.dict, window.__DATA__.names || {}]
       : await Promise.all([
           withTimeout(fetch(pack.bibleUrl).then(r => r.text()), "bible.json", 20000),
           withTimeout(fetch(pack.dictUrl).then(r => r.json()), "dict.json", 20000),
+          pack.namesUrl
+            ? withTimeout(fetch(pack.namesUrl).then(r => r.json()), "names.json", 20000).catch(() => ({}))
+            : Promise.resolve({}),
         ]);
     const rawBible = JSON.parse(raw.replace(/^\uFEFF/, ""));
     bible = [];
@@ -301,7 +305,7 @@ async function loadData() {
         bible.push({ name, chapters });
       }
     }
-    dictionary = makeEngine(lang, dict);
+    dictionary = makeEngine(lang, dict, names);
   } catch (e) {
     showLoadError("Error al cargar los datos: " + e.message);
     throw e;

@@ -4,7 +4,7 @@ const CACHE = "biblefr-v23";
 // update, so the app opens instantly on subsequent visits instead of
 // re-downloading 18MB each time a new release ships.
 const DATA_CACHE = "biblefr-data";
-const DATA_ASSETS = ["data/bible.json", "data/dict.json", "data/tr/bible.json", "data/tr/dict.json"];
+const DATA_ASSETS = ["data/bible.json", "data/dict.json", "data/tr/bible.json", "data/tr/dict.json", "data/tr/names.json"];
 
 // Install: pre-cache the app shell and the big immutable data files for offline
 // use. Failures are tolerated — stale-while-revalidate below repairs the cache
