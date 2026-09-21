@@ -47,7 +47,7 @@ function makeEngine(langCode, dict, names) {
 
 let bible = [];       // [{name, chapters:[[verseText,...],...]}]
 let dictionary = null;
-let state = { book: 0, chapter: 0, vocab: [], scrollTop: 0, ai: { key: "", model: "" } };
+let state = { lang: "fr", book: 0, chapter: 0, verse: 0, vocab: [], scrollTop: 0, ai: { key: "", model: "" } };
 
 // ---- DOM refs -------------------------------------------------------------
 const $ = (id) => document.getElementById(id);
@@ -157,9 +157,11 @@ window.addEventListener("resize", syncTopbarHeight);
 function loadState() {
   try {
     const s = JSON.parse(localStorage.getItem("biblefr") || "{}");
+    if (s.lang && LANGS[s.lang]) lang = s.lang;
     if (Array.isArray(s.vocab)) state.vocab = s.vocab;
     if (typeof s.book === "number") state.book = s.book;
     if (typeof s.chapter === "number") state.chapter = s.chapter;
+    if (typeof s.verse === "number") state.verse = s.verse;
     if (typeof s.scrollTop === "number") state.scrollTop = s.scrollTop;
     if (s.ai && typeof s.ai === "object") {
       state.ai = { key: String(s.ai.key || ""), model: String(s.ai.model || "") };
@@ -168,9 +170,26 @@ function loadState() {
     }
   } catch (e) { /* ignore */ }
 }
+// The verse nearest the middle of the viewport: the "where I stopped" anchor.
+// Restoring by verse index is robust across devices/font sizes (unlike a raw
+// pixel scrollTop), and it also tracks the active verse while reading aloud.
+function activeVerseIndex() {
+  if (!readerEl || !el.verseText) return 0;
+  const vs = el.verseText.querySelectorAll(".verse");
+  if (!vs.length) return 0;
+  const top = readerEl.scrollTop + readerEl.clientHeight / 2;
+  let best = 0, bestD = Infinity;
+  for (let i = 0; i < vs.length; i++) {
+    const d = Math.abs(vs[i].offsetTop + vs[i].offsetHeight / 2 - top);
+    if (d < bestD) { bestD = d; best = i; }
+  }
+  return best;
+}
 function saveState() {
+  state.lang = lang;
   state.book = currentBookIndex;
   state.chapter = currentChapter;
+  state.verse = activeVerseIndex();
   state.scrollTop = canonicalScrollTop();
   try { localStorage.setItem("biblefr", JSON.stringify(state)); } catch (e) {}
 }
@@ -406,6 +425,8 @@ el.langSelect.addEventListener("change", async () => {
   const next = el.langSelect.value;
   if (next === lang || !LANGS[next]) return;
   lang = next;
+  state.lang = lang;
+  saveState();
   await loadData();
   await initApp();
 });
@@ -2481,12 +2502,22 @@ async function initApp() {
   el.chapterSelect.value = currentChapter;
   renderChapter();
   syncTopbarHeight();
-  if (readerEl && state.scrollTop) {
-    // re-apply a few times: line metrics settle after fonts/layout paint
-    setReaderScroll(state.scrollTop);
-    requestAnimationFrame(() => setReaderScroll(state.scrollTop));
-    setTimeout(() => setReaderScroll(state.scrollTop), 150);
-    setTimeout(() => setReaderScroll(state.scrollTop), 800);
+  if (readerEl) {
+    // Re-apply a few times: line metrics settle after fonts/layout paint.
+    // Prefer the saved verse (device-independent) over the raw pixel offset.
+    const vs = el.verseText.querySelectorAll(".verse");
+    const restore = () => {
+      if (typeof state.verse === "number" && vs[state.verse] && readerEl.clientHeight &&
+          vs[state.verse].offsetTop > readerEl.clientHeight * 0.9) {
+        setReaderScroll(Math.max(0, vs[state.verse].offsetTop - Math.max(0, (readerEl.clientHeight - vs[state.verse].offsetHeight) / 2)));
+      } else if (state.scrollTop) {
+        setReaderScroll(state.scrollTop);
+      }
+    };
+    restore();
+    requestAnimationFrame(restore);
+    setTimeout(() => restore(), 150);
+    setTimeout(() => restore(), 800);
   }
   refreshVocab();
 }

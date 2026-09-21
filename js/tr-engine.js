@@ -112,6 +112,56 @@ const TR_AMBIG_ES = {
 const TR_VERB_MARKERS = new Set(Object.keys(TR_VERB_ES).filter((n) => n !== "-lAr"));
 const TR_NOUN_MARKERS = new Set(Object.keys(TR_NOUN_ES).filter((n) => n !== "-lAr"));
 
+// Spanish labels for the suffixes the explanation layer adds on top of the
+// affix-stripping analyzer (negación, presente continuo, futuro, infinitivo,
+// aoristo, participio, capacidad, voz pasiva, relativo).
+const TR_EXPLAIN_ES = Object.assign({}, TR_NOUN_ES, TR_VERB_ES, TR_DERIV_ES, {
+  "-mA": "negación (no)",
+  "-mI_neg": "negación (no)",
+  "-(y)ıyor": "presente continuo",
+  "-(y)AcAk": "futuro",
+  "-mAk": "infinitivo",
+  "-mAz": "aoristo negativo",
+  "-Ar/-Ir": "aoristo (presente)",
+  "-(y)Abil": "poder (sufijo de capacidad)",
+  "-(y)Il": "pasivo",
+  "-(y)DIk": "relativo («lo que …»)",
+  "-(y)En": "participio (que …)",
+});
+
+// Explanation-only verb suffixes: each entry is [name, anchored regex]. The
+// surface is matched left→right after the stem (construction order), so the
+// optional buffer letters (y/n/s and the stem vowels) already appear here.
+// Ordered by specificity so greedy backtracking prefers real suffixes over
+// splitting them into smaller ones («mez» before «me», «sınız» before «sın»…).
+const TR_VREXPL = [
+  ["-sUnUz", /^s[ıiuü]n(?:ız|iz|uz|üz)/],
+  ["-(y)UnUz", /^(?:y)?(?:[ıiuü])?n(?:ız|iz|uz|üz)/],
+  ["-sUn", /^s[ıiuü]n/],
+  ["-nUz", /^(?:[ıiuü])?(?:nız|niz|nuz|nüz)/],
+  ["-lAr", /^l(?:ar|er)/],
+  ["-DUr", /^(?:y)?(?:t|d)[ıiuü]r/],
+  ["-mUş", /^(?:y)?m[ıiuü]ş/],
+  ["-mAz", /^m(?:az|ez)/],
+  ["-mAk", /^m(?:ak|ek)/],
+  ["-mA", /^m[ae]/],
+  ["-mI_neg", /^m[ıiuü]/],
+  ["-(y)ıyor", /^(?:y)?(?:[ıiuü])?yor/],
+  ["-(y)AcAk", /^(?:y)?(?:a|e)c(?:ak|ek)/],
+  ["-(y)Abil", /^(?:y)?(?:a|e)bil/],
+  ["-Ar/-Ir", /^(?:[aeıiuü])?r/],
+  ["-(y)DU", /^(?:y)?(?:d|t)[ıiuü]/],
+  ["-(y)sA", /^(?:y)?s[ae]/],
+  ["-(y)ken", /^(?:y)?ken/],
+  ["-(y)DIk", /^(?:y)?(?:d|t)[ıiuü](?:k|ğ)/],
+  ["-(y)En", /^(?:y)?[ae]n/],
+  ["-(y)Il", /^(?:y)?[ıiuü]l/],
+  ["-(n)Un", /^(?:n)?[ıiuü]n/],
+  ["-(y)Un", /^(?:y)?(?:[ıiuü])?n/],
+  ["-(y)Um", /^(?:y)?(?:[ıiuü])?m/],
+  ["-(y)Uz", /^(?:y)?(?:[ıiuü])?z/],
+];
+
 // Verbally shared machine: noun "head" suffixes (states from noun_states.yml).
 const TR_NOUN_STATES = {
   a: { final: true, t: [["s16", "c"], ["s7", "k"], ["s3", "h"], ["s5", "h"], ["s1", "l"], ["s14", "f"], ["s15", "g"], ["s17", "e"], ["s10", "e"], ["s19", "m"], ["s4", "h"], ["s9", "c"], ["s12", "f"], ["s13", "b"], ["s18", "d"], ["s2", "h"], ["s6", "h"], ["s8", "b"], ["s11", "b"]] },
@@ -569,23 +619,112 @@ export class TrEngine {
     return null;
   }
 
-  _morphInfo(a) {
-    const hasVerb = a.chain.some((c) => c.name !== "-lAr" && TR_VERB_MARKERS.has(c.name));
-    const hasNoun = a.chain.some((c) => c.name !== "-lAr" &&
+// Shared chain → explanation labels, disambiguating the shared «-lAr» by the
+  // family of its sibling suffixes (verb person/tense vs noun case/possessive).
+  _chainEs(chain) {
+    const hasVerb = chain.some((c) => c.name !== "-lAr" && TR_VERB_MARKERS.has(c.name));
+    const hasNoun = chain.some((c) => c.name !== "-lAr" &&
       (TR_NOUN_MARKERS.has(c.name) || c.name in TR_DERIV_ES));
-    const chain = a.chain.map((c) => ({
+    return chain.map((c) => ({
       name: c.name,
       surface: c.surface,
       es: c.name === "-lAr"
         ? (hasVerb && !hasNoun ? "3ª persona plural (verbo)"
           : hasNoun && !hasVerb ? "plural (nombre)"
           : TR_AMBIG_ES["-lAr"])
-        : (TR_AMBIG_ES[c.name] || c.es),
+        : c.name === "-(y)Un" && hasVerb
+          ? "2ª pl / imperativo (vosotros)"   // «etmeyin» = et + -me + -yin
+        : (TR_EXPLAIN_ES[c.name] || c.es || c.name),
     }));
+  }
+
+  _morphInfo(a) {
+    const suff = this._chainEs(a.chain);
     return {
       root: a.stem,
-      form: trForm(a.stem, chain),
-      suffixes: chain.map((c) => ({ name: c.name, surface: c.surface, es: c.es })),
+      form: trForm(a.stem, suff),
+      suffixes: suff,
+      hasMorphology: true,
+    };
+  }
+
+  // Backtracking segmentation of the verb-part of a word into the suffixes of
+  // TR_VREXPL. Returns { root, chain } with chain in construction order
+  // (innermost first), or null when no full segmentation exists.
+  _explainVerbChain(bare) {
+    if (!trTurkish(bare) || bare.length < 3) return null;
+    const L = bare.length;
+    const failMemo = new Set();
+    const consume = (pos) => {
+      if (pos === L) return [];
+      if (failMemo.has(pos)) return null;
+      for (const [name, re] of TR_VREXPL) {
+        const m = re.exec(bare.slice(pos));
+        if (m && m[0]) {
+          const rest = consume(pos + m[0].length);
+          if (rest) return [{ name, surface: m[0] }, ...rest];
+        }
+      }
+      failMemo.add(pos);
+      return null;
+    };
+    let best = null;
+    const isNeg = (c) => c.name === "-mA" || c.name === "-mI_neg" || c.name === "-mAz";
+    const better = (chain) => {
+      // Prefer the reading that keeps the negation as a suffix («gel» + -me +
+      // -di), otherwise the one that strips the least.
+      const neg = chain.some(isNeg);
+      if (!best) return true;
+      const bestNeg = best.chain.some(isNeg);
+      if (neg !== bestNeg) return neg;
+      if (chain.length !== best.chain.length) return chain.length < best.chain.length;
+      return false;
+    };
+    for (let S = 2; S < L; S++) {
+      const root = bare.slice(0, S);
+      // Turkish roots are often monosyllabic («gel», «bil», «yaz»): only require
+      // a plausible stem; the dictionary gate rejects over-stripping.
+      if (!trTurkish(root)) continue;
+      const chain = consume(S);
+      if (chain && chain.length && better(chain)) {
+        best = { root, chain };
+      }
+    }
+    if (!best) return null;
+    if (best.chain.length <= 6) return best;
+    return null;
+  }
+
+  // Improve the panel explanation without touching meaning selection: re-derive
+  // the suffix chain for words whose strip is missing/incomplete (negation,
+  // continuous present, future, infinitive, aorist…) using _explainVerbChain,
+  // always gated so the found root is a real word. Returns null (keep the
+  // analyzer chain) when the word does not look verb-inflected or no safe
+  // segmentation reaches the end.
+  _explainBetter(bare, info) {
+    const c = String(bare).replace(/'/g, "");
+    if (!c || c.length < 4 || !trTurkish(c)) return null;
+    // Unmistakable verb tails allow decomposing any token; the weaker tense
+    // tails are only trusted when the whole token is not itself a dictionary
+    // entry (otherwise this would shred real roots like «kimse»), or when the
+    // analyzer chain is the negation phantasm («olmasın» → -m posesivo + -e +
+    // -sın: a verb marker mixed with noun markers) that we must repair.
+    const strong = /(?:acak|ecek|mak|mek|maz|mez|meyin|mayın|abil|ebil|yor(?:[ıiuü]?[mn]|s[ıiuü]n|sunuz|uz|lar))$/.test(c);
+    const weak = /(?:[dt][ıiuü]|m[ıiuü]ş|s[ae]|ken|s[ıiuü]n|[ıiuü]n)$/.test(c);
+    const inDict = Boolean(this.lookup(c));
+    const hasSuffixes = (info.suffixes || []).length > 0;
+    const phantomVerb = !hasSuffixes || info.suffixes.some((s) => TR_VERB_MARKERS.has(s.name));
+    const phantomNoun = info.suffixes.some((s) => TR_NOUN_MARKERS.has(s.name));
+    const phantom = phantomVerb && phantomNoun;
+    if (!(strong || (weak && !inDict) || phantom)) return null;
+    const res = this._explainVerbChain(c);
+    if (!res) return null;
+    if (!(res.root === info.root || this.lookup(res.root) || res.root.length >= 3)) return null;
+    const suff = this._chainEs(res.chain.slice().reverse());
+    return {
+      root: res.root,
+      form: trForm(res.root, suff),
+      suffixes: suff,
       hasMorphology: true,
     };
   }
@@ -621,11 +760,11 @@ export class TrEngine {
     // single-word panel), decompose it anyway and keep the direct meaning.
     const direct = this.lookup(w) || this.lookup(bare);
     if (direct) {
-      if (opts.morphology) {
-        const best = this._pickAnalysis(analyzeTr(bare), bare);
-        if (best) return [direct, this._morphInfo(best)];
-      }
-      return [direct, { root: bare, form: "", isBare: true, suffixes: [] }];
+      const isBare = { root: bare, form: "", isBare: true, suffixes: [] };
+      if (!opts.morphology) return [direct, isBare];
+      const best = this._pickAnalysis(analyzeTr(bare), bare);
+      const base = best ? this._morphInfo(best) : isBare;
+      return [direct, this._explainBetter(bare, base) || base];
     }
     const analyses = analyzeTr(bare);
     // Prefer the decomposition that reaches a known stem (over-stripping
@@ -666,7 +805,8 @@ export class TrEngine {
     const info = chosen.chain.length
       ? this._morphInfo(chosen)
       : { root: chosen.stem, form: "", suffixes: [] };
-    return [meanings, info];
+    const out = opts.morphology ? (this._explainBetter(bare, info) || info) : info;
+    return [meanings, out];
   }
 
   segment(text, opts = {}) {
