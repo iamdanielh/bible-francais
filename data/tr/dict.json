@@ -2068,7 +2068,8 @@
     "sus flechas"
   ],
   "yay": [
-    "arco"
+    "extender",
+    "tender"
   ],
   "yayı": [
     "el arco",
@@ -6278,9 +6279,8 @@
     "presentar"
   ],
   "belli": [
-    "claro",
     "evidente",
-    "determinado"
+    "manifiesto"
   ],
   "gerektiğini": [
     "que es necesario"
@@ -6301,8 +6301,7 @@
     "mirad"
   ],
   "yalancı": [
-    "mentiroso",
-    "falso"
+    "mentiroso"
   ],
   "öfkelendi": [
     "se enojó",
@@ -10155,8 +10154,7 @@
     "dominio"
   ],
   "dağıt": [
-    "repartir",
-    "esparcir"
+    "distribuir"
   ],
   "kutsan": [
     "ser bendecido"
@@ -16719,5 +16717,529 @@
   ],
   "şammua": [
     "Sammua"
+  ],
+  "beye": [
+    "señor",
+    "jefe"
+  ],
+  "yardımcım": [
+    "mi ayudante"
+  ],
+  "coşsunlar": [
+    "que se alegren"
+  ],
+  "tartışıp": [
+    "discutiendo"
+  ],
+  "vaade": [
+    "a la promesa"
+  ],
+  "darağacına": [
+    "a la horca"
+  ],
+  "lanetlidir": [
+    "es maldito"
+  ],
+  "sağlayan": [
+    "el que provee"
+  ],
+  "üretir": [
+    "produce"
+  ],
+  "sığınıyorum": [
+    "me refugio"
+  ],
+  "sesleniyor": [
+    "clama"
+  ],
+  "değerlidir": [
+    "es valioso"
+  ],
+  "yatıştırır": [
+    "apacigua"
+  ],
+  "aldatıcıdır": [
+    "es engañoso"
+  ],
+  "tutuşturacağım": [
+    "encenderé"
+  ],
+  "hapse": [
+    "a la prisión"
+  ],
+  "lütfa": [
+    "a la gracia"
+  ],
+  "yağdıracağım": [
+    "haré llover"
+  ],
+  "özlüyor": [
+    "añora"
+  ],
+  "fazlaydı": [
+    "era demasiado"
+  ],
+  "efendinizin": [
+    "de vuestro señor"
+  ],
+  "güden": [
+    "el que pastorea"
+  ],
+  "bozan": [
+    "el que corrompe"
+  ],
+  "bozul": [
+    "corromperse"
+  ],
+  "tiksineceksiniz": [
+    "aborreceréis"
+  ],
+  "yoksullaşır": [
+    "se empobrece"
+  ],
+  "denediler": [
+    "probaron"
+  ],
+  "çoğaldığı": [
+    "que aumentó"
+  ],
+  "izlemekten": [
+    "de seguir"
+  ],
+  "hoşlanır": [
+    "se deleita"
+  ],
+  "alıkoyan": [
+    "el que retiene"
+  ],
+  "kulem": [
+    "mi torre"
+  ],
+  "döndürecek": [
+    "hará volver"
+  ],
+  "çevreleyen": [
+    "el que rodea"
+  ],
+  "yakalayın": [
+    "atrapad"
+  ],
+  "otlayan": [
+    "el que pace"
+  ],
+  "eğlence": [
+    "recreación",
+    "diversión"
+  ],
+  "bozuk": [
+    "corrompido",
+    "dañado"
+  ],
+  "utandılar": [
+    "se avergonzaron"
+  ],
+  "utan": [
+    "avergonzarse"
+  ],
+  "inanmayın": [
+    "no creáis"
+  ],
+  "gümrük": [
+    "impuesto",
+    "aduana"
+  ],
+  "hoşlanan": [
+    "el que se deleita"
+  ],
+  "karışıklık": [
+    "confusión",
+    "perturbación"
+  ],
+  "alçak": [
+    "bajo",
+    "vil"
+  ],
+  "yayılmış": [
+    "extendido"
+  ],
+  "korkut": [
+    "asustar"
+  ],
+  "çit": [
+    "seto",
+    "vallado"
+  ],
+  "sebepsiz": [
+    "sin causa"
+  ],
+  "şuah": [
+    "Súa"
+  ],
+  "saklanır": [
+    "se esconde"
+  ],
+  "hedef": [
+    "blanco",
+    "objetivo"
+  ],
+  "durmaz": [
+    "no cesa"
+  ],
+  "geçer": [
+    "pasa",
+    "cruza"
+  ],
+  "bildirsinler": [
+    "que anuncien"
+  ],
+  "edilemez": [
+    "no puede ser hecho"
+  ],
+  "altüst": [
+    "trastornado",
+    "confundido"
+  ],
+  "tomruk": [
+    "cepo",
+    "grillos"
+  ],
+  "fidan": [
+    "renuevo",
+    "retoño"
+  ],
+  "yakalayacak": [
+    "atrapará"
+  ],
+  "yutacak": [
+    "tragará"
+  ],
+  "hükmeder": [
+    "gobierna"
+  ],
+  "sokar": [
+    "hace entrar"
+  ],
+  "yayar": [
+    "extiende"
+  ],
+  "anlayan": [
+    "el que entiende"
+  ],
+  "dikiyor": [
+    "planta",
+    "cose"
+  ],
+  "demiyor": [
+    "no dice"
+  ],
+  "gözet": [
+    "vigilar"
+  ],
+  "pekiştir": [
+    "afirmar",
+    "confirmar"
+  ],
+  "kavurucu": [
+    "abrasador"
+  ],
+  "yaltaklan": [
+    "adular"
+  ],
+  "itaatsiz": [
+    "desobediente"
+  ],
+  "doğmamış": [
+    "no nacido"
+  ],
+  "aşağılık": [
+    "vil",
+    "despreciable"
+  ],
+  "utansın": [
+    "que se avergüence"
+  ],
+  "çakal": [
+    "chacal"
+  ],
+  "rüzgârdan": [
+    "del viento"
+  ],
+  "yutmak": [
+    "tragar"
+  ],
+  "sarsıl": [
+    "estremecerse"
+  ],
+  "dinlenir": [
+    "descansa"
+  ],
+  "doyar": [
+    "se sacia"
+  ],
+  "sarp": [
+    "escarpado",
+    "agreste"
+  ],
+  "serpilip": [
+    "creciendo"
+  ],
+  "anlama": [
+    "el entender"
+  ],
+  "yüceltsin": [
+    "que exalte"
+  ],
+  "kışkırt": [
+    "incitar"
+  ],
+  "doyuracağım": [
+    "saciaré"
+  ],
+  "sessizlik": [
+    "silencio"
+  ],
+  "mucize": [
+    "milagro",
+    "maravilla"
+  ],
+  "acıyacak": [
+    "tendrá compasión"
+  ],
+  "çeviren": [
+    "el que vuelve"
+  ],
+  "zulmeden": [
+    "el que oprime"
+  ],
+  "zarif": [
+    "elegante",
+    "fino"
+  ],
+  "eker": [
+    "siembra"
+  ],
+  "ahlaksız": [
+    "disoluto"
+  ],
+  "yoksun": [
+    "privado de",
+    "carente"
+  ],
+  "anı": [
+    "recuerdo",
+    "memoria"
+  ],
+  "alaycı": [
+    "burlón"
+  ],
+  "mahvolur": [
+    "perece"
+  ],
+  "ahmak": [
+    "necio"
+  ],
+  "başarısız": [
+    "sin éxito",
+    "fracasado"
+  ],
+  "bulmaz": [
+    "no encuentra"
+  ],
+  "zulmedenler": [
+    "los que oprimen"
+  ],
+  "sönmez": [
+    "no se apaga"
+  ],
+  "üstünlük": [
+    "superioridad"
+  ],
+  "gelmiyor": [
+    "no viene"
+  ],
+  "süslen": [
+    "adornarse"
+  ],
+  "kurtarılacak": [
+    "será salvado"
+  ],
+  "yükseltilecek": [
+    "será elevado"
+  ],
+  "getirilir": [
+    "es traído"
+  ],
+  "çiğnen": [
+    "ser pisoteado"
+  ],
+  "insansız": [
+    "sin gente"
+  ],
+  "otlayacak": [
+    "pacerá"
+  ],
+  "yıkık": [
+    "destruido",
+    "ruinoso"
+  ],
+  "kükreyen": [
+    "el que ruge"
+  ],
+  "tükenecek": [
+    "se agotará"
+  ],
+  "sarstı": [
+    "sacudió"
+  ],
+  "sars": [
+    "sacudir"
+  ],
+  "zayıflıyor": [
+    "se debilita"
+  ],
+  "sürelik": [
+    "por un tiempo"
+  ],
+  "çekül": [
+    "plomada"
+  ],
+  "çözül": [
+    "desatarse"
+  ],
+  "ekilen": [
+    "lo sembrado"
+  ],
+  "boşayıp": [
+    "repudiando"
+  ],
+  "inatçılık": [
+    "terquedad"
+  ],
+  "dolduracağım": [
+    "llenaré"
+  ],
+  "kükre": [
+    "rugir"
+  ],
+  "kurtulamayacak": [
+    "no escapará"
+  ],
+  "kullanan": [
+    "el que usa"
+  ],
+  "yazan": [
+    "el que escribe"
+  ],
+  "dönmüyorlardı": [
+    "no volvían"
+  ],
+  "bakarken": [
+    "mientras mira"
+  ],
+  "küfret": [
+    "blasfemar",
+    "maldecir"
+  ],
+  "gerildiği": [
+    "que fue tensado"
+  ],
+  "sarsılacak": [
+    "será sacudido"
+  ],
+  "dileyen": [
+    "el que desea"
+  ],
+  "ufak": [
+    "pequeño"
+  ],
+  "vahyi": [
+    "la revelación"
+  ],
+  "göründüğünde": [
+    "cuando aparece"
+  ],
+  "tercüme": [
+    "traducción"
+  ],
+  "duyurarak": [
+    "anunciando"
+  ],
+  "kıt": [
+    "escaso",
+    "limitado"
+  ],
+  "katlanılır": [
+    "se tolera"
+  ],
+  "verimsiz": [
+    "improductivo",
+    "estéril"
+  ],
+  "hardal": [
+    "mostaza"
+  ],
+  "tatmayacak": [
+    "no probará"
+  ],
+  "olmayalım": [
+    "no seamos"
+  ],
+  "doğuş": [
+    "nacimiento"
+  ],
+  "kuşku": [
+    "duda",
+    "sospecha"
+  ],
+  "bırakma": [
+    "el dejar"
+  ],
+  "gerilmek": [
+    "extenderse"
+  ],
+  "ötme": [
+    "el cantar"
+  ],
+  "öttü": [
+    "cantó"
+  ],
+  "gözlüyorlardı": [
+    "observaban"
+  ],
+  "dirilecek": [
+    "resucitará"
+  ],
+  "çözüp": [
+    "desatando"
+  ],
+  "mümkün": [
+    "posible"
+  ],
+  "iskender": [
+    "Alejandro"
+  ],
+  "edebilmek": [
+    "poder hacer"
+  ],
+  "tapan": [
+    "el que adora"
+  ],
+  "ruhça": [
+    "en espíritu"
+  ],
+  "görünmeyen": [
+    "el que no se ve"
+  ],
+  "aranızdayken": [
+    "mientras estaba entre vosotros"
+  ],
+  "ekilir": [
+    "es sembrado"
+  ],
+  "unutmayın": [
+    "no olvidéis"
+  ],
+  "yazmak": [
+    "escribir"
   ]
 }
