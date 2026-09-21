@@ -37,6 +37,15 @@ Reglas TR:
   sufijos** (`trMorphHtml` en `js/app.js`). Es opt-in: `resolve(word, {morphology:true})` /
   `segment(text, {morphology:true})` (el gate escanea 473k tokens y no debe analizar de más).
   `_pickAnalysis` mantiene la selección histórica del motor → los significados no cambian.
+- Capa de explicación (`_explainBetter`/`_explainVerbChain`, tablas `TR_EXPLAIN_ES`/
+  `TR_VREXPL`): añade al panel los sufijos que el analizador no conoce (negación -me/-ma,
+  presente continuo -(y)ıyor, futuro -(y)AcAk, infinitivo -mAk, aoristo -mAz/-Ar, participio,
+  -(y)Abil, -(y)DIk…) y repara cadenas fantasma del strip («olmasın» ya no es -m posesivo +
+  -e dativo + -sın). Solo toca el panel; el significado y el gate quedan intactos
+  (verificar siempre con `/tmp/opencode/tr-negprobe.mjs` y `tr-meaning-diff.mjs` → 0).
+- La app recuerda posición de lectura: `state` en localStorage guarda `lang`/`book`/`chapter`/
+  `verse` (el versículo activo del viewport, más fiable que scrollTop) y lo restaura en
+  `initApp()` (con reintentos hasta 800 ms; cae a `scrollTop` si el índice no existe).
 
 ## Arquitectura del feature español (sucinta)
 
