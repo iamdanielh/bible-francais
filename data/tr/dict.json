@@ -814,7 +814,7 @@
     "creed"
   ],
   "iman": [
-    "la fe"
+    "fe"
   ],
   "gün": [
     "el día"
@@ -4295,7 +4295,8 @@
     "fino"
   ],
   "yabancı": [
-    "extranjero"
+    "extranjero",
+    "extraño"
   ],
   "yalnız": [
     "solo"
@@ -10234,8 +10235,7 @@
     "dónde"
   ],
   "şiddet": [
-    "violencia",
-    "fuerza"
+    "violencia"
   ],
   "çamur": [
     "barro",
@@ -18353,5 +18353,398 @@
   ],
   "yaralan": [
     "ser herido"
+  ],
+  "atma": [
+    "el lanzar",
+    "el arrojar"
+  ],
+  "açıl": [
+    "abrirse"
+  ],
+  "aradık": [
+    "buscamos"
+  ],
+  "tanıdık": [
+    "conocido"
+  ],
+  "sel": [
+    "torrente",
+    "inundación"
+  ],
+  "heybet": [
+    "majestad",
+    "esplendor"
+  ],
+  "kürsü": [
+    "tribuna",
+    "trono"
+  ],
+  "şölen": [
+    "banquete",
+    "fiesta"
+  ],
+  "ihtişam": [
+    "magnificencia",
+    "esplendor"
+  ],
+  "çevirir": [
+    "vuelve",
+    "convierte"
+  ],
+  "insanoğl": [
+    "hijo del hombre"
+  ],
+  "zayıflık": [
+    "debilidad"
+  ],
+  "benzeyiş": [
+    "semejanza"
+  ],
+  "uyluk": [
+    "muslo"
+  ],
+  "uyarı": [
+    "advertencia"
+  ],
+  "yöre": [
+    "comarca",
+    "región"
+  ],
+  "toplanma": [
+    "asamblea",
+    "reunión"
+  ],
+  "ordugâhta": [
+    "en el campamento"
+  ],
+  "gözetmen": [
+    "supervisor",
+    "inspector"
+  ],
+  "bölecek": [
+    "dividirá"
+  ],
+  "kaldırdık": [
+    "levantamos"
+  ],
+  "süs": [
+    "adorno",
+    "ornamento"
+  ],
+  "tabak": [
+    "plato",
+    "bandeja"
+  ],
+  "çalıştık": [
+    "trabajamos"
+  ],
+  "garnizon": [
+    "guarnición"
+  ],
+  "sığınan": [
+    "el que se refugia"
+  ],
+  "kapak": [
+    "tapa",
+    "cubierta"
+  ],
+  "anlaş": [
+    "entenderse"
+  ],
+  "artır": [
+    "aumentar",
+    "incrementar"
+  ],
+  "inanıyor": [
+    "cree"
+  ],
+  "bilemez": [
+    "no puede saber"
+  ],
+  "oynaş": [
+    "retozar"
+  ],
+  "emektaş": [
+    "compañero",
+    "asociado"
+  ],
+  "sağlayacak": [
+    "proveerá"
+  ],
+  "kavuş": [
+    "alcanzar",
+    "reunirse con"
+  ],
+  "kabuk": [
+    "corteza",
+    "cáscara"
+  ],
+  "kirlettik": [
+    "contaminamos"
+  ],
+  "fikir": [
+    "idea",
+    "pensamiento"
+  ],
+  "bildirir": [
+    "anuncia",
+    "informa"
+  ],
+  "mahkeme": [
+    "tribunal",
+    "juicio"
+  ],
+  "suçlama": [
+    "acusación"
+  ],
+  "sunduk": [
+    "ofrecimos"
+  ],
+  "sarnıç": [
+    "cisterna"
+  ],
+  "çıkarıyor": [
+    "saca"
+  ],
+  "söylemez": [
+    "no dice"
+  ],
+  "dinledik": [
+    "escuchamos"
+  ],
+  "doyur": [
+    "saciar"
+  ],
+  "okuduk": [
+    "leímos"
+  ],
+  "seçilmiş": [
+    "elegido",
+    "escogido"
+  ],
+  "savunma": [
+    "defensa"
+  ],
+  "ezilen": [
+    "el oprimido"
+  ],
+  "döşek": [
+    "lecho",
+    "cama"
+  ],
+  "övünme": [
+    "jactancia",
+    "orgullo"
+  ],
+  "tanrısallık": [
+    "divinidad"
+  ],
+  "kurnaz": [
+    "astuto",
+    "sagaz"
+  ],
+  "topuk": [
+    "talón",
+    "calcañar"
+  ],
+  "teke": [
+    "macho cabrío"
+  ],
+  "çaldık": [
+    "robamos"
+  ],
+  "vurma": [
+    "el golpear"
+  ],
+  "konuşmaz": [
+    "no habla"
+  ],
+  "casus": [
+    "espía"
+  ],
+  "torba": [
+    "saco",
+    "talega"
+  ],
+  "getirmez": [
+    "no trae"
+  ],
+  "edindik": [
+    "obtuvimos"
+  ],
+  "ora": [
+    "ese lugar",
+    "allí"
+  ],
+  "inleme": [
+    "gemido"
+  ],
+  "bulamayacak": [
+    "no podrá encontrar"
+  ],
+  "kalça": [
+    "cadera"
+  ],
+  "örtüyor": [
+    "cubre"
+  ],
+  "tüy": [
+    "pluma",
+    "pelo"
+  ],
+  "atkı": [
+    "manto",
+    "chal",
+    "banda"
+  ],
+  "gelin": [
+    "novia"
+  ],
+  "kirletecek": [
+    "contaminará"
+  ],
+  "satıl": [
+    "ser vendido"
+  ],
+  "dönmez": [
+    "no vuelve"
+  ],
+  "böğr": [
+    "costado",
+    "ijada"
+  ],
+  "evlenir": [
+    "se casa"
+  ],
+  "ekil": [
+    "ser sembrado"
+  ],
+  "bulunma": [
+    "el ser hallado"
+  ],
+  "vermedik": [
+    "no dimos"
+  ],
+  "koruma": [
+    "protección",
+    "guardia"
+  ],
+  "kaynana": [
+    "suegra"
+  ],
+  "temizlik": [
+    "limpieza",
+    "pureza"
+  ],
+  "hadım": [
+    "eunuco"
+  ],
+  "bildiri": [
+    "proclamación",
+    "anuncio"
+  ],
+  "damla": [
+    "gota"
+  ],
+  "koşuyor": [
+    "corre"
+  ],
+  "ışıltı": [
+    "resplandor"
+  ],
+  "işiten": [
+    "el que oye"
+  ],
+  "tartışma": [
+    "discusión",
+    "disputa"
+  ],
+  "örtül": [
+    "ser cubierto"
+  ],
+  "gösteriyor": [
+    "muestra"
+  ],
+  "dip": [
+    "fondo"
+  ],
+  "besl": [
+    "alimentar"
+  ],
+  "yönel": [
+    "dirigirse",
+    "encaminarse"
+  ],
+  "sattık": [
+    "vendimos"
+  ],
+  "ekecek": [
+    "sembrará"
+  ],
+  "yalvar": [
+    "suplicar",
+    "rogar"
+  ],
+  "alınma": [
+    "el ser tomado"
+  ],
+  "koymayacak": [
+    "no pondrá"
+  ],
+  "söylenme": [
+    "el ser dicho"
+  ],
+  "keruv": [
+    "querubín"
+  ],
+  "katlan": [
+    "soportar",
+    "aguantar"
+  ],
+  "sürdürür": [
+    "continúa"
+  ],
+  "sunuyor": [
+    "ofrece"
+  ],
+  "adanma": [
+    "consagración"
+  ],
+  "yüklen": [
+    "cargar"
+  ],
+  "çıplaklık": [
+    "desnudez"
+  ],
+  "hasar": [
+    "daño",
+    "perjuicio"
+  ],
+  "tencere": [
+    "olla",
+    "caldero"
+  ],
+  "saçak": [
+    "fleco",
+    "borde"
+  ],
+  "kavuşacak": [
+    "alcanzará"
+  ],
+  "başlayacak": [
+    "comenzará"
+  ],
+  "tapar": [
+    "adora"
+  ],
+  "kopya": [
+    "copia"
+  ],
+  "yokluk": [
+    "carencia",
+    "pobreza"
+  ],
+  "vuruş": [
+    "golpe"
   ]
 }
