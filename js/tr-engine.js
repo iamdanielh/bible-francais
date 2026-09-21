@@ -504,7 +504,7 @@ function trNumberEs(word) {
   return ordinal ? trEsOrdinal(num) : trEsCardinal(num);
 }
 // Bible cross-references embedded in the YTC text («19:18», «20:13-15,17»).
-const TR_REFERENCE = /^\d+(?::\d+)?(?:[-,]\d+)*$/;
+const TR_REFERENCE = /^\d+(?::\d+)?(?:[-,–—]\d+(?::\d+)?)*$/;
 
 export class TrEngine {
   constructor(map, names) {
@@ -536,8 +536,8 @@ export class TrEngine {
     if (!bare) return [null, {}];
     // Digits are not in TR_ALPHABET: a bare number becomes a Spanish cardinal,
     // a chapter:verse citation is kept as a bible reference.
-    if (/^[0-9][0-9.,:\-]*$/.test(bare)) {
-      if (!/[:\-,]/.test(bare)) {
+    if (/^[0-9][0-9.,:\-\u2013\u2014]*$/.test(bare)) {
+      if (!/[:\-,\u2013\u2014]/.test(bare)) {
         const es = trNumberEs(bare);
         if (es) return [[es], { root: bare, form: "número", isNumber: true, suffixes: [] }];
       } else {
@@ -626,15 +626,22 @@ export class TrEngine {
     for (const tok of String(text).split(/\s+/)) {
       const w = tok.replace(/^[\-.,;:!?…«»"'“”‘’()\[\]{}*\u2013\u2014—]+|[\-.,;:!?…«»"'“”‘’()\[\]{}*\u2013\u2014—]+$/g, "");
       if (!w) continue;
-      // YTC sometimes glues a chapter:verse citation to the preceding word
-      // («seveceksin10:27», «David’in7:42»): split it off.
-      const ns = w.search(/\d/);
-      if (ns > 0) {
-        const word = w.slice(0, ns).replace(/[.\u2019\u201D'"”’‘]+$/, "");
-        const ref = w.slice(ns);
-        if (word && /[A-Za-zÇĞİÖŞÜçğıöşü]/.test(word) && TR_REFERENCE.test(ref)) {
-          push(word);
-          push(ref);
+      // YTC sometimes glues a chapter:verse citation to an adjacent word,
+      // before or after it and with or without intervening punctuation
+      // («seveceksin10:27», «David’in7:42», «2:24olacak», «çıkacak.’”2:6»,
+      // «vergisini,12:4»): split the citation off and keep both parts.
+      const refMatch = w.match(/(\d+(?::\d+)?(?:[-,–—]\d+(?::\d+)?)*)/);
+      if (refMatch) {
+        const trimEnd = /[\-.,;:!?…«»"'“”‘’()\[\]{}*\u2013\u2014—]+$/;
+        const trimStart = /^[\-.,;:!?…«»"'“”‘’()\[\]{}*\u2013\u2014—]+/;
+        const before = w.slice(0, refMatch.index).replace(trimEnd, "");
+        const after = w.slice(refMatch.index + refMatch[0].length).replace(trimStart, "");
+        const beforeWord = /[A-Za-zÇĞİÖŞÜçğıöşü]/.test(before);
+        const afterWord = /[A-Za-zÇĞİÖŞÜçğıöşü]/.test(after);
+        if (beforeWord || afterWord) {
+          if (beforeWord) push(before);
+          push(refMatch[0]);
+          if (afterWord) push(after);
           continue;
         }
       }
