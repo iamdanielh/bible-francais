@@ -632,7 +632,7 @@ async function translateContext() {
   _translateBusy = true;
   el.ctxResult.innerHTML = "<span class='dim'>Traduciendo…</span>";
   try {
-    const body = new URLSearchParams({ q: _ctxQuery.slice(0, 3000), langpair: "fr|es" });
+    const body = new URLSearchParams({ q: _ctxQuery.slice(0, 3000), langpair: lang === "tr" ? "tr|es" : "fr|es" });
     const resp = await fetch("https://api.mymemory.translated.net/get", {
       method: "POST",
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
@@ -1677,13 +1677,16 @@ function removeVocab(entry) {
 // settings overrides this one. Delete this line to stop auto-activation.
 const DEFAULT_AI_KEY = ["sk-or-v1-", "5206320f", "4649b94a", "0ea19035", "461653a7", "f1e883a0", "84f0a100", "2394d8d4", "c15d0a9f"].join("");
 
-const AI_SYSTEM_PROMPT =
-  "Eres un profesor de francés para hispanohablantes que leen la Biblia. " +
-  "Responde siempre en español sencillo, como un amigo que enseña, sin palabras técnicas " +
-  "(no digas «imperfecto subyacente», di «pasado que describe el ambiente»). " +
-  "Para cada palabra que expliques, da primero su traducción al español y, si aporta algo, " +
-  "una frase sencilla sobre cómo se usa. " +
-  "Da ejemplos cortos en francés con su traducción al español. Máximo 120 palabras.";
+function AI_SYSTEM_PROMPT() {
+  const isTr = lang === "tr";
+  const src = isTr ? "turco" : "francés";
+  const srcBible = isTr ? "la Biblia" : "la Biblia";
+  return "Eres un profesor de " + src + " para hispanohablantes que leen la Biblia. " +
+    "Responde siempre en español sencillo, como un amigo que enseña, sin palabras técnicas. " +
+    "Para cada palabra que expliques, da primero su traducción al español y, si aporta algo, " +
+    "una frase sencilla sobre cómo se usa. " +
+    "Da ejemplos cortos en " + src + " con su traducción al español. Máximo 120 palabras.";
+}
 
 function effectiveAIKey() {
   if (state.ai && state.ai.key && state.ai.key.trim()) return state.ai.key.trim();
