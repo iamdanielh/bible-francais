@@ -42007,5 +42007,923 @@
   ],
   "getirebileyim": [
     "que pueda traer"
+  ],
+  "א": [
+    "Alef"
+  ],
+  "ב": [
+    "Bet"
+  ],
+  "ג": [
+    "Guímel"
+  ],
+  "ד": [
+    "Dálet"
+  ],
+  "ה": [
+    "He"
+  ],
+  "ו": [
+    "Vav"
+  ],
+  "ז": [
+    "Zayin"
+  ],
+  "ח": [
+    "Jet"
+  ],
+  "ט": [
+    "Tet"
+  ],
+  "י": [
+    "Yod"
+  ],
+  "כ": [
+    "Kaf"
+  ],
+  "ך": [
+    "Kaf final"
+  ],
+  "ל": [
+    "Lámed"
+  ],
+  "מ": [
+    "Mem"
+  ],
+  "ם": [
+    "Mem final"
+  ],
+  "נ": [
+    "Nun"
+  ],
+  "ן": [
+    "Nun final"
+  ],
+  "ס": [
+    "Sámej"
+  ],
+  "ע": [
+    "Ayin"
+  ],
+  "פ": [
+    "Pe"
+  ],
+  "ף": [
+    "Pe final"
+  ],
+  "צ": [
+    "Tsade"
+  ],
+  "ץ": [
+    "Tsade final"
+  ],
+  "ק": [
+    "Qof"
+  ],
+  "ר": [
+    "Resh"
+  ],
+  "ש": [
+    "Shin"
+  ],
+  "ת": [
+    "Tav"
+  ],
+  "okurlar": [
+    "lectores"
+  ],
+  "kaldırıldıklarında": [
+    "cuando fueron levantados"
+  ],
+  "gönül": [
+    "corazón"
+  ],
+  "bağlamayın": [
+    "no atéis"
+  ],
+  "susturulacak": [
+    "será silenciado"
+  ],
+  "gürültücü": [
+    "ruidoso"
+  ],
+  "keskinleştiren": [
+    "que afila"
+  ],
+  "uğratacak": [
+    "hará incurrir"
+  ],
+  "tartacaklar": [
+    "pesarán"
+  ],
+  "bunalttı": [
+    "agobió"
+  ],
+  "ödedin": [
+    "pagaste"
+  ],
+  "yaklaştırdığın": [
+    "que acercaste"
+  ],
+  "uğultusunu": [
+    "su estruendo"
+  ],
+  "yatıştıran": [
+    "que calma"
+  ],
+  "düzeltirsin": [
+    "corriges"
+  ],
+  "yumuşatır": [
+    "suaviza"
+  ],
+  "mahsulle": [
+    "con la cosecha"
+  ],
+  "bürünür": [
+    "se envuelve"
+  ],
+  "kaplanır": [
+    "se recubre"
+  ],
+  "örtünür": [
+    "se cubre"
+  ],
+  "bağrışır": [
+    "grita"
+  ],
+  "yapıt": [
+    "obra"
+  ],
+  "arıtır": [
+    "purifica"
+  ],
+  "arıttın": [
+    "purificaste"
+  ],
+  "verseydim": [
+    "si hubiera dado"
+  ],
+  "çevirmeyen": [
+    "que no vuelve"
+  ],
+  "saçtırsın": [
+    "que haga esparcir"
+  ],
+  "kaçsınlar": [
+    "que huyan"
+  ],
+  "dağıldığı": [
+    "que se dispersó"
+  ],
+  "savunucusudur": [
+    "es su defensor"
+  ],
+  "kavurduğu": [
+    "que abrasó"
+  ],
+  "parlarsın": [
+    "brillas"
+  ],
+  "dağıttığında": [
+    "cuando dispersó"
+  ],
+  "dağlardır": [
+    "son montañas"
+  ],
+  "yerleşmek": [
+    "asentarse"
+  ],
+  "okuyucular": [
+    "lectores"
+  ],
+  "çalgıcılar": [
+    "músicos"
+  ],
+  "söyleyin—selah": [
+    "cantad, Selah"
+  ],
+  "atfedin": [
+    "atribuid"
+  ],
+  "basılacak": [
+    "será impreso"
+  ],
+  "aştığı": [
+    "que superó"
+  ],
+  "masal": [
+    "cuento"
+  ],
+  "batmayayım": [
+    "que no me hunda"
+  ],
+  "boğmasın": [
+    "que no ahogue"
+  ],
+  "kalbimi": [
+    "mi corazón"
+  ],
+  "göremesinler": [
+    "que no puedan ver"
+  ],
+  "bükük": [
+    "torcido"
+  ],
+  "yaraladığın": [
+    "que heriste"
+  ],
+  "anlatıyorlar": [
+    "cuentan"
+  ],
+  "silinsinler": [
+    "que sean borrados"
+  ],
+  "yazılmasınlar": [
+    "que no sean escritos"
+  ],
+  "kımıldayan": [
+    "que se mueve"
+  ],
+  "yerleşip": [
+    "asentándose"
+  ],
+  "gözleyenler": [
+    "los que observan"
+  ],
+  "kahroldular": [
+    "se desesperaron"
+  ],
+  "biçilmiş": [
+    "segado"
+  ],
+  "eğilsin": [
+    "que se incline"
+  ],
+  "haykıran": [
+    "que grita"
+  ],
+  "destekçisi": [
+    "su partidario"
+  ],
+  "dalgalansın": [
+    "que ondee"
+  ],
+  "tükenmişti": [
+    "se había agotado"
+  ],
+  "kaymıştı": [
+    "había resbalado"
+  ],
+  "çırpınma": [
+    "no te agites"
+  ],
+  "şişmanlıktan": [
+    "de la gordura"
+  ],
+  "fırlamış": [
+    "que saltó"
+  ],
+  "cezalandırıldım": [
+    "fui castigado"
+  ],
+  "deseydim": [
+    "si hubiera dicho"
+  ],
+  "süpürülüp": [
+    "barrido"
+  ],
+  "buruktu": [
+    "estaba afligido"
+  ],
+  "yıkıntılara": [
+    "a las ruinas"
+  ],
+  "baltalı": [
+    "con hacha"
+  ],
+  "mucizevi": [
+    "milagroso"
+  ],
+  "sövecek": [
+    "insultará"
+  ],
+  "göğsünden": [
+    "de su pecho"
+  ],
+  "fışkırttın": [
+    "hiciste brotar"
+  ],
+  "konuşmayın": [
+    "no habléis"
+  ],
+  "köpüklü": [
+    "espumoso"
+  ],
+  "dizginlendi": [
+    "fue refrenado"
+  ],
+  "haykırırım": [
+    "grito"
+  ],
+  "gevşemedi": [
+    "no se aflojó"
+  ],
+  "ilahimi": [
+    "mi cántico"
+  ],
+  "anarım": [
+    "recuerdo"
+  ],
+  "çalkalandı": [
+    "se agitó"
+  ],
+  "saklamayacağız": [
+    "no ocultaremos"
+  ],
+  "anlatacağız": [
+    "contaremos"
+  ],
+  "unutmasınlar": [
+    "que no olviden"
+  ],
+  "vefasız": [
+    "desleal"
+  ],
+  "ağızlarındayken": [
+    "mientras está en sus bocas"
+  ],
+  "davranarak": [
+    "tratando"
+  ],
+  "uyandırmadı": [
+    "no despertó"
+  ],
+  "yel": [
+    "viento"
+  ],
+  "içmesinler": [
+    "que no beban"
+  ],
+  "doluya": [
+    "al granizo"
+  ],
+  "hışım": [
+    "ira"
+  ],
+  "eğrildiler": [
+    "se torcieron"
+  ],
+  "iğrendi": [
+    "sintió asco"
+  ],
+  "ağlayamadı": [
+    "no pudo llorar"
+  ],
+  "anmayan": [
+    "que no recuerda"
+  ],
+  "buluşsun": [
+    "que se encuentre"
+  ],
+  "gülüşüyorlar": [
+    "se ríen juntos"
+  ],
+  "besleniyor": [
+    "se alimenta"
+  ],
+  "azarlamanla": [
+    "con tu reprensión"
+  ],
+  "çağıralım": [
+    "llamemos"
+  ],
+  "küfeden": [
+    "de la cesta"
+  ],
+  "sınadım": [
+    "probé"
+  ],
+  "dinleseydi": [
+    "si hubiera escuchado"
+  ],
+  "yürüseydi": [
+    "si hubiera andado"
+  ],
+  "sinerdi": [
+    "se ocultaría"
+  ],
+  "beslerdim": [
+    "alimentaría"
+  ],
+  "kudular": [
+    "se enfurecieron"
+  ],
+  "oluşturdular": [
+    "formaron"
+  ],
+  "edinelim": [
+    "adquiramos"
+  ],
+  "fırtınanla": [
+    "con tu tempestad"
+  ],
+  "kasırganla": [
+    "con tu huracán"
+  ],
+  "kaplat": [
+    "haz recubrir"
+  ],
+  "bayılırmış": [
+    "al parecer se desmaya"
+  ],
+  "koyabilecek": [
+    "podrá poner"
+  ],
+  "dindir": [
+    "calma"
+  ],
+  "yayacak": [
+    "extenderá"
+  ],
+  "diriltmeyecek": [
+    "no resucitará"
+  ],
+  "buluştular": [
+    "se encontraron"
+  ],
+  "öpüştüler": [
+    "se besaron"
+  ],
+  "artarak": [
+    "aumentando"
+  ],
+  "benzersizdir": [
+    "es único"
+  ],
+  "söylenir": [
+    "se dice"
+  ],
+  "kaydedeceğim": [
+    "registraré"
+  ],
+  "yazarken": [
+    "mientras escribe"
+  ],
+  "sayılıyorum": [
+    "soy contado"
+  ],
+  "kaçamıyorum": [
+    "no puedo huir"
+  ],
+  "unutulmuşluk": [
+    "olvido"
+  ],
+  "katlanırken": [
+    "mientras soporta"
+  ],
+  "kıyaslanabilir": [
+    "comparable"
+  ],
+  "kabardığında": [
+    "cuando se hinchó"
+  ],
+  "sakinleştirirsin": [
+    "calmas"
+  ],
+  "kuvvetlidir": [
+    "es fuerte"
+  ],
+  "alkışlamayı": [
+    "aplaudir"
+  ],
+  "güçlendirecektir": [
+    "fortalecerá"
+  ],
+  "ezmeyecektir": [
+    "no aplastará"
+  ],
+  "sadakatim": [
+    "mi lealtad"
+  ],
+  "seslenecek": [
+    "llamará"
+  ],
+  "terkederse": [
+    "si abandona"
+  ],
+  "çiğnerlerse": [
+    "si pisotean"
+  ],
+  "bozmayacak": [
+    "no romperá"
+  ],
+  "kısalttın": [
+    "acortaste"
+  ],
+  "içttiğin": [
+    "que hiciste beber"
+  ],
+  "bağrımda": [
+    "en mi pecho"
+  ],
+  "doğmadan": [
+    "sin nacer"
+  ],
+  "yaratmadan": [
+    "sin crear"
+  ],
+  "filizlenip": [
+    "brotando"
+  ],
+  "yeşerir": [
+    "verdece"
+  ],
+  "lötülük": [
+    "maldad"
+  ],
+  "sazla": [
+    "con el laúd"
+  ],
+  "pekiştirilmiş": [
+    "reforzado"
+  ],
+  "saçıyorlar": [
+    "esparcen"
+  ],
+  "katlediyorlar": [
+    "masacran"
+  ],
+  "akıllanacaksınız": [
+    "os haréis sensatos"
+  ],
+  "yerleştiren": [
+    "que coloca"
+  ],
+  "kazılıncaya": [
+    "hasta ser cavado"
+  ],
+  "kayıyor": [
+    "resbala"
+  ],
+  "avutmaların": [
+    "tus consuelos"
+  ],
+  "sevindiriyor": [
+    "alegra"
+  ],
+  "şer": [
+    "mal"
+  ],
+  "haykıralım": [
+    "gritemos"
+  ],
+  "eğilelim": [
+    "inclinémonos"
+  ],
+  "çökelim": [
+    "derrumbémonos"
+  ],
+  "gözetimindeki": [
+    "el de tu vigilancia"
+  ],
+  "duysanız": [
+    "si oyérais"
+  ],
+  "denediklerinde": [
+    "cuando probaron"
+  ],
+  "sınadıklarında": [
+    "cuando probaron"
+  ],
+  "ululuk": [
+    "majestad"
+  ],
+  "pekiştirilmiştir": [
+    "ha sido reforzado"
+  ],
+  "çınlatın": [
+    "haced resonar"
+  ],
+  "melodiyle": [
+    "con melodía"
+  ],
+  "gerçekleştirirsin": [
+    "realizas"
+  ],
+  "ödetmiş": [
+    "ha hecho pagar"
+  ],
+  "sürdürmeye": [
+    "a continuar"
+  ],
+  "tutunmayacaklar": [
+    "no se agarrarán"
+  ],
+  "sustururum": [
+    "silenciaré"
+  ],
+  "kaşıkçı": [
+    "espátula"
+  ],
+  "aşağılıyor": [
+    "humilla"
+  ],
+  "kullanıyorlar": [
+    "usan"
+  ],
+  "uzayan": [
+    "que se extiende"
+  ],
+  "acırlar": [
+    "se apiadan"
+  ],
+  "yaratılacak": [
+    "será creado"
+  ],
+  "mahküm": [
+    "condenado"
+  ],
+  "kısalttı": [
+    "acortó"
+  ],
+  "değişecek": [
+    "cambiará"
+  ],
+  "arzunu": [
+    "tu deseo"
+  ],
+  "doyuran": [
+    "que sacia"
+  ],
+  "suçlamaz": [
+    "no acusa"
+  ],
+  "ödetti": [
+    "hizo pagar"
+  ],
+  "acırsa": [
+    "si se apiada"
+  ],
+  "acır": [
+    "se apiada"
+  ],
+  "hatırlayanlaradır": [
+    "es para los que recuerdan"
+  ],
+  "gürleyişinin": [
+    "de su retumbar"
+  ],
+  "belirlediğin": [
+    "que determinaste"
+  ],
+  "geçmesinler": [
+    "que no pasen"
+  ],
+  "çıkarttığın": [
+    "que sacaste"
+  ],
+  "giderirler": [
+    "eliminan"
+  ],
+  "öterler": [
+    "cantan"
+  ],
+  "yetiştirirsin": [
+    "crías"
+  ],
+  "sulanır": [
+    "se riega"
+  ],
+  "porsuklarının": [
+    "de sus tejones"
+  ],
+  "oynasın": [
+    "que juegue"
+  ],
+  "yaratılırlar": [
+    "son creados"
+  ],
+  "tüter": [
+    "humea"
+  ],
+  "yabancıydılar": [
+    "eran extranjeros"
+  ],
+  "kursunlar": [
+    "que establezcan"
+  ],
+  "yöneltti": [
+    "dirigió"
+  ],
+  "kararttı": [
+    "oscureció"
+  ],
+  "yenik": [
+    "derrotado"
+  ],
+  "yandaşlarını": [
+    "sus partidarios"
+  ],
+  "durmasaydı": [
+    "si no se hubiera detenido"
+  ],
+  "düşürmeye": [
+    "a derribar"
+  ],
+  "dağıtmaya": [
+    "a dispersar"
+  ],
+  "isyankârdılar": [
+    "eran rebeldes"
+  ],
+  "gidebilsinler": [
+    "que puedan ir"
+  ],
+  "sallanıp": [
+    "sacudiéndose"
+  ],
+  "sakinleşir": [
+    "se calma"
+  ],
+  "sakinleştiği": [
+    "que se calmó"
+  ],
+  "döndürür": [
+    "hace volver"
+  ],
+  "göletine": [
+    "a su estanque"
+  ],
+  "hazırlasınlar": [
+    "que preparen"
+  ],
+  "eksilmesine": [
+    "a su disminución"
+  ],
+  "azalırlar": [
+    "disminuyen"
+  ],
+  "yolsuz": [
+    "sin camino"
+  ],
+  "gezen": [
+    "que anda"
+  ],
+  "dilenciler": [
+    "mendigos"
+  ],
+  "bulunsunlar": [
+    "que se hallen"
+  ],
+  "kuşandığı": [
+    "que ciñó"
+  ],
+  "kayboluyorum": [
+    "me pierdo"
+  ],
+  "yağsız": [
+    "sin grasa"
+  ],
+  "sallıyorlar": [
+    "sacuden"
+  ],
+  "örtsünler": [
+    "que cubran"
+  ],
+  "yığacak": [
+    "amontonará"
+  ],
+  "hatırlanmasını": [
+    "que sea recordado"
+  ],
+  "hatırlanır": [
+    "es recordado"
+  ],
+  "dertlenir": [
+    "se aflige"
+  ],
+  "batışına": [
+    "a su hundimiento"
+  ],
+  "övülmelidir": [
+    "debe ser alabado"
+  ],
+  "eğilen": [
+    "que se inclina"
+  ],
+  "çakmaktaşını": [
+    "el pedernal"
+  ],
+  "hissetmezler": [
+    "no sienten"
+  ],
+  "boğazlarıyla": [
+    "con sus gargantas"
+  ],
+  "övmezler": [
+    "no alaban"
+  ],
+  "geçirmişti": [
+    "había pasado"
+  ],
+  "ortanda": [
+    "en tu medio"
+  ],
+  "ittin": [
+    "empujaste"
+  ],
+  "yüceltirim": [
+    "exalto"
+  ],
+  "uyalım": [
+    "obedezcamos"
+  ],
+  "uğramazdım": [
+    "no visitaría"
+  ],
+  "bulundurdukça": [
+    "mientras mantengas"
+  ],
+  "öğrendikçe": [
+    "a medida que aprendes"
+  ],
+  "sapmama": [
+    "no desviarme"
+  ],
+  "işlememek": [
+    "no cometer"
+  ],
+  "bulunduracağım": [
+    "mantendré"
+  ],
+  "tutuşuyor": [
+    "se enciende"
+  ],
+  "yönelt": [
+    "dirige"
+  ],
+  "canlandır": [
+    "reanima"
+  ],
+  "sapmıştım": [
+    "me había desviado"
+  ],
+  "öğrenebileyim": [
+    "que pueda aprender"
+  ],
+  "sadakattir": [
+    "es lealtad"
+  ],
+  "kapsar": [
+    "abarca"
+  ],
+  "kusursuzluğun": [
+    "tu perfección"
+  ],
+  "sınırsızdır": [
+    "es ilimitado"
+  ],
+  "uygulamaya": [
+    "a aplicar"
+  ],
+  "tutabileyim": [
+    "que pueda retener"
+  ],
+  "utanmayayım": [
+    "que no me avergüence"
+  ],
+  "ezmesine": [
+    "a su aplastar"
+  ],
+  "genişçe": [
+    "ampliamente"
+  ],
+  "uymuyorlar": [
+    "no obedecen"
+  ],
+  "dosdoğrudur": [
+    "es recto"
+  ],
+  "tökezletemez": [
+    "no puede hacer tropezar"
+  ],
+  "uyuklar": [
+    "dormita"
+  ],
+  "koruyucun": [
+    "tu protector"
+  ],
+  "gidişini": [
+    "su ida"
+  ],
+  "küçümsemesine": [
+    "a su desprecio"
+  ],
+  "alevlendiğinde": [
+    "cuando se encendió"
+  ],
+  "yardımcımızdır": [
+    "es nuestro ayudante"
   ]
 }
