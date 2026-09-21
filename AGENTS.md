@@ -33,6 +33,10 @@ Reglas TR:
 - `data/tr/names.json` (TR raíz → nombre ES): el motor TR lo usa para marcar `isName`.
   `data/tr/dict.json` es el léxico real (única salida versionada por lote).
 - El motor `js/tr-engine.js` resuelve números y nombres (nunca "sin traducción").
+- Panel de palabra (TR): al tocar una palabra flexionada se explica la **raíz + cadena de
+  sufijos** (`trMorphHtml` en `js/app.js`). Es opt-in: `resolve(word, {morphology:true})` /
+  `segment(text, {morphology:true})` (el gate escanea 473k tokens y no debe analizar de más).
+  `_pickAnalysis` mantiene la selección histórica del motor → los significados no cambian.
 
 ## Arquitectura del feature español (sucinta)
 

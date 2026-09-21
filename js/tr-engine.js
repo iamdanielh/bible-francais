@@ -101,6 +101,16 @@ const TR_VERB_ES = {
   "-(y)ken": "mientras",
 };
 const TR_DERIV_ES = { "-lU": "sufijo relacional (que tiene)" };
+// Suffixes shared by the noun and verb tables: label both readings so the
+// explanation is never wrong for a nominal word («peygamberler» = plural, not
+// 3rd-person plural).
+const TR_AMBIG_ES = {
+  "-lAr": "plural (nombre) / 3ª persona plural (verbo)",
+};
+// Suffixes that betray whether «-lAr» is nominal (case/possessive alongside it)
+// or verbal (a tense/person suffix alongside it).
+const TR_VERB_MARKERS = new Set(Object.keys(TR_VERB_ES).filter((n) => n !== "-lAr"));
+const TR_NOUN_MARKERS = new Set(Object.keys(TR_NOUN_ES).filter((n) => n !== "-lAr"));
 
 // Verbally shared machine: noun "head" suffixes (states from noun_states.yml).
 const TR_NOUN_STATES = {
@@ -533,7 +543,54 @@ export class TrEngine {
     return arr;
   }
 
-  resolve(word, _opts = {}) {
+  _stemMeaning(stem) {
+    const key = normalizeTr(stem);
+    const m = this._index.get(key) || this._index.get(key.replace(/'/g, ""));
+    return Array.isArray(m) && m.length ? m.slice() : null;
+  }
+
+  // Choose the decomposition whose stem the dictionary knows. This preserves the
+  // engine's historical selection (the first analysis in the analyzer's own
+  // order, which is a reliable stem heuristic) so meanings do not change; the
+  // same analysis supplies the morphology shown in the panel. Returns null when
+  // no suffix chain reaches a known stem.
+  _pickAnalysis(analyses, bare) {
+    const valid = (a) => a.chain.length && a.stem !== bare;
+    for (const a of analyses) {
+      if (!valid(a)) continue;
+      const m = this._index.get(normalizeTr(a.stem));
+      if (m && Array.isArray(m) && m.length) return a;
+    }
+    for (const a of analyses) {
+      if (!valid(a)) continue;
+      const m = this._index.get(normalizeTr(a.stem).replace(/'/g, ""));
+      if (m && Array.isArray(m) && m.length) return a;
+    }
+    return null;
+  }
+
+  _morphInfo(a) {
+    const hasVerb = a.chain.some((c) => c.name !== "-lAr" && TR_VERB_MARKERS.has(c.name));
+    const hasNoun = a.chain.some((c) => c.name !== "-lAr" &&
+      (TR_NOUN_MARKERS.has(c.name) || c.name in TR_DERIV_ES));
+    const chain = a.chain.map((c) => ({
+      name: c.name,
+      surface: c.surface,
+      es: c.name === "-lAr"
+        ? (hasVerb && !hasNoun ? "3ª persona plural (verbo)"
+          : hasNoun && !hasVerb ? "plural (nombre)"
+          : TR_AMBIG_ES["-lAr"])
+        : (TR_AMBIG_ES[c.name] || c.es),
+    }));
+    return {
+      root: a.stem,
+      form: trForm(a.stem, chain),
+      suffixes: chain.map((c) => ({ name: c.name, surface: c.surface, es: c.es })),
+      hasMorphology: true,
+    };
+  }
+
+  resolve(word, opts = {}) {
     const w = normalizeTr(word).replace(/’/g, "'");
     const bare = w.replace(/'/g, "");
     if (!bare) return [null, {}];
@@ -558,31 +615,24 @@ export class TrEngine {
       }
       return [null, {}];
     }
-    // A known root wins before any stripping (also handles "Tanrı'nın").
+    // A known root wins before any stripping (also handles "Tanrı'nın"). The
+    // dict now holds every inflected surface form (100% coverage), so a direct
+    // hit would hide the grammar; when the caller asks for morphology (the
+    // single-word panel), decompose it anyway and keep the direct meaning.
     const direct = this.lookup(w) || this.lookup(bare);
-    if (direct) return [direct, { root: bare, form: "", isBare: true, suffixes: [] }];
+    if (direct) {
+      if (opts.morphology) {
+        const best = this._pickAnalysis(analyzeTr(bare), bare);
+        if (best) return [direct, this._morphInfo(best)];
+      }
+      return [direct, { root: bare, form: "", isBare: true, suffixes: [] }];
+    }
     const analyses = analyzeTr(bare);
-    let chosen = analyses[0];
-    let meanings = null;
-    // Prefer a stem that actually exists in the dict (over-stripping happens).
-    for (const a of analyses) {
-      const m = this._index.get(a.stem);
-      if (m) {
-        chosen = a;
-        meanings = Array.isArray(m) && m.length ? m.slice() : null;
-        break;
-      }
-    }
-    if (!meanings) {
-      for (const a of analyses) {
-        const m = this._index.get(a.stem.replace(/'/g, ""));
-        if (m && Array.isArray(m) && m.length) {
-          chosen = a;
-          meanings = m.slice();
-          break;
-        }
-      }
-    }
+    // Prefer the decomposition that reaches a known stem (over-stripping
+    // happens); the same analysis supplies the morphology for the panel.
+    const picked = this._pickAnalysis(analyses, bare);
+    let chosen = picked || analyses[0];
+    let meanings = picked ? this._stemMeaning(picked.stem) : null;
     // Turkish number words/ordinals not present in the real dictionary.
     if (!meanings) {
       const es = trNumberEs(bare);
@@ -606,24 +656,23 @@ export class TrEngine {
           root: a.stem,
           form: "nombre propio",
           suffixes: a.chain.map((c) => ({ name: c.name, surface: c.surface, es: c.es })),
+          hasMorphology: a.chain.length > 0,
         }];
       }
       // Fallback: a capitalized token that is neither a real word nor in the
       // curated name table is a proper name; keep it and flag it as such.
       return [[word], { isName: true, root: bare, form: "nombre propio", suffixes: [] }];
     }
-    const info = {
-      root: chosen.stem,
-      form: trForm(chosen.stem, chosen.chain),
-      suffixes: chosen.chain.map((c) => ({ name: c.name, surface: c.surface, es: c.es })),
-    };
+    const info = chosen.chain.length
+      ? this._morphInfo(chosen)
+      : { root: chosen.stem, form: "", suffixes: [] };
     return [meanings, info];
   }
 
-  segment(text) {
+  segment(text, opts = {}) {
     const out = [];
     const push = (w) => {
-      const [m, info] = this.resolve(w);
+      const [m, info] = this.resolve(w, opts);
       out.push([w, m, info]);
     };
     for (const tok of String(text).split(/\s+/)) {
@@ -653,3 +702,5 @@ export class TrEngine {
     return out;
   }
 }
+
+export { analyzeTr };

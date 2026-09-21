@@ -1,5 +1,5 @@
 import { Dictionary, friendlyTense, friendlyForm, esInfinitive, esConjugado, esCompuesto } from "./dict.js?v=45";
-import { TrEngine } from "./tr-engine.js?v=45";
+import { TrEngine } from "./tr-engine.js?v=46";
 
 // ---- language packs --------------------------------------------------------
 // Every language is a self-contained pack: which data files to fetch, how to
@@ -543,18 +543,20 @@ function closePanel() {
 function presentWord(word, ti, token, sentenceInitial) {
   if (!dictionary) return;
   hideContextTranslation();
-  const [meanings, info] = dictionary.resolve(word, { sentenceInitial });
+  const [meanings, info] = dictionary.resolve(word, { sentenceInitial, morphology: lang === "tr" });
   currentKey = word;
   el.wordLabel.textContent = word;
   openPanel("word");
+  const morphHtml = lang === "tr" ? trMorphHtml(info) : "";
   let grammar = "";
-  if (meanings && (info.form || info.infinitive || info.tense)) {
+  if (!morphHtml && meanings && (info.form || info.infinitive || info.tense)) {
     grammar = plainGloss(info, meanings[0], meanings);
   }
   if (!meanings) {
     if (info.isName) {
       el.meaning.innerHTML = "<span class='dim'>Nombre propio: persona o lugar.</span>";
-      el.grammar.textContent = plainGloss(info, "") || "nombre propio";
+      if (morphHtml) el.grammar.innerHTML = morphHtml;
+      else el.grammar.textContent = plainGloss(info, "") || "nombre propio";
       el.note.textContent = "Selecciona una palabra del texto para ver su significado.";
       el.saveBtn.disabled = true;
       el.speakBtn.disabled = false;
@@ -569,7 +571,8 @@ function presentWord(word, ti, token, sentenceInitial) {
     return;
   }
   el.meaning.innerHTML = "<b>Español:</b>\n" + meanList(meanings.slice(0, 8));
-  el.grammar.textContent = grammar;
+  if (morphHtml) el.grammar.innerHTML = morphHtml;
+  else el.grammar.textContent = grammar;
   el.note.textContent = "";
   el.saveBtn.disabled = false;
   el.speakBtn.disabled = false;
@@ -1743,6 +1746,29 @@ const PERSON_DE = {
   "3sg/1sg": "mí / él / ella",
   "2sg/1sg": "mí / ti"
 };
+// Turkish morphology explanation: shows the root (with its meaning) and every
+// suffix of the chain with its grammatical function, so tapping an inflected
+// word teaches how Turkish builds it instead of only giving the final gloss.
+function trMorphHtml(info) {
+  if (!info || !info.hasMorphology || !info.root) return "";
+  const rootMean = (dictionary && dictionary.lookup(info.root) || [])[0] || "";
+  // suffixes come outermost-first; reverse to show them as they are built.
+  const rows = [...(info.suffixes || [])].reverse().map((s) =>
+    `<li><b>-${esc(s.surface)}</b> <span class="morph-es">${esc(s.es)}</span></li>`
+  ).join("");
+  const head = info.isName
+    ? "Nombre propio con sufijo de caso"
+    : "Palabra formada por sufijos";
+  return `<div class="morph">` +
+    `<div class="morph-head">${esc(head)}</div>` +
+    `<div class="morph-root">Raíz <b>${esc(info.root)}</b>` +
+      (rootMean ? ` <span class="morph-dim">(${esc(rootMean)})</span>` : "") +
+    `</div>` +
+    (rows ? `<ul class="morph-sufs">${rows}</ul>` : "") +
+    `<div class="morph-tip">En turco los sufijos se añaden en cadena al final de la raíz, ajustándose a la armonía vocálica.</div>` +
+  `</div>`;
+}
+
 function plainGloss(info, firstMean, glosses) {
   if (!info) return "";
   const form = info.form ? String(info.form) : "";
@@ -1842,7 +1868,7 @@ function aiContext(selected) {
 
 function localExplain(text) {
   if (!dictionary || !text) return "";
-  const segs = dictionary.segment(text);
+  const segs = dictionary.segment(text, { morphology: lang === "tr" });
   if (!segs || !segs.length) return "";
   return segs.map(([span, meanings, info]) => {
     const ms = (meanings || []).slice(0, 4);
@@ -2141,7 +2167,7 @@ function handleSelection() {
   el.saveBtn.disabled = true;
   const cleaned = text.replace(/\s+/g, " ");
   _ctxQuery = cleaned;
-  const segments = dictionary.segment(cleaned);
+  const segments = dictionary.segment(cleaned, { morphology: lang === "tr" });
   if (segments && segments.length) presentSelection(segments, cleaned);
 }
 
@@ -2243,7 +2269,7 @@ function touchSelectEnd() {
   const spoken = touched.map(w => w.textContent).join(" ").replace(/\s+/g, " ").trim();
   const clean = touched.map(w => w.dataset.word).join(" ").replace(/\s+/g, " ").trim();
   _ctxQuery = clean;
-  const segments = dictionary.segment(clean);
+  const segments = dictionary.segment(clean, { morphology: lang === "tr" });
   if (segments && segments.length) presentSelection(segments, spoken);
   else closePanel();
 }
