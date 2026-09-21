@@ -543,7 +543,8 @@
     "sus manos"
   ],
   "göz": [
-    "ojo"
+    "ojo",
+    "vista"
   ],
   "gözü": [
     "su ojo",
@@ -592,7 +593,8 @@
     "sus pies"
   ],
   "baş": [
-    "cabeza"
+    "cabeza",
+    "principal"
   ],
   "başı": [
     "la cabeza",
@@ -797,7 +799,7 @@
     "necesita"
   ],
   "gel": [
-    "ven"
+    "venir"
   ],
   "çağır": [
     "llamar"
@@ -863,10 +865,12 @@
     "pero"
   ],
   "fakat": [
-    "pero"
+    "pero",
+    "mas"
   ],
   "çünkü": [
-    "porque"
+    "porque",
+    "ya que"
   ],
   "olarak": [
     "como",
@@ -894,28 +898,34 @@
     "desde ; desde hace"
   ],
   "arasında": [
-    "entre ; en medio de"
+    "entre",
+    "en medio de"
   ],
   "içinde": [
-    "dentro de ; en"
+    "dentro de",
+    "en"
   ],
   "üzerinde": [
     "sobre ; encima de ; acerca de"
   ],
   "altında": [
-    "debajo de ; bajo"
+    "bajo",
+    "debajo de"
   ],
   "yanında": [
-    "junto a ; al lado de"
+    "junto a",
+    "al lado de"
   ],
   "önünde": [
-    "delante de ; ante"
+    "delante de",
+    "en frente de"
   ],
   "arkasında": [
     "detrás de"
   ],
   "çok": [
-    "mucho"
+    "mucho",
+    "muy"
   ],
   "az": [
     "poco"
@@ -961,8 +971,8 @@
     "nuevo"
   ],
   "eski": [
-    "viejo",
-    "antiguo"
+    "antiguo",
+    "viejo"
   ],
   "uzun": [
     "largo"
@@ -982,7 +992,9 @@
     "entero"
   ],
   "ancak": [
-    "pero"
+    "solo",
+    "pero",
+    "solamente"
   ],
   "daha": [
     "más"
@@ -1480,7 +1492,7 @@
   ],
   "güven": [
     "confianza",
-    "seguridad"
+    "confiar"
   ],
   "güveni": [
     "la confianza",
@@ -1994,7 +2006,8 @@
     "los ejércitos"
   ],
   "savaş": [
-    "guerra"
+    "guerra",
+    "batalla"
   ],
   "savaşı": [
     "la guerra",
@@ -2047,8 +2060,7 @@
     "flecha"
   ],
   "oku": [
-    "la flecha",
-    "su flecha"
+    "leer"
   ],
   "oklar": [
     "las flechas"
@@ -2296,7 +2308,9 @@
     "de él ; de ella ; su"
   ],
   "onları": [
-    "a ellos ; a ellas"
+    "los",
+    "las",
+    "aquellos"
   ],
   "onların": [
     "de ellos ; de ellas"
@@ -2335,7 +2349,7 @@
     "de esto"
   ],
   "bunları": [
-    "a estos"
+    "estas cosas"
   ],
   "bunların": [
     "de estos"
@@ -2431,7 +2445,8 @@
     "él mismo ; ella misma ; sí mismo"
   ],
   "kendilerini": [
-    "a sí mismos ; a sí mismas"
+    "a sí mismos",
+    "ellos mismos"
   ],
   "kendileri": [
     "ellos mismos ; ellas mismas"
@@ -2449,25 +2464,28 @@
     "de eso ; de aquello"
   ],
   "şunları": [
-    "esos ; esas ; estas cosas"
+    "estas cosas",
+    "aquellas"
   ],
   "şunlar": [
     "esos ; esas ; aquellos"
   ],
   "hangi": [
-    "cuál ; cuáles ; cuál de"
+    "cuál",
+    "cuáles"
   ],
   "hangisi": [
     "cuál de ellos ; cuál ; cuáles"
   ],
   "kimi": [
-    "a quién ; a algunos ; a algunos"
+    "a quién",
+    "a algunos"
   ],
   "kim": [
     "quién"
   ],
   "kimin": [
-    "de quién ; de quiénes"
+    "de quién"
   ],
   "kime": [
     "a quién"
@@ -2485,7 +2503,7 @@
     "ningún ; ninguno"
   ],
   "hiçbiri": [
-    "ninguno de ; ninguno"
+    "ninguno"
   ],
   "hiçbirini": [
     "a ninguno ; a ninguno de"
@@ -2524,7 +2542,7 @@
     "único"
   ],
   "çoğu": [
-    "la mayoría ; muchos"
+    "la mayoría"
   ],
   "çoğunu": [
     "la mayoría de ; a la mayoría"
@@ -2692,7 +2710,8 @@
     "de debajo de ; desde debajo"
   ],
   "üstünde": [
-    "sobre ; encima de"
+    "encima de",
+    "sobre"
   ],
   "üstüne": [
     "sobre ; encima de"
@@ -2758,7 +2777,8 @@
     "cerca ; cercano"
   ],
   "yakında": [
-    "cerca ; pronto"
+    "cerca",
+    "pronto"
   ],
   "yakınında": [
     "cerca de ; junto a"
@@ -2770,7 +2790,7 @@
     "lejos"
   ],
   "uzakta": [
-    "lejos ; a lo lejos"
+    "lejos"
   ],
   "uzaktan": [
     "de lejos"
@@ -2800,7 +2820,8 @@
     "enteramente ; por completo"
   ],
   "hepsi": [
-    "todo ; todos ; la totalidad"
+    "todos",
+    "todo ello"
   ],
   "hepsini": [
     "todo ; a todos ; todos"
@@ -2872,7 +2893,8 @@
     "algunos ; unos"
   ],
   "bazıları": [
-    "algunos ; algunos de ellos"
+    "algunos",
+    "unos"
   ],
   "bazılarını": [
     "a algunos ; a algunos de ellos"
@@ -3367,7 +3389,8 @@
     "seguro ; fiel"
   ],
   "bununla": [
-    "con esto"
+    "con esto",
+    "con ello"
   ],
   "bunlardan": [
     "de estos"
@@ -3391,13 +3414,13 @@
     "allá ; hacia allá"
   ],
   "nerede": [
-    "dónde ; en dónde"
+    "dónde"
   ],
   "nereden": [
-    "de dónde ; desde dónde"
+    "de dónde"
   ],
   "nereye": [
-    "adónde ; hacia dónde"
+    "a dónde"
   ],
   "burad": [
     "aquí ; este lugar"
@@ -3424,7 +3447,8 @@
     "así ; de esa manera"
   ],
   "böylece": [
-    "así ; de este modo"
+    "así",
+    "de este modo"
   ],
   "öyleyse": [
     "entonces ; si es así"
@@ -3436,7 +3460,8 @@
     "que ; para que ; el cual"
   ],
   "nasıl": [
-    "cómo ; de qué manera"
+    "cómo",
+    "de qué manera"
   ],
   "niçin": [
     "por qué ; para qué"
@@ -3475,7 +3500,8 @@
     "nada"
   ],
   "azı": [
-    "poco ; una parte"
+    "poco",
+    "una pequeña parte"
   ],
   "biraz": [
     "un poco ; algo"
@@ -3520,13 +3546,15 @@
     "además ; encima"
   ],
   "ayrıca": [
-    "además"
+    "además",
+    "por otra parte"
   ],
   "lakin": [
     "pero ; sin embargo"
   ],
   "oysa": [
-    "mientras que"
+    "mientras que",
+    "sin embargo"
   ],
   "buna rağmen": [
     "a pesar de esto"
@@ -3562,7 +3590,8 @@
     "de repente"
   ],
   "birden": [
-    "de repente"
+    "de repente",
+    "de pronto"
   ],
   "yahve": [
     "Yahve ; el Señor"
@@ -3705,9 +3734,9 @@
     "un"
   ],
   "biri": [
-    "alguien",
+    "alguno",
     "uno",
-    "alguno"
+    "alguien"
   ],
   "birini": [
     "a alguien",
@@ -3931,8 +3960,8 @@
     "mediante"
   ],
   "boyunca": [
-    "durante",
-    "a lo largo de"
+    "a lo largo de",
+    "durante"
   ],
   "üzere": [
     "para",
@@ -4275,7 +4304,7 @@
     "es como"
   ],
   "git": [
-    "ve"
+    "ir"
   ],
   "geliyor": [
     "viene"
@@ -4634,8 +4663,8 @@
     "qué es"
   ],
   "iç": [
-    "interior",
-    "dentro"
+    "beber",
+    "interior"
   ],
   "içindir": [
     "es para",
@@ -5157,6 +5186,7 @@
     "permanecerá"
   ],
   "aç": [
+    "abrir",
     "hambriento"
   ],
   "ihtiyar": [
@@ -5407,8 +5437,7 @@
     "pasó"
   ],
   "çevresinde": [
-    "alrededor de",
-    "en torno a"
+    "alrededor de"
   ],
   "uyarınca": [
     "según",
@@ -5739,8 +5768,7 @@
     "desnudo"
   ],
   "yaz": [
-    "escribe",
-    "verano"
+    "escribir"
   ],
   "ayrıldı": [
     "se separó",
@@ -6545,7 +6573,7 @@
   ],
   "yaşlı": [
     "anciano",
-    "mayor"
+    "viejo"
   ],
   "vakti": [
     "su tiempo",
@@ -7195,7 +7223,7 @@
     "lo que amó"
   ],
   "ye": [
-    "come"
+    "comer"
   ],
   "dokundu": [
     "tocó"
@@ -7378,8 +7406,8 @@
     "rebelde"
   ],
   "duy": [
-    "oye",
-    "escucha"
+    "oír",
+    "sentir"
   ],
   "çıkarır": [
     "saca",
@@ -7946,7 +7974,8 @@
     "da igual"
   ],
   "zor": [
-    "difícil"
+    "difícil",
+    "duro"
   ],
   "iyileştirdi": [
     "sanó",
@@ -9584,5 +9613,900 @@
   ],
   "Benyamin'in": [
     "de Benjamín"
+  ],
+  "ara": [
+    "buscar",
+    "espacio",
+    "entre"
+  ],
+  "üzer": [
+    "sobre",
+    "encima"
+  ],
+  "put": [
+    "ídolo"
+  ],
+  "yapma": [
+    "el hacer"
+  ],
+  "gördük": [
+    "vimos",
+    "hemos visto"
+  ],
+  "taraf": [
+    "lado",
+    "parte",
+    "partido"
+  ],
+  "bölge": [
+    "región",
+    "zona"
+  ],
+  "uç": [
+    "punta",
+    "extremo"
+  ],
+  "dost": [
+    "amigo"
+  ],
+  "perde": [
+    "cortina",
+    "velo"
+  ],
+  "oda": [
+    "habitación",
+    "cámara"
+  ],
+  "deri": [
+    "piel",
+    "cuero"
+  ],
+  "mezar": [
+    "tumba",
+    "sepulcro"
+  ],
+  "ölçü": [
+    "medida"
+  ],
+  "çevre": [
+    "alrededor",
+    "entorno"
+  ],
+  "ağz": [
+    "boca"
+  ],
+  "dedik": [
+    "dijimos"
+  ],
+  "aldık": [
+    "tomamos",
+    "recibimos"
+  ],
+  "ip": [
+    "cuerda",
+    "soga"
+  ],
+  "yara": [
+    "herida",
+    "llaga"
+  ],
+  "ayrıl": [
+    "separarse",
+    "partirse"
+  ],
+  "geldik": [
+    "vinimos",
+    "llegamos"
+  ],
+  "saç": [
+    "cabello",
+    "cabellera"
+  ],
+  "direk": [
+    "columna",
+    "poste"
+  ],
+  "duyur": [
+    "anunciar",
+    "proclamar"
+  ],
+  "kâse": [
+    "cuenco",
+    "tazón"
+  ],
+  "çıktık": [
+    "salimos"
+  ],
+  "iğrençlik": [
+    "abominación"
+  ],
+  "köşe": [
+    "esquina",
+    "rincón"
+  ],
+  "sokak": [
+    "calle"
+  ],
+  "kork": [
+    "temer"
+  ],
+  "dilek": [
+    "deseo",
+    "ruego"
+  ],
+  "zincir": [
+    "cadena"
+  ],
+  "gurur": [
+    "orgullo"
+  ],
+  "koca": [
+    "esposo",
+    "marido",
+    "grande"
+  ],
+  "birlik": [
+    "unión",
+    "unidad"
+  ],
+  "konuşma": [
+    "conversación",
+    "discurso",
+    "el hablar"
+  ],
+  "önder": [
+    "líder",
+    "guía"
+  ],
+  "öldür": [
+    "matar"
+  ],
+  "yaka": [
+    "costado",
+    "cuello"
+  ],
+  "yak": [
+    "quemar",
+    "arder"
+  ],
+  "levha": [
+    "lámina",
+    "placa",
+    "tabla"
+  ],
+  "köy": [
+    "aldea",
+    "pueblo"
+  ],
+  "saray": [
+    "palacio"
+  ],
+  "arka": [
+    "espalda",
+    "parte trasera"
+  ],
+  "bildik": [
+    "sabíamos",
+    "conocíamos"
+  ],
+  "başlangıç": [
+    "principio",
+    "comienzo"
+  ],
+  "kitap": [
+    "libro"
+  ],
+  "temel": [
+    "fundamento",
+    "cimiento"
+  ],
+  "akraba": [
+    "pariente",
+    "familiares"
+  ],
+  "havra": [
+    "sinagoga"
+  ],
+  "ödül": [
+    "premio",
+    "galardón"
+  ],
+  "pınar": [
+    "manantial",
+    "fuente"
+  ],
+  "dudak": [
+    "labio"
+  ],
+  "asker": [
+    "soldado",
+    "ejército"
+  ],
+  "orman": [
+    "bosque"
+  ],
+  "buyur": [
+    "ordenar",
+    "mandar"
+  ],
+  "çal": [
+    "tocar",
+    "robar"
+  ],
+  "yeme": [
+    "comida",
+    "el comer"
+  ],
+  "dal": [
+    "rama"
+  ],
+  "komşu": [
+    "prójimo",
+    "vecino"
+  ],
+  "etraf": [
+    "alrededor",
+    "entorno"
+  ],
+  "çerçeve": [
+    "marco"
+  ],
+  "çokluk": [
+    "multitud",
+    "abundancia"
+  ],
+  "bul": [
+    "encontrar",
+    "hallar"
+  ],
+  "sofra": [
+    "mesa",
+    "banquete"
+  ],
+  "yaratık": [
+    "criatura"
+  ],
+  "orta": [
+    "medio",
+    "centro"
+  ],
+  "gençlik": [
+    "juventud"
+  ],
+  "kule": [
+    "torre"
+  ],
+  "deve": [
+    "camello"
+  ],
+  "yücelt": [
+    "ensalzar",
+    "exaltar"
+  ],
+  "arkadaş": [
+    "amigo",
+    "compañero"
+  ],
+  "unut": [
+    "olvidar"
+  ],
+  "yaşadık": [
+    "vivimos"
+  ],
+  "kor": [
+    "brasa",
+    "rescoldo"
+  ],
+  "büyüklük": [
+    "grandeza"
+  ],
+  "ücret": [
+    "paga",
+    "salario"
+  ],
+  "parmak": [
+    "dedo"
+  ],
+  "işçi": [
+    "obrero"
+  ],
+  "hâkim": [
+    "juez"
+  ],
+  "giriş": [
+    "entrada"
+  ],
+  "kurtul": [
+    "salvarse",
+    "escapar"
+  ],
+  "seçtik": [
+    "elegimos"
+  ],
+  "boyunduruk": [
+    "yugo"
+  ],
+  "amaç": [
+    "meta",
+    "propósito"
+  ],
+  "yazı": [
+    "escritura"
+  ],
+  "tüccar": [
+    "comerciante"
+  ],
+  "kurt": [
+    "lobo"
+  ],
+  "güzellik": [
+    "belleza"
+  ],
+  "kilise": [
+    "iglesia"
+  ],
+  "din": [
+    "religión",
+    "fe"
+  ],
+  "kirlilik": [
+    "inmundicia",
+    "suciedad"
+  ],
+  "bekçi": [
+    "guardián",
+    "vigilante"
+  ],
+  "ağırlık": [
+    "peso"
+  ],
+  "sırt": [
+    "espalda",
+    "lomo"
+  ],
+  "dava": [
+    "causa",
+    "pleito"
+  ],
+  "an": [
+    "instante",
+    "momento"
+  ],
+  "güçlen": [
+    "fortalecerse"
+  ],
+  "gelme": [
+    "venida",
+    "llegada"
+  ],
+  "yönetici": [
+    "administrador",
+    "gobernante"
+  ],
+  "canavar": [
+    "monstruo",
+    "fiera"
+  ],
+  "ölme": [
+    "muerte",
+    "el morir"
+  ],
+  "akıl": [
+    "mente",
+    "entendimiento"
+  ],
+  "geliş": [
+    "venida",
+    "llegada"
+  ],
+  "kirlet": [
+    "ensuciar",
+    "contaminar"
+  ],
+  "tekerlek": [
+    "rueda"
+  ],
+  "kazanç": [
+    "ganancia",
+    "provecho"
+  ],
+  "masa": [
+    "mesa"
+  ],
+  "ahlaksızlık": [
+    "inmoralidad",
+    "impiedad"
+  ],
+  "kuyu": [
+    "pozo",
+    "cisterna"
+  ],
+  "baharat": [
+    "especias",
+    "aromáticos"
+  ],
+  "onur": [
+    "honor"
+  ],
+  "mesken": [
+    "morada",
+    "habitación"
+  ],
+  "ada": [
+    "isla"
+  ],
+  "bereket": [
+    "bendición",
+    "abundancia"
+  ],
+  "dol": [
+    "llenarse"
+  ],
+  "ist": [
+    "querer",
+    "pedir"
+  ],
+  "yık": [
+    "derribar",
+    "destruir"
+  ],
+  "bel": [
+    "cintura",
+    "lomo"
+  ],
+  "davar": [
+    "ganado",
+    "rebaño"
+  ],
+  "eşya": [
+    "objetos",
+    "enseres"
+  ],
+  "köpek": [
+    "perro"
+  ],
+  "dik": [
+    "vertical",
+    "erguido"
+  ],
+  "meshet": [
+    "ungir"
+  ],
+  "akılsızlık": [
+    "insensatez",
+    "necedad"
+  ],
+  "bağış": [
+    "don",
+    "dádiva",
+    "perdón"
+  ],
+  "öğretmen": [
+    "maestro"
+  ],
+  "öğreti": [
+    "enseñanza",
+    "doctrina"
+  ],
+  "zindan": [
+    "prisión",
+    "cárcel"
+  ],
+  "ölen": [
+    "el que muere",
+    "difunto"
+  ],
+  "benlik": [
+    "el yo",
+    "ser"
+  ],
+  "gökyüz": [
+    "cielo"
+  ],
+  "kenar": [
+    "borde",
+    "orilla"
+  ],
+  "hatır": [
+    "memoria",
+    "recuerdo"
+  ],
+  "uzaklaş": [
+    "alejarse"
+  ],
+  "mağara": [
+    "cueva",
+    "caverna"
+  ],
+  "görme": [
+    "visión",
+    "el ver"
+  ],
+  "art": [
+    "aumentar",
+    "sobrar"
+  ],
+  "takım": [
+    "equipo",
+    "conjunto",
+    "utensilios"
+  ],
+  "ceset": [
+    "cadáver"
+  ],
+  "uyan": [
+    "despertar"
+  ],
+  "kurtarış": [
+    "salvación",
+    "liberación"
+  ],
+  "kudret": [
+    "poder",
+    "fortaleza"
+  ],
+  "azar": [
+    "reprimenda",
+    "regaño"
+  ],
+  "sırık": [
+    "vara",
+    "palo largo"
+  ],
+  "hükm": [
+    "juicio",
+    "sentencia",
+    "dominio"
+  ],
+  "dağıt": [
+    "repartir",
+    "esparcir"
+  ],
+  "kutsan": [
+    "ser bendecido"
+  ],
+  "girer": [
+    "entra"
+  ],
+  "kiriş": [
+    "viga",
+    "trabe"
+  ],
+  "sor": [
+    "preguntar",
+    "inquirir"
+  ],
+  "sır": [
+    "secreto",
+    "misterio"
+  ],
+  "dolaş": [
+    "vagar",
+    "pasear"
+  ],
+  "alçalt": [
+    "humillar",
+    "bajar"
+  ],
+  "mesele": [
+    "asunto",
+    "cuestión"
+  ],
+  "ceza": [
+    "castigo",
+    "pena"
+  ],
+  "yatar": [
+    "se acuesta",
+    "yace"
+  ],
+  "efod": [
+    "efod"
+  ],
+  "giy": [
+    "ponerse",
+    "vestirse"
+  ],
+  "tasar": [
+    "proyectar",
+    "diseñar"
+  ],
+  "çekiyor": [
+    "tira",
+    "está tirando"
+  ],
+  "vicdan": [
+    "conciencia"
+  ],
+  "kum": [
+    "arena"
+  ],
+  "çarık": [
+    "sandalia"
+  ],
+  "peş": [
+    "parte trasera",
+    "persecución"
+  ],
+  "yolculuk": [
+    "viaje"
+  ],
+  "diş": [
+    "diente"
+  ],
+  "başlık": [
+    "cabecera",
+    "coronamiento"
+  ],
+  "nere": [
+    "dónde"
+  ],
+  "şiddet": [
+    "violencia",
+    "fuerza"
+  ],
+  "çamur": [
+    "barro",
+    "lodo"
+  ],
+  "kütük": [
+    "tronco",
+    "madero"
+  ],
+  "çarmıh": [
+    "la cruz"
+  ],
+  "aracılık": [
+    "mediación",
+    "intercesión"
+  ],
+  "kova": [
+    "cubo"
+  ],
+  "yeter": [
+    "basta",
+    "es suficiente"
+  ],
+  "tekne": [
+    "barco",
+    "embarcación"
+  ],
+  "şamdan": [
+    "candelabro",
+    "candelero"
+  ],
+  "özdeyiş": [
+    "proverbio",
+    "sentencia"
+  ],
+  "üye": [
+    "miembro"
+  ],
+  "boşluk": [
+    "vacío",
+    "hueco"
+  ],
+  "birbir": [
+    "el uno al otro",
+    "entre sí"
+  ],
+  "sütun": [
+    "columna",
+    "pilar"
+  ],
+  "ambar": [
+    "granero",
+    "almacén"
+  ],
+  "kil": [
+    "arcilla"
+  ],
+  "tomar": [
+    "rollo",
+    "volumen"
+  ],
+  "kanat": [
+    "ala"
+  ],
+  "aldat": [
+    "engañar"
+  ],
+  "kaynak": [
+    "fuente",
+    "manantial"
+  ],
+  "indir": [
+    "bajar",
+    "hacer descender"
+  ],
+  "halka": [
+    "anillo",
+    "círculo"
+  ],
+  "davran": [
+    "comportarse",
+    "actuar"
+  ],
+  "döndür": [
+    "hacer volver",
+    "devolver"
+  ],
+  "uyar": [
+    "advertir",
+    "según"
+  ],
+  "meme": [
+    "pecho",
+    "seno"
+  ],
+  "leğen": [
+    "palangana",
+    "lebrillo"
+  ],
+  "kutsallık": [
+    "santidad"
+  ],
+  "seç": [
+    "elegir",
+    "escoger"
+  ],
+  "akıntı": [
+    "corriente"
+  ],
+  "kusur": [
+    "defecto",
+    "falta"
+  ],
+  "ondalık": [
+    "diezmo"
+  ],
+  "ilah": [
+    "dios",
+    "divinidad"
+  ],
+  "kur": [
+    "fundar",
+    "establecer"
+  ],
+  "yakarış": [
+    "súplica",
+    "oración"
+  ],
+  "pislik": [
+    "suciedad",
+    "inmundicia"
+  ],
+  "tane": [
+    "grano"
+  ],
+  "kısm": [
+    "parte"
+  ],
+  "savaşma": [
+    "el luchar",
+    "el pelear"
+  ],
+  "kıvılcım": [
+    "chispa"
+  ],
+  "danış": [
+    "consultar",
+    "aconsejarse"
+  ],
+  "danışman": [
+    "consejero"
+  ],
+  "genişlik": [
+    "anchura"
+  ],
+  "dirilt": [
+    "resucitar",
+    "dar vida"
+  ],
+  "tutku": [
+    "pasión",
+    "anhelo"
+  ],
+  "işleme": [
+    "obra",
+    "labor",
+    "el hacer"
+  ],
+  "çenk": [
+    "arpa"
+  ],
+  "çalan": [
+    "el que toca",
+    "el que roba"
+  ],
+  "alet": [
+    "instrumento",
+    "herramienta"
+  ],
+  "testi": [
+    "jarra",
+    "cántaro"
+  ],
+  "sancı": [
+    "dolor",
+    "dolores de parto"
+  ],
+  "gedik": [
+    "brecha",
+    "portillo"
+  ],
+  "veril": [
+    "ser dado",
+    "darse"
+  ],
+  "dağıl": [
+    "dispersarse",
+    "dispersar"
+  ],
+  "yazdır": [
+    "hacer escribir"
+  ],
+  "anla": [
+    "entender",
+    "comprender"
+  ],
+  "gözle": [
+    "observar",
+    "vigilar"
+  ],
+  "sürpriz": [
+    "sorpresa"
+  ],
+  "öl": [
+    "morir"
+  ],
+  "kapat": [
+    "cerrar"
+  ],
+  "sessizce": [
+    "silenciosamente"
+  ],
+  "usulca": [
+    "suavemente",
+    "quedito"
+  ],
+  "belki": [
+    "quizá",
+    "tal vez"
+  ],
+  "madem": [
+    "ya que",
+    "puesto que"
+  ],
+  "oysaki": [
+    "mientras que",
+    "pero"
+  ],
+  "ileride": [
+    "delante",
+    "más adelante"
+  ],
+  "geride": [
+    "atrás",
+    "detrás"
+  ],
+  "dışarıda": [
+    "afuera",
+    "fuera"
+  ],
+  "içeride": [
+    "adentro",
+    "dentro"
+  ],
+  "karşıda": [
+    "enfrente",
+    "al frente"
+  ],
+  "arkada": [
+    "detrás",
+    "atrás"
+  ],
+  "kimden": [
+    "de quién"
   ]
 }
