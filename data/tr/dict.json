@@ -20291,5 +20291,516 @@
   "kabule": [
     "a la aceptación",
     "aceptable"
+  ],
+  "miydi": [
+    "era"
+  ],
+  "mıydı": [
+    "era"
+  ],
+  "alındığı": [
+    "de donde fue tomado",
+    "al ser tomado"
+  ],
+  "mısınız": [
+    "sois",
+    "estáis"
+  ],
+  "mıdır": [
+    "es"
+  ],
+  "işlettirdiği": [
+    "que hizo cometer",
+    "que hizo pecar"
+  ],
+  "miyiz": [
+    "somos",
+    "estamos"
+  ],
+  "isen": [
+    "si eres",
+    "si estás"
+  ],
+  "mudur": [
+    "es"
+  ],
+  "atanmış": [
+    "nombrado",
+    "designado",
+    "asignado"
+  ],
+  "yaptıysam": [
+    "si he hecho"
+  ],
+  "biten": [
+    "que crece",
+    "que termina"
+  ],
+  "olduysa": [
+    "si sucedió",
+    "si pasó"
+  ],
+  "etmemişse": [
+    "si no ha hecho"
+  ],
+  "muyuz": [
+    "somos",
+    "estamos"
+  ],
+  "geldiyse": [
+    "si vino",
+    "si llegó"
+  ],
+  "muydu": [
+    "era"
+  ],
+  "muyum": [
+    "soy",
+    "estoy"
+  ],
+  "yazıcıydı": [
+    "era escriba"
+  ],
+  "kaldırılmamıştı": [
+    "no había sido quitado",
+    "no había sido abolido"
+  ],
+  "işlettiren": [
+    "que hizo cometer",
+    "que hizo pecar"
+  ],
+  "sağlık": [
+    "salud",
+    "sanidad"
+  ],
+  "lütufkârdır": [
+    "es bondadoso",
+    "es misericordioso"
+  ],
+  "bağlıdır": [
+    "está atado",
+    "está ligado"
+  ],
+  "çöker": [
+    "se derrumba",
+    "cae"
+  ],
+  "edilmez": [
+    "no es",
+    "no se hace"
+  ],
+  "günahkâra": [
+    "al pecador"
+  ],
+  "yaran": [
+    "que parte",
+    "que hiende"
+  ],
+  "sarhoşluk": [
+    "embriaguez",
+    "borrachera"
+  ],
+  "arayalım": [
+    "busquemos"
+  ],
+  "uyuyanların": [
+    "de los que duermen"
+  ],
+  "temizleyin": [
+    "limpiad",
+    "limpien"
+  ],
+  "kurulacak": [
+    "será establecido",
+    "será fundado"
+  ],
+  "bağcı": [
+    "viñador",
+    "viñatero"
+  ],
+  "kayalık": [
+    "peñasco",
+    "rocoso",
+    "peñón"
+  ],
+  "yönetecek": [
+    "gobernará",
+    "regirá"
+  ],
+  "oturulmayacak": [
+    "no será habitado"
+  ],
+  "duymasınlar": [
+    "que no oigan"
+  ],
+  "kararlaştırıldı": [
+    "fue decidido",
+    "fue decretado"
+  ],
+  "leopar": [
+    "leopardo"
+  ],
+  "yağmalayacaklar": [
+    "saquearán",
+    "despojarán"
+  ],
+  "süpüreceğim": [
+    "barreré"
+  ],
+  "düşündüğüm": [
+    "que pienso",
+    "lo que pienso"
+  ],
+  "söylenecek": [
+    "será cantado",
+    "será dicho"
+  ],
+  "bağışlanmayacaktır": [
+    "no será perdonado"
+  ],
+  "bağışlanacak": [
+    "será perdonado"
+  ],
+  "çalınacak": [
+    "será tocado",
+    "sonará"
+  ],
+  "pis": [
+    "sucio",
+    "inmundo"
+  ],
+  "konuşman": [
+    "tu hablar",
+    "tu palabra"
+  ],
+  "savrulan": [
+    "que es aventado",
+    "esparcido"
+  ],
+  "gerecek": [
+    "estirará",
+    "tensará"
+  ],
+  "batacak": [
+    "se clavará",
+    "se hundirá"
+  ],
+  "iyileştiğini": [
+    "que sanó",
+    "que se recuperó"
+  ],
+  "solar": [
+    "se marchita"
+  ],
+  "yayan": [
+    "que extiende",
+    "que difunde"
+  ],
+  "düşünmeyin": [
+    "no penséis",
+    "no piensen"
+  ],
+  "yüceltileceğim": [
+    "seré glorificado"
+  ],
+  "dağılacak": [
+    "se dispersará",
+    "se disipará"
+  ],
+  "dikmek": [
+    "plantar",
+    "erigir"
+  ],
+  "tanıyan": [
+    "que conoce"
+  ],
+  "kirletmemek": [
+    "no contaminar",
+    "no profanar"
+  ],
+  "parıltı": [
+    "destello",
+    "resplandor"
+  ],
+  "düzeltin": [
+    "corregid",
+    "enmendad"
+  ],
+  "geçmiyor": [
+    "no pasa",
+    "no pasa de largo"
+  ],
+  "koptu": [
+    "se rompió",
+    "se arrancó"
+  ],
+  "getirerek": [
+    "trayendo"
+  ],
+  "lanetlik": [
+    "maldito",
+    "objeto de maldición"
+  ],
+  "yıkılmayacak": [
+    "no será derribado"
+  ],
+  "tutuklayıp": [
+    "arrestó",
+    "apresó"
+  ],
+  "hayvansız": [
+    "sin animales",
+    "sin ganado"
+  ],
+  "bölüp": [
+    "cortando",
+    "partiendo"
+  ],
+  "sürükleyip": [
+    "arrastrando",
+    "llevando"
+  ],
+  "benzeteyim": [
+    "compare",
+    "asemeje"
+  ],
+  "ışıldayan": [
+    "resplandeciente",
+    "relampagueante"
+  ],
+  "dinlesinler": [
+    "que oigan",
+    "que escuchen"
+  ],
+  "yırtıp": [
+    "rasgando",
+    "rompiendo"
+  ],
+  "lekelenmesin": [
+    "no sea manchado",
+    "no sea profanado"
+  ],
+  "anılır": [
+    "es recordado",
+    "se menciona"
+  ],
+  "cilalandı": [
+    "fue afilado",
+    "fue pulido"
+  ],
+  "denizciler": [
+    "marineros"
+  ],
+  "balıkçılar": [
+    "pescadores"
+  ],
+  "heykel": [
+    "estatua",
+    "ídolo"
+  ],
+  "şükretti": [
+    "dio gracias"
+  ],
+  "bilgisizlik": [
+    "ignorancia",
+    "falta de conocimiento"
+  ],
+  "hâkimiyet": [
+    "señorío",
+    "dominio"
+  ],
+  "boğdu": [
+    "estranguló",
+    "ahogó"
+  ],
+  "sınayın": [
+    "probéis",
+    "poned a prueba"
+  ],
+  "toplayarak": [
+    "reuniendo",
+    "recogiendo"
+  ],
+  "öğretip": [
+    "enseñando",
+    "instruyendo"
+  ],
+  "yapmayan": [
+    "que no hace"
+  ],
+  "kanaması": [
+    "su hemorragia",
+    "su flujo"
+  ],
+  "maruz": [
+    "expuesto a",
+    "sujeto a"
+  ],
+  "suçlamak": [
+    "acusar",
+    "culpar"
+  ],
+  "deliceleri": [
+    "la cizaña"
+  ],
+  "atılan": [
+    "que es echado",
+    "que es arrojado"
+  ],
+  "şüphe": [
+    "duda"
+  ],
+  "kaybederse": [
+    "si pierde"
+  ],
+  "imansız": [
+    "sin fe",
+    "incrédulo"
+  ],
+  "satılıp": [
+    "siendo vendido"
+  ],
+  "mümkündür": [
+    "es posible"
+  ],
+  "öğütleştiler": [
+    "conspiraron",
+    "deliberaron"
+  ],
+  "uzmanı": [
+    "su experto",
+    "el especialista"
+  ],
+  "bağışlanması": [
+    "su perdón",
+    "el perdón"
+  ],
+  "çözmeye": [
+    "a desatar",
+    "a resolver"
+  ],
+  "toplanmıştı": [
+    "se había reunido"
+  ],
+  "etmemelerini": [
+    "que no hagan",
+    "no hacer"
+  ],
+  "reddedilmesi": [
+    "su rechazo",
+    "ser rechazado"
+  ],
+  "azarlayarak": [
+    "reprendiendo",
+    "regañando"
+  ],
+  "dilersek": [
+    "si deseamos",
+    "si queremos"
+  ],
+  "büyüyor": [
+    "crece",
+    "crecía"
+  ],
+  "yazıldığı": [
+    "como está escrito",
+    "donde está escrito"
+  ],
+  "yaklaşırken": [
+    "al acercarse",
+    "mientras se acerca"
+  ],
+  "sefahat": [
+    "disipación",
+    "desenfreno"
+  ],
+  "stadia": [
+    "estadios"
+  ],
+  "mührünü": [
+    "su sello"
+  ],
+  "şimdidir": [
+    "es ahora"
+  ],
+  "öyleyim": [
+    "soy así",
+    "soy yo"
+  ],
+  "göğsüne": [
+    "sobre su pecho",
+    "a su pecho"
+  ],
+  "sevmeyen": [
+    "que no ama"
+  ],
+  "kanıtlanmış": [
+    "comprobado",
+    "demostrado"
+  ],
+  "kararlılıkla": [
+    "con constancia",
+    "con firmeza"
+  ],
+  "çağırtıp": [
+    "hizo llamar",
+    "mandó llamar"
+  ],
+  "sürüklediler": [
+    "arrastraron"
+  ],
+  "anlayınca": [
+    "al comprender",
+    "cuando entendió"
+  ],
+  "yargılıyorsun": [
+    "juzgas"
+  ],
+  "mahkûmiyet": [
+    "condenación",
+    "culpabilidad"
+  ],
+  "öpüşle": [
+    "con beso"
+  ],
+  "selamlıyor": [
+    "saluda"
+  ],
+  "bölünmeler": [
+    "divisiones",
+    "escisiones"
+  ],
+  "açgözlü": [
+    "codicioso",
+    "avaro"
+  ],
+  "olmuyor": [
+    "no es",
+    "no se hace"
+  ],
+  "diriltilir": [
+    "es resucitado"
+  ],
+  "barıştırdı": [
+    "reconcilió"
+  ],
+  "övüneceğim": [
+    "me jactaré",
+    "me gloriaré"
+  ],
+  "mahva": [
+    "a la destrucción",
+    "a la ruina"
+  ],
+  "yetkin": [
+    "perfecto",
+    "maduro"
+  ],
+  "ayık": [
+    "sobrio",
+    "despierto"
+  ],
+  "sevelim": [
+    "amemos"
   ]
 }
