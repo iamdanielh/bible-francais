@@ -563,7 +563,10 @@
     "la boca"
   ],
   "yüz": [
-    "cara ; faz"
+    "cien",
+    "ciento",
+    "cara",
+    "faz"
   ],
   "yüzü": [
     "su rostro",
@@ -2281,7 +2284,7 @@
     "al precipicio"
   ],
   "on": [
-    "él ; ella ; eso"
+    "diez"
   ],
   "onu": [
     "a él ; a ella ; lo"
@@ -3695,5 +3698,820 @@
   ],
   "kez": [
     "la vez"
+  ],
+  "bir": [
+    "uno",
+    "una",
+    "un"
+  ],
+  "biri": [
+    "alguien",
+    "uno",
+    "alguno"
+  ],
+  "birini": [
+    "a alguien",
+    "a uno"
+  ],
+  "iki": [
+    "dos"
+  ],
+  "üç": [
+    "tres"
+  ],
+  "dört": [
+    "cuatro"
+  ],
+  "beş": [
+    "cinco"
+  ],
+  "altı": [
+    "seis"
+  ],
+  "yedi": [
+    "siete"
+  ],
+  "sekiz": [
+    "ocho"
+  ],
+  "dokuz": [
+    "nueve"
+  ],
+  "yirmi": [
+    "veinte"
+  ],
+  "otuz": [
+    "treinta"
+  ],
+  "kırk": [
+    "cuarenta"
+  ],
+  "elli": [
+    "cincuenta"
+  ],
+  "altmış": [
+    "sesenta"
+  ],
+  "yetmiş": [
+    "setenta"
+  ],
+  "seksen": [
+    "ochenta"
+  ],
+  "doksan": [
+    "noventa"
+  ],
+  "bin": [
+    "mil"
+  ],
+  "ikinci": [
+    "segundo"
+  ],
+  "üçüncü": [
+    "tercero"
+  ],
+  "var": [
+    "hay",
+    "existe"
+  ],
+  "vardı": [
+    "había",
+    "existía"
+  ],
+  "vardır": [
+    "hay",
+    "existe"
+  ],
+  "yok": [
+    "no hay",
+    "no existe",
+    "no"
+  ],
+  "yoktur": [
+    "no hay",
+    "no existe"
+  ],
+  "yoksa": [
+    "si no",
+    "de lo contrario"
+  ],
+  "yoktu": [
+    "no había",
+    "no existía"
+  ],
+  "değil": [
+    "no es",
+    "no está"
+  ],
+  "değildir": [
+    "no es"
+  ],
+  "dedi": [
+    "dijo"
+  ],
+  "dediler": [
+    "dijeron"
+  ],
+  "dedim": [
+    "dije"
+  ],
+  "diyor": [
+    "dice"
+  ],
+  "diye": [
+    "diciendo"
+  ],
+  "diyerek": [
+    "diciendo"
+  ],
+  "olan": [
+    "que es",
+    "el que es",
+    "lo que es"
+  ],
+  "olanlar": [
+    "los que son",
+    "los que están"
+  ],
+  "olanı": [
+    "lo que es",
+    "el que es"
+  ],
+  "oldu": [
+    "fue",
+    "se hizo"
+  ],
+  "olduğu": [
+    "que fue",
+    "que era",
+    "que estaba"
+  ],
+  "olduğunu": [
+    "que fue",
+    "que era",
+    "que estaba"
+  ],
+  "olduğum": [
+    "que soy",
+    "que era"
+  ],
+  "olduğumu": [
+    "que soy",
+    "que era"
+  ],
+  "olacak": [
+    "será",
+    "va a ser"
+  ],
+  "olacaktır": [
+    "será"
+  ],
+  "olacaklar": [
+    "serán"
+  ],
+  "olsun": [
+    "sea",
+    "que sea",
+    "que haya"
+  ],
+  "olur": [
+    "será",
+    "ocurre",
+    "sucede"
+  ],
+  "olmak": [
+    "ser",
+    "estar",
+    "llegar a ser"
+  ],
+  "olun": [
+    "sed",
+    "llegad a ser"
+  ],
+  "olmayan": [
+    "el que no es",
+    "lo que no es"
+  ],
+  "olmayacak": [
+    "no será"
+  ],
+  "olup": [
+    "siendo",
+    "y fue"
+  ],
+  "karşı": [
+    "contra",
+    "frente a",
+    "hacia"
+  ],
+  "karşılık": [
+    "a cambio",
+    "en respuesta"
+  ],
+  "birlikte": [
+    "juntos",
+    "junto con"
+  ],
+  "ile": [
+    "con",
+    "y",
+    "por medio de"
+  ],
+  "hakkında": [
+    "acerca de",
+    "sobre",
+    "respecto a"
+  ],
+  "tarafından": [
+    "por",
+    "de parte de"
+  ],
+  "aracılığıyla": [
+    "por medio de",
+    "mediante"
+  ],
+  "boyunca": [
+    "durante",
+    "a lo largo de"
+  ],
+  "üzere": [
+    "para",
+    "a fin de"
+  ],
+  "dek": [
+    "hasta"
+  ],
+  "bile": [
+    "incluso",
+    "aun"
+  ],
+  "hem": [
+    "y",
+    "también",
+    "a la vez"
+  ],
+  "ey": [
+    "oh"
+  ],
+  "ya": [
+    "o",
+    "o bien",
+    "ya"
+  ],
+  "işte": [
+    "he aquí",
+    "he ahí"
+  ],
+  "aynı": [
+    "mismo",
+    "igual"
+  ],
+  "bugün": [
+    "hoy"
+  ],
+  "gerçekten": [
+    "de verdad",
+    "verdaderamente"
+  ],
+  "lütfen": [
+    "por favor"
+  ],
+  "mi": [
+    "acaso"
+  ],
+  "mı": [
+    "acaso"
+  ],
+  "mu": [
+    "acaso"
+  ],
+  "şey": [
+    "cosa"
+  ],
+  "şeyler": [
+    "cosas"
+  ],
+  "şeyleri": [
+    "las cosas",
+    "sus cosas"
+  ],
+  "şeye": [
+    "a la cosa",
+    "a algo"
+  ],
+  "kişi": [
+    "persona"
+  ],
+  "kişiyi": [
+    "a la persona"
+  ],
+  "insan": [
+    "hombre",
+    "ser humano"
+  ],
+  "insanın": [
+    "del hombre",
+    "del ser humano"
+  ],
+  "insanlar": [
+    "los hombres",
+    "los seres humanos"
+  ],
+  "insana": [
+    "al hombre",
+    "al ser humano"
+  ],
+  "insanoğlu": [
+    "hijo del hombre"
+  ],
+  "çocuk": [
+    "niño",
+    "hijo",
+    "muchacho"
+  ],
+  "ad": [
+    "nombre"
+  ],
+  "adı": [
+    "su nombre",
+    "el nombre"
+  ],
+  "adını": [
+    "su nombre",
+    "tu nombre"
+  ],
+  "adına": [
+    "en nombre de",
+    "en su nombre"
+  ],
+  "ses": [
+    "voz"
+  ],
+  "sesini": [
+    "su voz"
+  ],
+  "sesle": [
+    "con la voz"
+  ],
+  "altın": [
+    "oro"
+  ],
+  "gümüş": [
+    "plata"
+  ],
+  "taş": [
+    "piedra"
+  ],
+  "yol": [
+    "camino"
+  ],
+  "yola": [
+    "al camino"
+  ],
+  "ülke": [
+    "país",
+    "tierra"
+  ],
+  "ülkede": [
+    "en el país",
+    "en la tierra"
+  ],
+  "ülkeyi": [
+    "al país",
+    "a la tierra"
+  ],
+  "ülkeye": [
+    "al país",
+    "a la tierra"
+  ],
+  "bina": [
+    "edificio"
+  ],
+  "arşın": [
+    "codo"
+  ],
+  "haber": [
+    "noticia",
+    "mensaje"
+  ],
+  "yardım": [
+    "ayuda"
+  ],
+  "izin": [
+    "permiso"
+  ],
+  "iyilik": [
+    "bondad",
+    "bien"
+  ],
+  "sıkıntı": [
+    "angustia",
+    "aflicción"
+  ],
+  "acı": [
+    "dolor",
+    "sufrimiento",
+    "amargo"
+  ],
+  "iş": [
+    "obra",
+    "trabajo",
+    "asunto"
+  ],
+  "işi": [
+    "su obra",
+    "el trabajo",
+    "el asunto"
+  ],
+  "diyar": [
+    "tierra",
+    "región"
+  ],
+  "oymak": [
+    "clan",
+    "tribu"
+  ],
+  "kâhin": [
+    "sacerdote"
+  ],
+  "kâhinler": [
+    "los sacerdotes"
+  ],
+  "hizmet": [
+    "servicio"
+  ],
+  "hizmetkâr": [
+    "servidor",
+    "siervo"
+  ],
+  "ant": [
+    "juramento",
+    "pacto"
+  ],
+  "antlaşma": [
+    "alianza",
+    "pacto",
+    "convenio"
+  ],
+  "hüküm": [
+    "juicio",
+    "sentencia"
+  ],
+  "kötülük": [
+    "maldad",
+    "mal"
+  ],
+  "dua": [
+    "oración",
+    "plegaria"
+  ],
+  "esenlik": [
+    "paz",
+    "bienestar",
+    "salvación"
+  ],
+  "kabul": [
+    "aceptación"
+  ],
+  "teslim": [
+    "entrega",
+    "rendición"
+  ],
+  "yanıt": [
+    "respuesta"
+  ],
+  "güçlü": [
+    "fuerte",
+    "poderoso"
+  ],
+  "yüksek": [
+    "alto",
+    "elevado"
+  ],
+  "dolu": [
+    "lleno"
+  ],
+  "yakmalık": [
+    "holocausto"
+  ],
+  "buhur": [
+    "incienso"
+  ],
+  "sunu": [
+    "ofrenda"
+  ],
+  "sunusu": [
+    "su ofrenda",
+    "la ofrenda"
+  ],
+  "peygamber": [
+    "profeta"
+  ],
+  "peygamberlik": [
+    "profecía"
+  ],
+  "lütuf": [
+    "gracia",
+    "favor"
+  ],
+  "merhamet": [
+    "misericordia"
+  ],
+  "yalan": [
+    "mentira"
+  ],
+  "lanet": [
+    "maldición"
+  ],
+  "harap": [
+    "en ruinas",
+    "devastado"
+  ],
+  "feryat": [
+    "clamor",
+    "grito"
+  ],
+  "yasa": [
+    "ley"
+  ],
+  "buluşma": [
+    "reunión",
+    "encuentro"
+  ],
+  "ilk": [
+    "primero"
+  ],
+  "sağ": [
+    "derecho",
+    "derecha"
+  ],
+  "bol": [
+    "abundante",
+    "mucho"
+  ],
+  "genç": [
+    "joven"
+  ],
+  "güzel": [
+    "hermoso",
+    "bello",
+    "bueno"
+  ],
+  "ince": [
+    "delgado",
+    "fino"
+  ],
+  "yabancı": [
+    "extranjero"
+  ],
+  "yalnız": [
+    "solo"
+  ],
+  "yalnızca": [
+    "solamente",
+    "únicamente"
+  ],
+  "gibidir": [
+    "es como"
+  ],
+  "git": [
+    "ve"
+  ],
+  "geliyor": [
+    "viene"
+  ],
+  "gelip": [
+    "viniendo",
+    "tras venir"
+  ],
+  "gelen": [
+    "el que viene",
+    "venido"
+  ],
+  "yaptı": [
+    "hizo"
+  ],
+  "yaptılar": [
+    "hicieron"
+  ],
+  "yaptığı": [
+    "lo que hizo"
+  ],
+  "yapan": [
+    "el que hace"
+  ],
+  "yapılan": [
+    "hecho",
+    "lo que se hace"
+  ],
+  "yapmak": [
+    "hacer"
+  ],
+  "yapacağım": [
+    "haré"
+  ],
+  "yapacaksın": [
+    "harás"
+  ],
+  "etmek": [
+    "hacer"
+  ],
+  "eden": [
+    "el que hace"
+  ],
+  "edecek": [
+    "hará"
+  ],
+  "edeceğim": [
+    "haré"
+  ],
+  "eder": [
+    "hace"
+  ],
+  "edip": [
+    "haciendo",
+    "y hacer"
+  ],
+  "gönderdi": [
+    "envió"
+  ],
+  "gönderip": [
+    "enviando",
+    "tras enviar"
+  ],
+  "getirdi": [
+    "trajo"
+  ],
+  "getirdiler": [
+    "trajeron"
+  ],
+  "getireceğim": [
+    "traeré"
+  ],
+  "verdiği": [
+    "lo que dio"
+  ],
+  "vereceğim": [
+    "daré"
+  ],
+  "koydu": [
+    "puso"
+  ],
+  "çıktı": [
+    "salió"
+  ],
+  "çıktılar": [
+    "salieron"
+  ],
+  "çıkıp": [
+    "saliendo",
+    "tras salir"
+  ],
+  "çıkardı": [
+    "sacó"
+  ],
+  "çıkan": [
+    "el que sale"
+  ],
+  "çıkacak": [
+    "saldrá"
+  ],
+  "girdi": [
+    "entró"
+  ],
+  "döndü": [
+    "volvió",
+    "regresó"
+  ],
+  "düştü": [
+    "cayó"
+  ],
+  "kaldı": [
+    "quedó",
+    "permaneció"
+  ],
+  "kalktı": [
+    "se levantó"
+  ],
+  "kalkıp": [
+    "levantándose",
+    "tras levantarse"
+  ],
+  "sordu": [
+    "preguntó"
+  ],
+  "konuştu": [
+    "habló"
+  ],
+  "vurdu": [
+    "golpeó"
+  ],
+  "öldü": [
+    "murió"
+  ],
+  "öldürdü": [
+    "mató"
+  ],
+  "alıp": [
+    "tomando",
+    "tras tomar"
+  ],
+  "yiyip": [
+    "comiendo",
+    "tras comer"
+  ],
+  "dinleyin": [
+    "escuchad",
+    "oíd"
+  ],
+  "duyunca": [
+    "al oír",
+    "cuando oyó"
+  ],
+  "buyurdu": [
+    "mandó",
+    "ordenó"
+  ],
+  "buyurduğu": [
+    "lo que mandó",
+    "que mandó"
+  ],
+  "söylediği": [
+    "lo que dijo",
+    "que dijo"
+  ],
+  "yaşayan": [
+    "el que vive",
+    "vivo"
+  ],
+  "oturan": [
+    "el que habita",
+    "el que está sentado"
+  ],
+  "bulunan": [
+    "el que se halla",
+    "situado"
+  ],
+  "kalan": [
+    "el que queda",
+    "restante"
+  ],
+  "tanrın": [
+    "tu Dios"
+  ],
+  "tanrınız": [
+    "vuestro Dios"
+  ],
+  "tanrım": [
+    "mi Dios",
+    "Dios mío"
+  ],
+  "tanrımız": [
+    "nuestro Dios"
+  ],
+  "efendim": [
+    "mi señor"
+  ],
+  "efendimiz": [
+    "nuestro señor"
+  ],
+  "israel": [
+    "Israel"
+  ],
+  "firavun": [
+    "faraón"
+  ],
+  "firavun'un": [
+    "del faraón"
+  ],
+  "solomon": [
+    "Salomón"
+  ],
+  "solomon'un": [
+    "de Salomón"
+  ],
+  "samuel": [
+    "Samuel"
+  ],
+  "petrus": [
+    "Pedro"
+  ],
+  "pavlus": [
+    "Pablo"
+  ],
+  "yeşua": [
+    "Josué"
+  ],
+  "ne": [
+    "qué",
+    "que"
+  ],
+  "şekil": [
+    "forma",
+    "manera"
+  ],
+  "şekilde": [
+    "de manera",
+    "en forma"
   ]
 }
