@@ -545,8 +545,11 @@ export class TrEngine {
       }
     }
     // Capitalized hyphenated/compound names («Beer-Şeva») are not in the
-    // Turkish alphabet check; keep them as proper names.
+    // Turkish alphabet check; keep them as proper names. An explicit dict entry
+    // (e.g. an em-dash token like «bağışlasan—yoksa») still wins.
     if (!trTurkish(bare)) {
+      const direct = this.lookup(w) || this.lookup(bare);
+      if (direct) return [direct, { root: bare, form: "", isBare: true, suffixes: [] }];
       if (trIsCapitalized(word)) {
         return [[word], { isName: true, root: bare, form: "nombre propio", suffixes: [] }];
       }
