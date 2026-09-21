@@ -512,7 +512,10 @@ export class TrEngine {
     // Index the Turkish dict with Turkish-aware lowercase keys so İ/I/ı match.
     this._index = new Map();
     for (const [k, v] of Object.entries(this._map)) {
-      this._index.set(normalizeTr(k), v);
+      const key = normalizeTr(k);
+      this._index.set(key, v);
+      const apos = key.replace(/’/g, "'");
+      if (apos !== key && !this._index.has(apos)) this._index.set(apos, v);
     }
     // Proper-name table (TR root → Spanish name). Always capitalized keys.
     this._names = names || {};
