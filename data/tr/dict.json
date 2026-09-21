@@ -858,8 +858,8 @@
     "y"
   ],
   "de": [
-    "también",
-    "y"
+    "decir",
+    "también"
   ],
   "ama": [
     "pero"
@@ -1146,9 +1146,8 @@
     "con jabón"
   ],
   "çağ": [
-    "tiempo",
     "época",
-    "edad"
+    "siglo"
   ],
   "çağda": [
     "en el tiempo",
@@ -1880,8 +1879,8 @@
     "bosque"
   ],
   "koru": [
-    "bosquecillo",
-    "arboleda"
+    "proteger",
+    "guardar"
   ],
   "koruda": [
     "en el bosquecillo"
@@ -2668,7 +2667,7 @@
     "su día ; el día"
   ],
   "günlerce": [
-    "por días ; durante días"
+    "por días"
   ],
   "akşamı": [
     "la tarde ; el anochecer"
@@ -2735,7 +2734,8 @@
     "al medio de ; en el centro de"
   ],
   "içine": [
-    "dentro de ; hacia dentro"
+    "dentro de",
+    "en"
   ],
   "içinden": [
     "de dentro ; desde dentro"
@@ -2820,8 +2820,8 @@
     "enteramente ; por completo"
   ],
   "hepsi": [
-    "todos",
-    "todo ello"
+    "todo",
+    "todos"
   ],
   "hepsini": [
     "todo ; a todos ; todos"
@@ -4315,8 +4315,7 @@
     "tras venir"
   ],
   "gelen": [
-    "el que viene",
-    "venido"
+    "el que viene"
   ],
   "yaptı": [
     "hizo"
@@ -6692,7 +6691,7 @@
     "selección"
   ],
   "bağışla": [
-    "perdona"
+    "perdonar"
   ],
   "doğrudur": [
     "es correcto",
@@ -7931,8 +7930,8 @@
     "enseñar"
   ],
   "çevir": [
-    "vuelve",
-    "traduce"
+    "volver",
+    "traducir"
   ],
   "karısına": [
     "a su esposa",
@@ -9399,8 +9398,8 @@
     "su concubina"
   ],
   "kıl": [
-    "pelo",
-    "cerda"
+    "hacer",
+    "nombrar"
   ],
   "ardımdan": [
     "detrás de mí",
@@ -9495,8 +9494,8 @@
     "lo que ofreció"
   ],
   "yan": [
-    "lado",
-    "costado"
+    "arder",
+    "quemarse"
   ],
   "yapılsın": [
     "que se haga"
@@ -11471,8 +11470,7 @@
     "bendición"
   ],
   "kurtulur": [
-    "se salva",
-    "escapa"
+    "se salva"
   ],
   "bakıyor": [
     "mira"
@@ -13771,5 +13769,619 @@
   ],
   "öldük": [
     "morimos"
+  ],
+  "alsın": [
+    "que tome"
+  ],
+  "ordugâht": [
+    "campamento"
+  ],
+  "zamank": [
+    "tiempo",
+    "momento"
+  ],
+  "yasan": [
+    "tu ley"
+  ],
+  "öğreten": [
+    "el que enseña"
+  ],
+  "dikkate": [
+    "atención",
+    "cuenta"
+  ],
+  "arat": [
+    "buscó",
+    "busqué"
+  ],
+  "yaşay": [
+    "vivir"
+  ],
+  "köye": [
+    "a la aldea"
+  ],
+  "öfken": [
+    "tu ira"
+  ],
+  "âdet": [
+    "costumbre"
+  ],
+  "yakan": [
+    "el que quema"
+  ],
+  "saygısızlık": [
+    "irreverencia",
+    "falta de respeto"
+  ],
+  "ayrılan": [
+    "el que se aparta"
+  ],
+  "sayılan": [
+    "el que es contado"
+  ],
+  "kişidir": [
+    "es persona"
+  ],
+  "ülkedir": [
+    "es país"
+  ],
+  "tükeninceye": [
+    "hasta que se acabe"
+  ],
+  "taşlay": [
+    "apedrear"
+  ],
+  "yapmalı": [
+    "debe hacer"
+  ],
+  "yaparken": [
+    "mientras hace"
+  ],
+  "çabucak": [
+    "muy pronto"
+  ],
+  "dinlemeyen": [
+    "el que no escucha"
+  ],
+  "koymuş": [
+    "había puesto"
+  ],
+  "edinceye": [
+    "hasta que haga"
+  ],
+  "örter": [
+    "cubre"
+  ],
+  "kurtarıcı": [
+    "libertador"
+  ],
+  "söyleyince": [
+    "cuando dice"
+  ],
+  "başlayınca": [
+    "cuando comienza"
+  ],
+  "takas": [
+    "trueque",
+    "intercambio"
+  ],
+  "semiz": [
+    "gordo",
+    "engordado"
+  ],
+  "baskın": [
+    "incursión",
+    "asalto"
+  ],
+  "düşünerek": [
+    "pensando"
+  ],
+  "bildirmek": [
+    "anunciar"
+  ],
+  "kaldırmak": [
+    "levantar"
+  ],
+  "bildiren": [
+    "el que anuncia"
+  ],
+  "zorba": [
+    "tirano",
+    "opresor"
+  ],
+  "annem": [
+    "mi madre"
+  ],
+  "çalıp": [
+    "tocando",
+    "robando"
+  ],
+  "yaptırdığı": [
+    "que hizo hacer"
+  ],
+  "iyileştirmek": [
+    "sanar"
+  ],
+  "kuşatma": [
+    "cerco",
+    "sitio"
+  ],
+  "görelim": [
+    "veamos"
+  ],
+  "kurtaramayacak": [
+    "no podrá salvar"
+  ],
+  "övmek": [
+    "alabar"
+  ],
+  "güçsüz": [
+    "débil"
+  ],
+  "dolaşıp": [
+    "andando",
+    "vagando"
+  ],
+  "dönsünler": [
+    "que vuelvan"
+  ],
+  "gelsinler": [
+    "que vengan"
+  ],
+  "murdar": [
+    "inmundo"
+  ],
+  "denilecek": [
+    "será dicho"
+  ],
+  "güve": [
+    "polilla"
+  ],
+  "ilahi": [
+    "himno",
+    "cántico"
+  ],
+  "sevindirir": [
+    "alegra"
+  ],
+  "kutsanır": [
+    "es bendecido"
+  ],
+  "dökmek": [
+    "verter"
+  ],
+  "açıklandı": [
+    "fue explicado",
+    "fue anunciado"
+  ],
+  "saçacağım": [
+    "esparciré"
+  ],
+  "dirilme": [
+    "resurrección"
+  ],
+  "horoz": [
+    "gallo"
+  ],
+  "yükselen": [
+    "el que sube"
+  ],
+  "dikip": [
+    "cosiendo",
+    "plantando"
+  ],
+  "çağırma": [
+    "llamamiento"
+  ],
+  "bulamayınca": [
+    "al no encontrar"
+  ],
+  "alarak": [
+    "tomando"
+  ],
+  "aranda": [
+    "entre ti"
+  ],
+  "sürdüreceğim": [
+    "continuaré"
+  ],
+  "ısrar": [
+    "insistencia",
+    "porfía"
+  ],
+  "indirip": [
+    "bajando"
+  ],
+  "almıştı": [
+    "había tomado"
+  ],
+  "çağırttı": [
+    "mandó llamar"
+  ],
+  "olamaz": [
+    "no puede ser"
+  ],
+  "sayılacaktır": [
+    "será contado"
+  ],
+  "ayırıp": [
+    "separando"
+  ],
+  "soyup": [
+    "despojando"
+  ],
+  "bilinir": [
+    "es sabido",
+    "se conoce"
+  ],
+  "dönerek": [
+    "volviendo"
+  ],
+  "denilir": [
+    "se dice",
+    "es llamado"
+  ],
+  "alalım": [
+    "tomemos"
+  ],
+  "ayrılırken": [
+    "al separarse"
+  ],
+  "şaul": [
+    "Saúl"
+  ],
+  "öldürüp": [
+    "matando"
+  ],
+  "atadığı": [
+    "que designó"
+  ],
+  "doğacak": [
+    "nacerá"
+  ],
+  "rahmi": [
+    "su vientre"
+  ],
+  "yenilecek": [
+    "será vencido"
+  ],
+  "yargılamak": [
+    "juzgar"
+  ],
+  "satarsa": [
+    "si vende"
+  ],
+  "safir": [
+    "zafiro"
+  ],
+  "dövmeci": [
+    "espina",
+    "cardo"
+  ],
+  "çember": [
+    "aro",
+    "círculo"
+  ],
+  "meshedecek": [
+    "ungirá"
+  ],
+  "ölmesinler": [
+    "que no mueran"
+  ],
+  "kaplayan": [
+    "el que cubre"
+  ],
+  "salla": [
+    "sacudir"
+  ],
+  "temizlemek": [
+    "limpiar"
+  ],
+  "kirletmek": [
+    "contaminar",
+    "profanar"
+  ],
+  "belirlediği": [
+    "que determinó"
+  ],
+  "korkutmayacak": [
+    "no causará temor"
+  ],
+  "kaçan": [
+    "el que huye"
+  ],
+  "adanan": [
+    "el que es consagrado"
+  ],
+  "tutsun": [
+    "que tome"
+  ],
+  "şafat": [
+    "Safat"
+  ],
+  "kalmayana": [
+    "hasta que no quede"
+  ],
+  "dar": [
+    "estrecho",
+    "angosto"
+  ],
+  "keşke": [
+    "ojalá"
+  ],
+  "sayan": [
+    "el que cuenta"
+  ],
+  "usul": [
+    "manera",
+    "costumbre"
+  ],
+  "duyurmaya": [
+    "a anunciar"
+  ],
+  "görmeyen": [
+    "el que no ve"
+  ],
+  "duymayan": [
+    "el que no oye"
+  ],
+  "duramayacak": [
+    "no podrá estar de pie"
+  ],
+  "durabilir": [
+    "puede estar de pie"
+  ],
+  "sevmek": [
+    "amar"
+  ],
+  "yerleştirmek": [
+    "establecer",
+    "colocar"
+  ],
+  "razı": [
+    "conforme"
+  ],
+  "yapıldığı": [
+    "que fue hecho"
+  ],
+  "yorgun": [
+    "cansado"
+  ],
+  "ağlayarak": [
+    "llorando"
+  ],
+  "tembel": [
+    "perezoso"
+  ],
+  "çevirip": [
+    "volviendo"
+  ],
+  "dizildiler": [
+    "fueron colocados"
+  ],
+  "doydu": [
+    "se sació"
+  ],
+  "çalışır": [
+    "trabaja"
+  ],
+  "bekçilik": [
+    "centinela",
+    "vigilia"
+  ],
+  "arayıp": [
+    "buscando"
+  ],
+  "yerleştireceğim": [
+    "estableceré"
+  ],
+  "kimsesiz": [
+    "sin recursos",
+    "huérfano"
+  ],
+  "iri": [
+    "grande"
+  ],
+  "yürüyerek": [
+    "caminando"
+  ],
+  "istemedin": [
+    "no pediste"
+  ],
+  "oturtacağım": [
+    "haré sentar"
+  ],
+  "yöneten": [
+    "el que gobierna"
+  ],
+  "oturulacak": [
+    "donde se sentará"
+  ],
+  "fildişi": [
+    "marfil"
+  ],
+  "döküldü": [
+    "fue derramado"
+  ],
+  "izebel": [
+    "Jezabel"
+  ],
+  "ayrılmaz": [
+    "no se separa"
+  ],
+  "döken": [
+    "el que vierte"
+  ],
+  "dinlemeyin": [
+    "no escuchéis"
+  ],
+  "bildirilen": [
+    "anunciado"
+  ],
+  "titrer": [
+    "tiembla"
+  ],
+  "uçup": [
+    "volando"
+  ],
+  "rezil": [
+    "vergonzoso",
+    "infame"
+  ],
+  "muhteşem": [
+    "magnífico",
+    "espléndido"
+  ],
+  "sevecen": [
+    "tierno",
+    "caritativo"
+  ],
+  "kırar": [
+    "rompe"
+  ],
+  "uğrayıp": [
+    "habiendo sufrido"
+  ],
+  "sadakatsiz": [
+    "infiel"
+  ],
+  "öv": [
+    "alabar"
+  ],
+  "reddeden": [
+    "el que rechaza"
+  ],
+  "hain": [
+    "traidor",
+    "desleal"
+  ],
+  "sağanak": [
+    "aguacero",
+    "lluvia"
+  ],
+  "vahiy": [
+    "revelación",
+    "profecía"
+  ],
+  "yargıçlık": [
+    "el oficio de juez"
+  ],
+  "görmesinler": [
+    "que no vean"
+  ],
+  "erecek": [
+    "alcanzará"
+  ],
+  "duyuluyor": [
+    "se oye"
+  ],
+  "güçlendireceğim": [
+    "fortaleceré"
+  ],
+  "yöntem": [
+    "método",
+    "manera"
+  ],
+  "bayağı": [
+    "vil",
+    "común"
+  ],
+  "çevirmeyeceğim": [
+    "no volveré"
+  ],
+  "kaygılan": [
+    "preocuparse"
+  ],
+  "kuruluş": [
+    "fundación"
+  ],
+  "sorgu": [
+    "interrogatorio"
+  ],
+  "açıldığını": [
+    "que fue abierto"
+  ],
+  "bulunamadı": [
+    "no fue hallado"
+  ],
+  "bağlanacak": [
+    "será atado"
+  ],
+  "dokunmayın": [
+    "no toquéis"
+  ],
+  "ömür": [
+    "vida"
+  ],
+  "şit": [
+    "Set"
+  ],
+  "çekilip": [
+    "retirándose"
+  ],
+  "görünüşe": [
+    "apariencia"
+  ],
+  "başkentin": [
+    "de la capital"
+  ],
+  "yakınlaş": [
+    "acercarse"
+  ],
+  "kutsallığın": [
+    "tu santidad"
+  ],
+  "ölçüsün": [
+    "su medida"
+  ],
+  "savrul": [
+    "ser esparcido"
+  ],
+  "alış": [
+    "el tomar",
+    "el recibir"
+  ],
+  "çaresiz": [
+    "sin remedio"
+  ],
+  "adaletsizlik": [
+    "injusticia"
+  ],
+  "gereç": [
+    "instrumento",
+    "herramienta"
+  ],
+  "kararmış": [
+    "oscurecido"
+  ],
+  "kurtuluşu": [
+    "su salvación"
+  ],
+  "parlayan": [
+    "el que brilla"
+  ],
+  "kaçırıp": [
+    "llevándose"
+  ],
+  "birleş": [
+    "unirse"
+  ],
+  "savaşıp": [
+    "combatiendo"
+  ],
+  "güçlüydü": [
+    "era fuerte"
+  ],
+  "ortağı": [
+    "su socio"
+  ],
+  "göndermek": [
+    "enviar"
+  ],
+  "varlığında": [
+    "en presencia de"
+  ],
+  "düzeni": [
+    "su orden"
   ]
 }
