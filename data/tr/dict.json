@@ -4513,5 +4513,843 @@
   "şekilde": [
     "de manera",
     "en forma"
+  ],
+  "ise": [
+    "en cuanto a",
+    "mientras que"
+  ],
+  "dışarı": [
+    "afuera",
+    "fuera"
+  ],
+  "gelecek": [
+    "futuro",
+    "venidero",
+    "el que viene"
+  ],
+  "yiyecek": [
+    "alimento",
+    "comida"
+  ],
+  "tanıklık": [
+    "testimonio"
+  ],
+  "karısı": [
+    "su esposa",
+    "su mujer"
+  ],
+  "içeri": [
+    "adentro",
+    "dentro"
+  ],
+  "yas": [
+    "luto"
+  ],
+  "kesinlikle": [
+    "ciertamente",
+    "con toda seguridad"
+  ],
+  "sahip": [
+    "dueño",
+    "amo"
+  ],
+  "uğruna": [
+    "por causa de",
+    "por"
+  ],
+  "satın": [
+    "compra"
+  ],
+  "ilgili": [
+    "referente a",
+    "relacionado"
+  ],
+  "budur": [
+    "esto es"
+  ],
+  "hoş": [
+    "agradable"
+  ],
+  "hizmetkârı": [
+    "su servidor"
+  ],
+  "hizmetkârları": [
+    "sus servidores"
+  ],
+  "hizmetkârının": [
+    "de su servidor"
+  ],
+  "hizmetkârlar": [
+    "los servidores"
+  ],
+  "yeryüzünde": [
+    "en la tierra",
+    "en el mundo"
+  ],
+  "yeryüzüne": [
+    "a la tierra"
+  ],
+  "yeryüzünü": [
+    "la tierra"
+  ],
+  "ilan": [
+    "proclamación"
+  ],
+  "koç": [
+    "carnero"
+  ],
+  "bilge": [
+    "sabio"
+  ],
+  "soyu": [
+    "su linaje",
+    "su descendencia"
+  ],
+  "hakkı": [
+    "su derecho"
+  ],
+  "son": [
+    "fin",
+    "final"
+  ],
+  "sonunda": [
+    "al final",
+    "al fin"
+  ],
+  "sona": [
+    "al final"
+  ],
+  "mutlu": [
+    "feliz",
+    "dichoso"
+  ],
+  "ta": [
+    "hasta"
+  ],
+  "halde": [
+    "estado",
+    "situación"
+  ],
+  "nedir": [
+    "qué es"
+  ],
+  "iç": [
+    "interior",
+    "dentro"
+  ],
+  "içindir": [
+    "es para",
+    "sirve para"
+  ],
+  "durdu": [
+    "se detuvo"
+  ],
+  "benzer": [
+    "semejante"
+  ],
+  "ait": [
+    "perteneciente a",
+    "de"
+  ],
+  "ol": [
+    "sé",
+    "sea"
+  ],
+  "dışında": [
+    "fuera de",
+    "salvo"
+  ],
+  "verecek": [
+    "dará"
+  ],
+  "boş": [
+    "vacío"
+  ],
+  "tunç": [
+    "bronce"
+  ],
+  "birinci": [
+    "primero"
+  ],
+  "misin": [
+    "eres"
+  ],
+  "değerli": [
+    "valioso",
+    "precioso"
+  ],
+  "dönüp": [
+    "volviendo",
+    "regresando"
+  ],
+  "ağır": [
+    "pesado",
+    "grave"
+  ],
+  "yap": [
+    "haz"
+  ],
+  "araya": [
+    "juntos",
+    "en medio"
+  ],
+  "kusursuz": [
+    "irreprochable",
+    "perfecto"
+  ],
+  "verildi": [
+    "fue dado",
+    "se dio"
+  ],
+  "aranızda": [
+    "entre vosotros"
+  ],
+  "doğurdu": [
+    "dio a luz",
+    "engendró"
+  ],
+  "aşağı": [
+    "abajo",
+    "hacia abajo"
+  ],
+  "doğruluk": [
+    "justicia",
+    "rectitud"
+  ],
+  "kuzu": [
+    "cordero"
+  ],
+  "söyleyin": [
+    "decid"
+  ],
+  "tamamen": [
+    "completamente"
+  ],
+  "kefaret": [
+    "expiación"
+  ],
+  "koyun": [
+    "oveja",
+    "ovejas"
+  ],
+  "süre": [
+    "tiempo",
+    "rato",
+    "período"
+  ],
+  "terk": [
+    "abandono"
+  ],
+  "ettiği": [
+    "lo que hizo",
+    "que hizo"
+  ],
+  "ağaç": [
+    "árbol"
+  ],
+  "ağacı": [
+    "el árbol"
+  ],
+  "ağacından": [
+    "del árbol",
+    "de su árbol"
+  ],
+  "indi": [
+    "bajó",
+    "descendió"
+  ],
+  "alay": [
+    "burla",
+    "mofa"
+  ],
+  "boğa": [
+    "toro"
+  ],
+  "saygı": [
+    "respeto",
+    "honor"
+  ],
+  "ediyor": [
+    "está haciendo"
+  ],
+  "saf": [
+    "puro"
+  ],
+  "türlü": [
+    "tipo",
+    "clase"
+  ],
+  "aralarında": [
+    "entre ellos"
+  ],
+  "gelir": [
+    "viene"
+  ],
+  "çıkar": [
+    "saca",
+    "extrae"
+  ],
+  "herhangi": [
+    "cualquier"
+  ],
+  "vaftiz": [
+    "bautismo"
+  ],
+  "otlak": [
+    "pastizal",
+    "pasto"
+  ],
+  "yanındaki": [
+    "el que está junto a",
+    "al lado de"
+  ],
+  "kaldırdı": [
+    "levantó",
+    "alzó"
+  ],
+  "şudur": [
+    "esto es"
+  ],
+  "kıtlık": [
+    "hambruna",
+    "escasez"
+  ],
+  "sünnet": [
+    "circuncisión"
+  ],
+  "tutup": [
+    "tomando",
+    "sujetando"
+  ],
+  "dinle": [
+    "escucha"
+  ],
+  "rahat": [
+    "cómodo",
+    "descanso"
+  ],
+  "doğan": [
+    "el que nace",
+    "nacido"
+  ],
+  "duruyordu": [
+    "estaba de pie",
+    "estaba firme"
+  ],
+  "ziyaret": [
+    "visita"
+  ],
+  "ortaya": [
+    "a la vista",
+    "en medio"
+  ],
+  "getirecek": [
+    "traerá"
+  ],
+  "cesur": [
+    "valiente",
+    "atrevido"
+  ],
+  "kutsadı": [
+    "bendijo"
+  ],
+  "buldu": [
+    "encontró",
+    "halló"
+  ],
+  "açtı": [
+    "abrió"
+  ],
+  "komutan": [
+    "comandante",
+    "capitán"
+  ],
+  "komutanı": [
+    "su comandante"
+  ],
+  "açık": [
+    "abierto",
+    "claro"
+  ],
+  "zina": [
+    "adulterio",
+    "fornicación"
+  ],
+  "geldiğini": [
+    "que vino",
+    "que llegó"
+  ],
+  "yaşındaydı": [
+    "tenía años"
+  ],
+  "hayvan": [
+    "animal"
+  ],
+  "hayvanları": [
+    "los animales",
+    "sus animales"
+  ],
+  "olmasın": [
+    "que no sea",
+    "no sea"
+  ],
+  "isyan": [
+    "rebelión"
+  ],
+  "konuşan": [
+    "el que habla"
+  ],
+  "bıraktı": [
+    "dejó",
+    "abandonó"
+  ],
+  "diyeceksin": [
+    "dirás"
+  ],
+  "ederek": [
+    "haciendo"
+  ],
+  "diyecek": [
+    "dirá"
+  ],
+  "yücelik": [
+    "gloria",
+    "majestad"
+  ],
+  "yüceliği": [
+    "su gloria"
+  ],
+  "tarafta": [
+    "en el lado",
+    "del lado"
+  ],
+  "hazır": [
+    "listo",
+    "preparado"
+  ],
+  "çağırıp": [
+    "llamando",
+    "tras llamar"
+  ],
+  "götürdü": [
+    "llevó"
+  ],
+  "yağla": [
+    "con aceite"
+  ],
+  "güç": [
+    "fuerza",
+    "poder"
+  ],
+  "fazla": [
+    "demasiado",
+    "demás"
+  ],
+  "dökmelik": [
+    "libación",
+    "ofrenda de libación"
+  ],
+  "düzen": [
+    "orden"
+  ],
+  "zarar": [
+    "daño",
+    "perjuicio"
+  ],
+  "belirti": [
+    "señal"
+  ],
+  "yapacak": [
+    "hará"
+  ],
+  "vay": [
+    "ay"
+  ],
+  "yağmur": [
+    "lluvia"
+  ],
+  "taşıyan": [
+    "el que lleva",
+    "el que soporta"
+  ],
+  "sundu": [
+    "ofreció",
+    "presentó"
+  ],
+  "bulut": [
+    "nube"
+  ],
+  "çıkarıp": [
+    "sacando",
+    "tras sacar"
+  ],
+  "öldürmek": [
+    "matar"
+  ],
+  "bilgi": [
+    "conocimiento",
+    "saber"
+  ],
+  "ağzından": [
+    "de la boca",
+    "de su boca"
+  ],
+  "para": [
+    "dinero"
+  ],
+  "pay": [
+    "parte",
+    "porción"
+  ],
+  "diyen": [
+    "el que dice"
+  ],
+  "incir": [
+    "higo",
+    "higuera"
+  ],
+  "tövbe": [
+    "arrepentimiento"
+  ],
+  "hayal": [
+    "sueño",
+    "ilusión"
+  ],
+  "bulunduğu": [
+    "donde se halla",
+    "que está"
+  ],
+  "gören": [
+    "el que ve"
+  ],
+  "olmaz": [
+    "no puede ser",
+    "no es"
+  ],
+  "kırmızı": [
+    "rojo",
+    "encarnado"
+  ],
+  "devam": [
+    "continuación"
+  ],
+  "oruç": [
+    "ayuno"
+  ],
+  "doğuya": [
+    "hacia el este"
+  ],
+  "sınırı": [
+    "su límite",
+    "la frontera"
+  ],
+  "alan": [
+    "el que toma"
+  ],
+  "musun": [
+    "eres"
+  ],
+  "söylüyorum": [
+    "digo",
+    "estoy diciendo"
+  ],
+  "koyacağım": [
+    "pondré"
+  ],
+  "ayrı": [
+    "separado",
+    "distinto"
+  ],
+  "olduğun": [
+    "que eres"
+  ],
+  "erkenden": [
+    "temprano",
+    "de madrugada"
+  ],
+  "diyecekler": [
+    "dirán"
+  ],
+  "etmeye": [
+    "a hacer",
+    "para hacer"
+  ],
+  "göndereceğim": [
+    "enviaré"
+  ],
+  "toplandılar": [
+    "se reunieron",
+    "se juntaron"
+  ],
+  "dönecek": [
+    "volverá",
+    "regresará"
+  ],
+  "kurtaracak": [
+    "salvará",
+    "rescatará"
+  ],
+  "sürgün": [
+    "destierro",
+    "exilio"
+  ],
+  "beden": [
+    "cuerpo"
+  ],
+  "buyurduğum": [
+    "lo que mandé"
+  ],
+  "bunlardır": [
+    "estos son"
+  ],
+  "yüzüstü": [
+    "boca abajo",
+    "postrado"
+  ],
+  "düşman": [
+    "enemigo"
+  ],
+  "düşmanlarının": [
+    "de sus enemigos"
+  ],
+  "hizmetkârım": [
+    "mi servidor"
+  ],
+  "açıkça": [
+    "claramente",
+    "abiertamente"
+  ],
+  "ağıt": [
+    "lamento",
+    "endecha"
+  ],
+  "kura": [
+    "suerte",
+    "sorteo"
+  ],
+  "söyledim": [
+    "dije"
+  ],
+  "kurdu": [
+    "fundó",
+    "estableció"
+  ],
+  "mutlaka": [
+    "seguramente",
+    "sin falta"
+  ],
+  "kaldırıp": [
+    "levantando",
+    "alzando"
+  ],
+  "parça": [
+    "pedazo",
+    "parte"
+  ],
+  "inkâr": [
+    "negación"
+  ],
+  "haksızlık": [
+    "injusticia"
+  ],
+  "kalacak": [
+    "quedará",
+    "permanecerá"
+  ],
+  "aç": [
+    "hambriento"
+  ],
+  "ihtiyar": [
+    "anciano"
+  ],
+  "ihtiyarları": [
+    "los ancianos"
+  ],
+  "ordugâhın": [
+    "del campamento"
+  ],
+  "ilâhlar": [
+    "dioses"
+  ],
+  "ilâhlara": [
+    "a los dioses"
+  ],
+  "yiğit": [
+    "valiente",
+    "bravo"
+  ],
+  "zevk": [
+    "placer",
+    "gozo"
+  ],
+  "öğrenci": [
+    "discípulo"
+  ],
+  "öğrencilerine": [
+    "a sus discípulos"
+  ],
+  "arasındaki": [
+    "que está entre"
+  ],
+  "yaptığını": [
+    "lo que hizo"
+  ],
+  "bildirdi": [
+    "anunció",
+    "informó"
+  ],
+  "yani": [
+    "es decir",
+    "o sea"
+  ],
+  "çıkaran": [
+    "el que saca"
+  ],
+  "başarılı": [
+    "exitoso",
+    "próspero"
+  ],
+  "geçip": [
+    "pasando",
+    "tras pasar"
+  ],
+  "çık": [
+    "sal"
+  ],
+  "geçirdi": [
+    "pasó"
+  ],
+  "ürün": [
+    "producto",
+    "fruto"
+  ],
+  "getirin": [
+    "traed"
+  ],
+  "etsinler": [
+    "que hagan"
+  ],
+  "düşecek": [
+    "caerá"
+  ],
+  "ürününü": [
+    "su producto",
+    "su fruto"
+  ],
+  "sayılanlar": [
+    "los contados"
+  ],
+  "savaşmak": [
+    "combatir",
+    "pelear"
+  ],
+  "gerçek": [
+    "verdadero",
+    "verdad"
+  ],
+  "kurtuluş": [
+    "salvación",
+    "liberación"
+  ],
+  "çarmıha": [
+    "a la cruz"
+  ],
+  "görmek": [
+    "ver"
+  ],
+  "gebe": [
+    "embarazada",
+    "encinta"
+  ],
+  "ağzını": [
+    "su boca"
+  ],
+  "tanık": [
+    "testigo"
+  ],
+  "beyaz": [
+    "blanco"
+  ],
+  "tarafına": [
+    "hacia el lado",
+    "al lado"
+  ],
+  "olsa": [
+    "si fuera",
+    "si hubiera"
+  ],
+  "bilecekler": [
+    "sabrán"
+  ],
+  "yarısı": [
+    "la mitad"
+  ],
+  "yaktı": [
+    "quemó",
+    "incendió"
+  ],
+  "olsaydı": [
+    "si fuera",
+    "si hubiera sido"
+  ],
+  "akılsız": [
+    "insensato",
+    "necio"
+  ],
+  "yargı": [
+    "juicio"
+  ],
+  "musunuz": [
+    "sois"
+  ],
+  "koyacaksın": [
+    "pondrás"
+  ],
+  "verdiğim": [
+    "lo que di"
+  ],
+  "söylemiş": [
+    "había dicho",
+    "dijo"
+  ],
+  "birlikteydi": [
+    "estaba con",
+    "estaba junto"
+  ],
+  "sığır": [
+    "ganado vacuno",
+    "buey"
+  ],
+  "yanıma": [
+    "a mi lado"
+  ],
+  "getirmek": [
+    "traer"
+  ],
+  "oldum": [
+    "fui",
+    "llegué a ser"
+  ],
+  "götürdüler": [
+    "llevaron"
+  ],
+  "hatırla": [
+    "recuerda"
+  ],
+  "kalk": [
+    "levántate"
+  ],
+  "sandık": [
+    "arca",
+    "cofre"
+  ],
+  "ishak": [
+    "Isaac"
+  ],
+  "filistliler": [
+    "filisteos"
+  ],
+  "yarden": [
+    "Jordán"
   ]
 }
