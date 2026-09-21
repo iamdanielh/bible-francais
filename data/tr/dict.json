@@ -23762,5 +23762,611 @@
   "gömülmeyecekler": [
     "no serán enterrados",
     "no serán sepultados"
+  ],
+  "bedenen": [
+    "corporalmente",
+    "en la carne",
+    "físicamente"
+  ],
+  "sınayan": [
+    "que prueba",
+    "que examina"
+  ],
+  "istemeyen": [
+    "que no quiere",
+    "que no desea"
+  ],
+  "yakmayacaklar": [
+    "no quemarán",
+    "no harán duelo"
+  ],
+  "tasarlıyorum": [
+    "estoy tramando",
+    "planeo"
+  ],
+  "şaşıp": [
+    "asombrándose",
+    "quedando atónito"
+  ],
+  "öfkelendirmeyin": [
+    "no provoquéis a ira",
+    "no me irritéis"
+  ],
+  "kaçamayacak": [
+    "no podrá huir",
+    "no podrá escapar"
+  ],
+  "kazandıran": [
+    "que hizo",
+    "que realizó"
+  ],
+  "döktükleri": [
+    "que derramaron",
+    "que vertieron"
+  ],
+  "sürgünlüğünü": [
+    "su destierro",
+    "su cautiverio"
+  ],
+  "mürekkeple": [
+    "con tinta"
+  ],
+  "öldürsünler": [
+    "que maten",
+    "mátenlo"
+  ],
+  "bilmeyecek": [
+    "no sabrá"
+  ],
+  "kurtulmayacak": [
+    "no escapará",
+    "no se librará"
+  ],
+  "övünüyorsun": [
+    "te jactas",
+    "presumes"
+  ],
+  "çevrende": [
+    "a tu alrededor",
+    "en tu entorno"
+  ],
+  "gelmediği": [
+    "que no vino",
+    "su no venida"
+  ],
+  "kışkırtıp": [
+    "incitando",
+    "azuzando"
+  ],
+  "esirgemeyin": [
+    "no perdonéis",
+    "no escatiméis"
+  ],
+  "kalınlığı": [
+    "su grosor",
+    "su espesor"
+  ],
+  "yıkmaya": [
+    "a derribar",
+    "a destruir"
+  ],
+  "kocaman": [
+    "muy grande",
+    "enorme"
+  ],
+  "çıkmıyor": [
+    "no sale",
+    "no procede"
+  ],
+  "aşağılamasını": [
+    "su humillación",
+    "su desprecio"
+  ],
+  "kristal": [
+    "cristal",
+    "hielo"
+  ],
+  "reddetsinler": [
+    "que rechacen",
+    "que desprecien"
+  ],
+  "alınlarına": [
+    "en sus frentes",
+    "a sus frentes"
+  ],
+  "uyarmak": [
+    "advertir",
+    "amonestar"
+  ],
+  "uyarıldı": [
+    "fue advertido",
+    "fue amonestado"
+  ],
+  "dindireceğim": [
+    "calmaré",
+    "aplacaré",
+    "haré cesar"
+  ],
+  "tasarlayan": [
+    "que trama",
+    "que planea"
+  ],
+  "gecikmeyecek": [
+    "no tardará",
+    "no se demorará"
+  ],
+  "geçirerek": [
+    "haciendo pasar",
+    "pasando por"
+  ],
+  "almamışsa": [
+    "si no tomó",
+    "si no ha cobrado"
+  ],
+  "davranmak": [
+    "comportarse",
+    "portarse",
+    "obrar"
+  ],
+  "söküldü": [
+    "fue arrancado",
+    "fue desarraigado"
+  ],
+  "kirletiyor": [
+    "contamináis",
+    "profanáis"
+  ],
+  "kalay": [
+    "estaño"
+  ],
+  "göğüslerini": [
+    "sus pechos",
+    "sus senos"
+  ],
+  "açılan": [
+    "abierta",
+    "por donde se abre"
+  ],
+  "düşüşünün": [
+    "de tu caída",
+    "de su caída"
+  ],
+  "onarıyorlardı": [
+    "reparaban",
+    "remendaban"
+  ],
+  "yarılacak": [
+    "será partido",
+    "se hendirá"
+  ],
+  "karartacağım": [
+    "oscureceré",
+    "entenebreceré"
+  ],
+  "saçmışlardı": [
+    "habían esparcido",
+    "habían sembrado"
+  ],
+  "yoldaşları": [
+    "sus compañeros",
+    "sus aliados"
+  ],
+  "çıkılıyordu": [
+    "se subía",
+    "se ascendía"
+  ],
+  "solmayan": [
+    "que no se marchita",
+    "que no se seca"
+  ],
+  "övüyor": [
+    "alaba",
+    "ensalza"
+  ],
+  "ilâhtan": [
+    "de un dios",
+    "de dios alguno"
+  ],
+  "suçlayan": [
+    "que acusaba",
+    "los acusadores"
+  ],
+  "yakılmak": [
+    "ser quemado",
+    "ser incendiado"
+  ],
+  "çiğneyip": [
+    "pisoteando",
+    "quebrantando"
+  ],
+  "yaltaklanarak": [
+    "adulando",
+    "con lisonjas"
+  ],
+  "nişanlayacağım": [
+    "desposaré",
+    "me prometeré contigo"
+  ],
+  "düşürmek": [
+    "hacer caer",
+    "derribar",
+    "tender trampa"
+  ],
+  "sunalım": [
+    "ofrezcamos",
+    "presentemos"
+  ],
+  "vazgeçer": [
+    "desiste",
+    "renuncia",
+    "se arrepiente"
+  ],
+  "olgunlaştı": [
+    "maduró",
+    "está madura"
+  ],
+  "akacak": [
+    "fluirá",
+    "manará"
+  ],
+  "gelselerdi": [
+    "si vinieran",
+    "si hubieran venido"
+  ],
+  "saptıran": [
+    "que descarría",
+    "que hace extraviar"
+  ],
+  "dökülür": [
+    "se derrama",
+    "se vierte"
+  ],
+  "seyirlik": [
+    "espectáculo",
+    "escarnio"
+  ],
+  "habercisi": [
+    "su mensajero",
+    "su heraldo"
+  ],
+  "sarsacağım": [
+    "sacudiré",
+    "haré temblar"
+  ],
+  "kıskanıyorum": [
+    "tengo celos",
+    "estoy celoso"
+  ],
+  "dileyin": [
+    "pedid",
+    "rogad"
+  ],
+  "soyağacı": [
+    "genealogía",
+    "árbol genealógico"
+  ],
+  "göründüğünü": [
+    "que apareció",
+    "cuándo se mostró"
+  ],
+  "yaşamaz": [
+    "no vive",
+    "no vivirá"
+  ],
+  "öğreterek": [
+    "enseñando",
+    "instruyendo"
+  ],
+  "sanmayın": [
+    "no penséis",
+    "no creáis"
+  ],
+  "yargılanacaktır": [
+    "será juzgado"
+  ],
+  "ödeyene": [
+    "hasta pagar",
+    "al que paga"
+  ],
+  "yapmıyor": [
+    "no hace"
+  ],
+  "ödüllendirecektir": [
+    "recompensará",
+    "premiará"
+  ],
+  "gizlide": [
+    "en lo secreto",
+    "en privado"
+  ],
+  "bağışlamazsanız": [
+    "si no perdonáis",
+    "si no perdonan"
+  ],
+  "bağışlamaz": [
+    "no perdona"
+  ],
+  "yargılanmayasınız": [
+    "para que no seáis juzgados"
+  ],
+  "ölçerseniz": [
+    "si medís",
+    "si miden"
+  ],
+  "ikiyüzlü": [
+    "hipócrita"
+  ],
+  "esti": [
+    "sopló"
+  ],
+  "öğretişine": [
+    "a su enseñanza",
+    "a su doctrina"
+  ],
+  "boğuldu": [
+    "se ahogó"
+  ],
+  "tutmuyor": [
+    "no guarda",
+    "no cumple"
+  ],
+  "silkin": [
+    "sacúdete",
+    "sácate el polvo"
+  ],
+  "yeterlidir": [
+    "es suficiente",
+    "basta"
+  ],
+  "çıkarılmayacak": [
+    "no será revelado",
+    "no saldrá a la luz"
+  ],
+  "bilinmeyecek": [
+    "no será conocido",
+    "no se sabrá"
+  ],
+  "değerlisiniz": [
+    "valéis más",
+    "sois más valiosos"
+  ],
+  "kaybedecek": [
+    "perderá"
+  ],
+  "duyuruluyor": [
+    "se anuncia",
+    "es proclamado"
+  ],
+  "ayyaş": [
+    "borracho",
+    "bebedor"
+  ],
+  "kuşanıp": [
+    "ceñido",
+    "vistiéndose"
+  ],
+  "bölünen": [
+    "dividido",
+    "que se divide"
+  ],
+  "tanınır": [
+    "se conoce",
+    "es conocido"
+  ],
+  "istediyse": [
+    "si quiso",
+    "si deseó"
+  ],
+  "hayalet": [
+    "fantasma",
+    "espectro"
+  ],
+  "bağrıştılar": [
+    "gritaron",
+    "dieron voces"
+  ],
+  "hatırlamıyor": [
+    "no recuerda",
+    "no se acuerda"
+  ],
+  "söylememelerini": [
+    "que no dijeran",
+    "no revelar"
+  ],
+  "yitirecek": [
+    "perderá"
+  ],
+  "kazanıp": [
+    "ganando",
+    "si gana"
+  ],
+  "katılığından": [
+    "por vuestra dureza",
+    "por la dureza"
+  ],
+  "kurtulabilir": [
+    "puede salvarse",
+    "puede ser salvo"
+  ],
+  "olanaksızdır": [
+    "es imposible"
+  ],
+  "seçilenler": [
+    "los escogidos",
+    "los elegidos"
+  ],
+  "selamlanmayı": [
+    "ser saludados",
+    "los saludos"
+  ],
+  "kaymaktaşından": [
+    "de alabastro"
+  ],
+  "ayartıya": [
+    "a la tentación",
+    "en tentación"
+  ],
+  "yakalamaya": [
+    "a prender",
+    "a capturar"
+  ],
+  "tükürüp": [
+    "escupiendo",
+    "escupieron"
+  ],
+  "duymuyor": [
+    "no oyes",
+    "no oye"
+  ],
+  "isteyip": [
+    "pidiendo",
+    "queriendo"
+  ],
+  "örüp": [
+    "tejiendo",
+    "trenzando"
+  ],
+  "düzleyin": [
+    "allanad",
+    "enderezad"
+  ],
+  "iyileştirip": [
+    "sanando",
+    "si sana"
+  ],
+  "gruplar": [
+    "grupos"
+  ],
+  "şehvet": [
+    "lujuria",
+    "concupiscencia"
+  ],
+  "atılmandan": [
+    "de tu tropiezo",
+    "si te hace tropezar"
+  ],
+  "aşağılayıp": [
+    "humillando",
+    "ultrajando"
+  ],
+  "yapmadığını": [
+    "que no haces",
+    "que no haces acepción"
+  ],
+  "dirildikten": [
+    "después de resucitar",
+    "tras ser resucitado"
+  ],
+  "ısınıyordu": [
+    "se calentaba",
+    "estaba calentándose"
+  ],
+  "imansızlıkları": [
+    "su incredulidad",
+    "su falta de fe"
+  ],
+  "işitildi": [
+    "fue oída",
+    "fue escuchada"
+  ],
+  "överek": [
+    "alabando",
+    "glorificando"
+  ],
+  "tamamladıktan": [
+    "después de completar",
+    "tras cumplir"
+  ],
+  "bulabilmek": [
+    "poder encontrar",
+    "para encontrar"
+  ],
+  "kazandırır": [
+    "aprovecha",
+    "gana",
+    "aporta"
+  ],
+  "umarak": [
+    "esperando",
+    "con la esperanza de"
+  ],
+  "ötekine": [
+    "al otro",
+    "a otro"
+  ],
+  "uzmanları": [
+    "los expertos",
+    "los maestros"
+  ],
+  "sınanma": [
+    "prueba",
+    "tentación"
+  ],
+  "gereklidir": [
+    "es necesario",
+    "es preciso"
+  ],
+  "ayartı": [
+    "tentación",
+    "prueba"
+  ],
+  "çalmaya": [
+    "a llamar",
+    "a golpear"
+  ],
+  "zulmedecekler": [
+    "perseguirán",
+    "maltratarán"
+  ],
+  "öğrencim": [
+    "mi discípulo",
+    "mi alumno"
+  ],
+  "uzaktayken": [
+    "mientras está lejos",
+    "estando lejos"
+  ],
+  "şikayet": [
+    "queja",
+    "acusación"
+  ],
+  "yüceltmek": [
+    "glorificar",
+    "ensalzar"
+  ],
+  "minan": [
+    "mina"
+  ],
+  "biçen": [
+    "que siega",
+    "que cosecha"
+  ],
+  "durabilmek": [
+    "poder estar en pie",
+    "poder mantenerse"
+  ],
+  "iyiliksever": [
+    "benefactor",
+    "bienhechor"
+  ],
+  "bulmuyorum": [
+    "no encuentro",
+    "no hallo"
+  ],
+  "umuyordu": [
+    "esperaba",
+    "ansiaba"
+  ],
+  "giydirip": [
+    "vistiéndolo",
+    "lo vistió"
+  ],
+  "gerektirecek": [
+    "requerirá",
+    "merecerá"
+  ],
+  "inananlar": [
+    "los que creen",
+    "los creyentes"
   ]
 }
