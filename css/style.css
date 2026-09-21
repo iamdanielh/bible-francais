@@ -804,21 +804,14 @@ html.touch .scrim.show { opacity: 0; }
   .topbar-title { font-size: 1rem; }
 }
 
-/* --- footer / attributions --- */
-.app-footer {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px 18px;
-  padding: 10px 16px 14px;
-  font-size: 0.72rem;
-  line-height: 1.5;
-  color: var(--muted);
+/* --- chapter attribution (discreet, at the end of each chapter) --- */
+.chapter-credit {
+  margin-top: 28px;
+  padding-top: 10px;
   border-top: 1px solid var(--border);
-}
-.app-footer a {
-  color: var(--accent);
-  text-decoration: none;
-}
-.app-footer a:hover {
-  text-decoration: underline;
+  font-size: 0.66rem;
+  line-height: 1.45;
+  color: var(--muted);
+  opacity: 0.7;
+  text-align: center;
 }

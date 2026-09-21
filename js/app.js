@@ -11,6 +11,7 @@ const LANGS = {
     flag: "🇫🇷",
     bibleUrl: "data/bible.json",
     dictUrl: "data/dict.json",
+    attribution: "Francés: La Bible en français courant © Sociedad Bíblica Francesa.",
     tts: { lang: "fr-FR", voice: pickFrVoice },
     aliases: {
       "Évangile selon Matthieu": "Matthieu",
@@ -28,6 +29,7 @@ const LANGS = {
     bibleUrl: "data/tr/bible.json",
     dictUrl: "data/tr/dict.json",
     namesUrl: "data/tr/names.json",
+    attribution: "Türkçe: Yorumsuz Türkçe Çeviri (YTC) © 2023–2025 İsmail Serinken y eBible.org — bajo Creative Commons BY-ND 4.0 (texto sin cambios).",
     tts: { lang: "tr-TR", voice: pickTrVoice },
     aliases: {},
   },
@@ -464,6 +466,13 @@ function renderChapter() {
     if (vi < verses.length - 1) docFrag.appendChild(document.createElement("br"));
   });
   el.verseText.appendChild(docFrag);
+  const attribution = (LANGS[lang] && LANGS[lang].attribution) || "";
+  if (attribution) {
+    const credit = document.createElement("div");
+    credit.className = "chapter-credit";
+    credit.textContent = attribution;
+    el.verseText.appendChild(credit);
+  }
   buildChapterTokens(book, currentChapter);
   if (readerEl) setReaderScroll(0); // new chapter starts at the top
   _lastScrollY = 0;
