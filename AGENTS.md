@@ -21,9 +21,11 @@ node /tmp/opencode/es-audit.mjs          # auditoría de cobertura (5.000 versos
 - Línea base: HEAD `47b5ca0` ("Agree number in passive participles..."). Arriba están
   `50433cb`, `b8eeea1`, `c2794ec` (los commits previos del feature español).
 
-## Fase TR (turco→español) — plan vivo en `CONTINUE.md`
+## Fase TR (turco→español) — **COMPLETADA: 100% (0 sin resolver)**
 
-Ver `CONTINUE.md` para el plan a 100% (nombres + léxico real + números). Reglas TR:
+`data/tr/dict.json` = 18392 claves; `lotes/tr-100.mjs` → `GATE-100: OK (0 sin resolver)`
+(473560/473560 tokens). `CONTINUE.md` conserva el plan y el historial de lotes E8.20–E8.75.
+Reglas TR:
 - Verificación TR por lote: `node /tmp/opencode/tr-apply.mjs` → `tr-fixture.mjs` →
   `tr-gap-v2.mjs` (cobertura REAL con el motor). `lotes/` y `CONTINUE.md` son untracked.
 - 0 dross, glosas reales en español, sin puntuación ni token turco en la glosa, claves sin
