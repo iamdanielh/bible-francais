@@ -294,6 +294,33 @@ $("themeBtn").addEventListener("click", () => {
 });
 applyTheme();
 
+// ---- reader text size ------------------------------------------------------
+const FS_KEY = "biblefr-fontsize";
+const FS_MIN = 15, FS_MAX = 27, FS_STEP = 1.5;
+
+function applyFontSize(px, persist = true) {
+  const clamped = Math.min(FS_MAX, Math.max(FS_MIN, px));
+  document.documentElement.style.setProperty("--reader-size", clamped + "px");
+  if (persist) { try { localStorage.setItem(FS_KEY, String(clamped)); } catch (e) {} }
+}
+
+function initFontSize() {
+  let px = 19;
+  try {
+    const saved = parseFloat(localStorage.getItem(FS_KEY));
+    if (Number.isFinite(saved)) px = saved;
+  } catch (e) {}
+  applyFontSize(px, false);
+  const bump = (dir) => {
+    const cur = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--reader-size")) || 19;
+    applyFontSize(Math.round((cur + dir * FS_STEP) * 2) / 2);
+  };
+  const dec = $("fontDecBtn"), inc = $("fontIncBtn");
+  if (dec) dec.addEventListener("click", () => bump(-1));
+  if (inc) inc.addEventListener("click", () => bump(1));
+}
+initFontSize();
+
 // ---- data loading ---------------------------------------------------------
 async function loadData() {
   // A fetch that hangs (common with a flaky service worker on iOS when the PWA
@@ -458,7 +485,10 @@ function renderChapter() {
   stopChapterRead();
   const book = bible[currentBookIndex];
   const verses = book.chapters[currentChapter] || [];
-  el.chapterTitle.textContent = `${book.name} — capítulo ${currentChapter + 1}`;
+  el.chapterTitle.innerHTML =
+    '<span class="ct-book">' + esc(book.name) + '</span>' +
+    '<span class="ct-ch">Capítulo ' + (currentChapter + 1) + '</span>' +
+    '<hr class="ct-rule">';
   el.verseText.innerHTML = "";
   const docFrag = document.createDocumentFragment();
   verses.forEach((text, vi) => {
@@ -497,6 +527,10 @@ function renderChapter() {
   buildChapterTokens(book, currentChapter);
   if (readerEl) setReaderScroll(0); // new chapter starts at the top
   _lastScrollY = 0;
+  // staggered entrance for the fresh chapter
+  el.verseText.classList.remove("fade");
+  void el.verseText.offsetWidth;
+  el.verseText.classList.add("fade");
   showTopbar();
   // showTopbar() re-scrolls to keep text pinned during a bar toggle, which
   // would push a fresh chapter off its top — override it back to the top.

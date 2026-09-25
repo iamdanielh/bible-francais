@@ -8,27 +8,35 @@
   <title>BiblioLingo — La Biblia en tu idioma</title>
   <link rel="manifest" href="manifest.webmanifest" />
   <link rel="apple-touch-icon" href="icon-180.png" />
-  <link rel="stylesheet" href="css/style.css?v=47" />
+  <link rel="stylesheet" href="css/style.css?v=48" />
 </head>
 <body>
   <header class="topbar">
     <div class="topbar-title">
       <span class="brand">📖</span>
-      <span>BiblioLingo</span>
+      <span class="brand-title">BiblioLingo</span>
       <select id="langSelect" class="lang-select" aria-label="Idioma"></select>
     </div>
     <div class="topbar-controls">
-      <select id="bookSelect" aria-label="Libro"></select>
-      <button id="prevBtn" title="Capítulo anterior">‹</button>
-      <select id="chapterSelect" aria-label="Capítulo"></select>
-      <button id="nextBtn" title="Capítulo siguiente">›</button>
-      <button id="readBtn" title="Leer todo el capítulo">▶</button>
-      <button id="vocabBtn" title="Ver vocabulario">⭐</button>
-      <button id="aiBtn" title="Preguntar a la IA">✨</button>
+      <div class="nav-group">
+        <select id="bookSelect" aria-label="Libro"></select>
+        <button id="prevBtn" title="Capítulo anterior" aria-label="Capítulo anterior">‹</button>
+        <select id="chapterSelect" aria-label="Capítulo"></select>
+        <button id="nextBtn" title="Capítulo siguiente" aria-label="Capítulo siguiente">›</button>
+      </div>
+      <button id="readBtn" class="tool-btn" title="Leer todo el capítulo" aria-label="Leer todo el capítulo"><span class="t-ico">▶</span><span class="t-label">Oír</span></button>
+      <button id="vocabBtn" class="tool-btn" title="Ver vocabulario" aria-label="Ver vocabulario"><span class="t-ico">⭐</span><span class="t-label">Vocab</span></button>
+      <button id="aiBtn" class="tool-btn" title="Preguntar a la IA" aria-label="Preguntar a la IA"><span class="t-ico">✨</span><span class="t-label">IA</span></button>
+      <div class="font-group" role="group" aria-label="Tamaño del texto">
+        <button id="fontDecBtn" title="Texto más pequeño" aria-label="Texto más pequeño">A−</button>
+        <button id="fontIncBtn" title="Texto más grande" aria-label="Texto más grande">A+</button>
+      </div>
     </div>
   </header>
 
-  <div id="loading" class="loading" hidden>Cargando la Biblia…</div>
+  <div id="loading" class="loading" hidden>Cargando la Biblia…
+    <div class="loading-skel" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+  </div>
 
   <main class="layout">
     <section class="reader">
@@ -140,7 +148,7 @@
     </div>
   </div>
 
-  <script type="module" src="js/app.js?v=48"></script>
+  <script type="module" src="js/app.js?v=49"></script>
 
   <script>
     // Non-module trap (runs even if the module above fails to load or parse).
