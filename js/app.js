@@ -1,6 +1,6 @@
 import { Dictionary, friendlyTense, friendlyForm, esInfinitive, esConjugado, esCompuesto } from "./dict.js?v=45";
 import { TrEngine } from "./tr-engine.js?v=46";
-import { EnEngine } from "./en-engine.js?v=1";
+import { EnEngine } from "./en-engine.js?v=2";
 
 // ---- language packs --------------------------------------------------------
 // Every language is a self-contained pack: which data files to fetch, how to
@@ -31,6 +31,7 @@ const LANGS = {
     esName: "inglés",
     bibleUrl: "data/en/bible.json",
     dictUrl: "data/en/dict.json",
+    namesUrl: "data/en/names.json",
     attribution: "English: World English Bible — public domain.",
     tts: { lang: "en-US", voice: pickEnVoice },
     aliases: {},

@@ -28,3 +28,28 @@
 > (https://github.com/apertium/apertium-en-es), bajo licencia **GPL-3.0**.
 > © Apertium contributors. Glosas adicionales de uso bíblico (KJV) añadidas
 > por el proyecto.
+
+## Suplementos de cobertura (2026-09-26)
+
+Medición sobre el corpus: 751.570 tokens, 12.684 formas únicas. Tasa de
+palabras sin traducción: **6,8% → 0,6%**.
+
+- **Lote 1** (~210 entradas): vocabulario bíblico frecuente ausente del bidix
+  (`covenant`, `tabernacle`, `shekel`, `rejoice`, `anoint`, `cherubim`…),
+  interjecciones (`woe`, `o`, `selah`) y el artículo `an`.
+- **Lote 2** (~10 entradas): `eastward`, `savior`, `fisherman`, `countryman`,
+  `madman` y raíces para plurales irregulares en *-men*.
+- **Lote 3** (~100 entradas): resto de alta frecuencia (`molten`, `conscience`,
+  `travail`, `garrison`, `reproof`, `deliverance`, `covetousness`…).
+- **Lote 4** (~40 entradas): `footman/craftsman/herdsman` (raíces de los
+  irregulares en *-men*), `mistress`, `trough`, `extol`, `tetrarch`…
+- Ningún lote sobrescribió entradas existentes (`overwrote-existing: 0`).
+
+## Nombres propios (`data/en/names.json`)
+
+1.322 entradas EN (minúsculas) → nombre en español, convenciones Reina-Valera
+(`yahweh`→Yahvé, `moses`→Moisés, `jerusalem`→Jerusalén, `judah`→Judá).
+Incluye gentilicios en minúscula (`philistines`→filisteos, `jews`→judíos) y
+formas idénticas al inglés para nombres raros (p. ej. `ashkenaz`→Ashkenaz),
+que el motor marca como nombre propio. Tabla curada por el proyecto
+(hechos onomásticos, sin licencia de terceros).
