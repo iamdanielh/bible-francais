@@ -8,7 +8,7 @@
   <title>BiblioLingo — La Biblia en tu idioma</title>
   <link rel="manifest" href="manifest.webmanifest" />
   <link rel="apple-touch-icon" href="icon-180.png" />
-  <link rel="stylesheet" href="css/style.css?v=51" />
+  <link rel="stylesheet" href="css/style.css?v=52" />
 </head>
 <body>
   <header class="topbar">
@@ -134,10 +134,10 @@
         <span id="rbVerse" class="rb-verse">—</span>
       </div>
       <div class="rb-controls">
-        <button id="rbPrev" class="icon-btn" title="Verso anterior" aria-label="Verso anterior">⏮</button>
+        <button id="rbPrev" class="icon-btn" title="Verso anterior" aria-label="Verso anterior"><span data-icon="prev"></span></button>
         <button id="rbPlay" class="round-btn" title="Reproducir / pausar" aria-label="Reproducir o pausar"><span data-icon="play"></span></button>
-        <button id="rbNext" class="icon-btn" title="Verso siguiente" aria-label="Verso siguiente">⏭</button>
-        <button id="rbStop" class="icon-btn" title="Detener" aria-label="Detener">⏹</button>
+        <button id="rbNext" class="icon-btn" title="Verso siguiente" aria-label="Verso siguiente"><span data-icon="next"></span></button>
+        <button id="rbStop" class="icon-btn" title="Detener" aria-label="Detener"><span data-icon="stop"></span></button>
       </div>
       <div class="rb-right">
         <button id="rbSpeed" class="speed-btn" title="Elegir velocidad de lectura" aria-label="Elegir velocidad de lectura">1.0×</button>
@@ -150,7 +150,7 @@
     </div>
   </div>
 
-  <script type="module" src="js/app.js?v=53"></script>
+  <script type="module" src="js/app.js?v=54"></script>
 
   <script>
     // Non-module trap (runs even if the module above fails to load or parse).

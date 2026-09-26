@@ -68,6 +68,9 @@ const ICONS = {
   dots: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="5" cy="12" r="1.7"/><circle cx="12" cy="12" r="1.7"/><circle cx="19" cy="12" r="1.7"/></svg>',
   volume: _SVG_OPEN + '<path d="M11 5L6.8 9H3.5v6h3.3L11 19z"/><path d="M15 9.3a4 4 0 0 1 0 5.4M17.8 6.8a8 8 0 0 1 0 10.4"/></svg>',
   check: _SVG_OPEN + '<path d="M4.5 12.5l5 5L19.5 7"/></svg>',
+  prev: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18.5 5.4v13.2a.9.9 0 0 1-1.36.77l-8.2-5.07v4.3a1.1 1.1 0 0 1-2.2 0V5.4a1.1 1.1 0 0 1 2.2 0v4.3l8.2-5.07a.9.9 0 0 1 1.36.77z" fill="currentColor" stroke-width="1.2"/></svg>',
+  next: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5.5 5.4v13.2a.9.9 0 0 0 1.36.77l8.2-5.07v4.3a1.1 1.1 0 0 0 2.2 0V5.4a1.1 1.1 0 0 0-2.2 0v4.3l-8.2-5.07a.9.9 0 0 0-1.36.77z" fill="currentColor" stroke-width="1.2"/></svg>',
+  stop: '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="6.5" y="6.5" width="11" height="11" rx="2.2" fill="currentColor"/></svg>',
 };
 function setIcon(span, name) {
   if (!span || !ICONS[name]) return;

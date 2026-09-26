@@ -225,6 +225,8 @@ button:disabled { opacity: 0.38; cursor: not-allowed; transform: none; }
 .btn-ico svg { width: 16px; height: 16px; }
 .more-btn svg { width: 22px; height: 22px; }
 .round-btn svg { width: 18px; height: 18px; }
+.icon-btn { display: inline-flex; align-items: center; justify-content: center; }
+.icon-btn svg { width: 20px; height: 20px; }
 .ghost-btn:has(.btn-ico), .primary-btn:has(.btn-ico) {
   display: inline-flex; align-items: center; justify-content: center; gap: 8px;
 }
