@@ -1,5 +1,6 @@
 import { Dictionary, friendlyTense, friendlyForm, esInfinitive, esConjugado, esCompuesto } from "./dict.js?v=45";
 import { TrEngine } from "./tr-engine.js?v=46";
+import { EnEngine } from "./en-engine.js?v=1";
 
 // ---- language packs --------------------------------------------------------
 // Every language is a self-contained pack: which data files to fetch, how to
@@ -9,6 +10,7 @@ const LANGS = {
   fr: {
     label: "Français",
     flag: "🇫🇷",
+    esName: "francés",
     bibleUrl: "data/bible.json",
     dictUrl: "data/dict.json",
     attribution: "Francés: La Bible en français courant © Sociedad Bíblica Francesa.",
@@ -23,9 +25,20 @@ const LANGS = {
       "Genèse": "Genèse",
     },
   },
+  en: {
+    label: "English",
+    flag: "🇺🇸",
+    esName: "inglés",
+    bibleUrl: "data/en/bible.json",
+    dictUrl: "data/en/dict.json",
+    attribution: "English: World English Bible — public domain.",
+    tts: { lang: "en-US", voice: pickEnVoice },
+    aliases: {},
+  },
   tr: {
     label: "Türkçe",
     flag: "🇹🇷",
+    esName: "turco",
     bibleUrl: "data/tr/bible.json",
     dictUrl: "data/tr/dict.json",
     namesUrl: "data/tr/names.json",
@@ -34,13 +47,14 @@ const LANGS = {
     aliases: {},
   },
 };
-const LANG_ORDER = ["fr", "tr"];
+const LANG_ORDER = ["fr", "en", "tr"];
 let lang = "fr";
 
 // Build the engine for a language. dict.js is French→Spanish; tr-engine.js
 // is the Turkish engine (suffix analysis lands in Fase 1, TR→ES dict in Fase 2).
 function makeEngine(langCode, dict, names) {
   if (langCode === "fr") return new Dictionary(dict);
+  if (langCode === "en") return new EnEngine(dict, names);
   if (langCode === "tr") return new TrEngine(dict, names);
   throw new Error("motor no disponible para " + langCode);
 }
@@ -898,6 +912,16 @@ function pickTrVoice(voices) {
   if (polite) return polite;
   if (IS_IOS) return null; // let the OS-chosen default voice win
   return tr.find((v) => !BAD_VOICES.test(v.name)) || tr[0];
+}
+function pickEnVoice(voices) {
+  const en = (voices || []).filter((v) => /^en/i.test(v.lang));
+  if (!en.length) return null;
+  const us = en.filter((v) => /^en[-_]US/i.test(v.lang));
+  const pool = us.length ? us : en;
+  const samantha = pool.find((v) => /samantha/i.test(v.name));
+  if (samantha) return samantha;
+  if (IS_IOS) return null; // let the OS-chosen default voice win
+  return pool.find((v) => !BAD_VOICES.test(v.name)) || pool[0];
 }
 const packTTS = () => (LANGS[lang] && LANGS[lang].tts) || { lang: "fr-FR", voice: pickFrVoice };
 
@@ -1783,9 +1807,7 @@ function removeVocab(entry) {
 const DEFAULT_AI_KEY = ["sk-or-v1-", "5206320f", "4649b94a", "0ea19035", "461653a7", "f1e883a0", "84f0a100", "2394d8d4", "c15d0a9f"].join("");
 
 function AI_SYSTEM_PROMPT() {
-  const isTr = lang === "tr";
-  const src = isTr ? "turco" : "francés";
-  const srcBible = isTr ? "la Biblia" : "la Biblia";
+  const src = (LANGS[lang] && LANGS[lang].esName) || "francés";
   return "Eres un profesor de " + src + " para hispanohablantes que leen la Biblia. " +
     "Responde siempre en español sencillo, como un amigo que enseña, sin palabras técnicas. " +
     "Para cada palabra que expliques, da primero su traducción al español y, si aporta algo, " +
