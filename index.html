@@ -8,7 +8,7 @@
   <title>BiblioLingo — La Biblia en tu idioma</title>
   <link rel="manifest" href="manifest.webmanifest" />
   <link rel="apple-touch-icon" href="icon-180.png" />
-  <link rel="stylesheet" href="css/style.css?v=53" />
+  <link rel="stylesheet" href="css/style.css?v=54" />
 </head>
 <body>
   <header class="topbar">
@@ -17,12 +17,12 @@
       <button id="navTitle" class="nav-title" aria-haspopup="dialog" aria-label="Elegir libro y capítulo">BiblioLingo</button>
       <button id="nextBtn" class="nav-arrow" title="Capítulo siguiente" aria-label="Capítulo siguiente">›</button>
     </div>
+    <button id="readBtn" class="icon-btn top-action" title="Leer todo el capítulo" aria-label="Escuchar el capítulo"><span data-icon="play"></span></button>
+    <button id="aiBtn" class="icon-btn top-action" title="Pregunta a la IA" aria-label="Pregunta a la IA"><span data-icon="sparkles"></span></button>
     <div class="menu-wrap">
       <button id="moreBtn" class="more-btn" title="Más opciones" aria-label="Más opciones" aria-haspopup="true" aria-expanded="false"><span data-icon="dots"></span></button>
       <div class="menu" id="moreMenu" role="menu" aria-label="Opciones">
-        <button id="readBtn" class="menu-item" role="menuitem"><span class="mi-ico" data-icon="play"></span><span>Escuchar</span></button>
         <button id="vocabBtn" class="menu-item" role="menuitem"><span class="mi-ico" data-icon="star"></span><span>Vocabulario</span></button>
-        <button id="aiBtn" class="menu-item" role="menuitem"><span class="mi-ico" data-icon="sparkles"></span><span>Pregunta a la IA</span></button>
         <hr>
         <div class="menu-label">Tamaño de texto</div>
         <div class="menu-seg" role="group" aria-label="Tamaño del texto">
