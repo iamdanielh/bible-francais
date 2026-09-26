@@ -66,6 +66,8 @@ const ICONS = {
   globe: _SVG_OPEN + '<circle cx="12" cy="12" r="8.4"/><path d="M3.6 12h16.8M12 3.6c2.2 2.3 3.4 5.2 3.4 8.4s-1.2 6.1-3.4 8.4c-2.2-2.3-3.4-5.2-3.4-8.4S9.8 5.9 12 3.6z"/></svg>',
   book: _SVG_OPEN + '<path d="M4 19.5v-14A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5z"/><path d="M4 20.5A2.5 2.5 0 0 1 6.5 18H20"/></svg>',
   dots: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="5" cy="12" r="1.7"/><circle cx="12" cy="12" r="1.7"/><circle cx="19" cy="12" r="1.7"/></svg>',
+  volume: _SVG_OPEN + '<path d="M11 5L6.8 9H3.5v6h3.3L11 19z"/><path d="M15 9.3a4 4 0 0 1 0 5.4M17.8 6.8a8 8 0 0 1 0 10.4"/></svg>',
+  check: _SVG_OPEN + '<path d="M4.5 12.5l5 5L19.5 7"/></svg>',
 };
 function setIcon(span, name) {
   if (!span || !ICONS[name]) return;
@@ -1482,7 +1484,7 @@ function speakReadVerse(i) {
 // chapter is queued synchronously from inside the tap gesture. iOS only lets
 // the first speak() begin from the gesture, and it garbage-collects utterances
 // that aren't retained (a chained per-verse speak() was silently dropped until
-// the 🔊 word button warmed the engine) — so references are kept and each
+// the word speak button warmed the engine) — so references are kept and each
 // verse highlights on its own onstart.
 function startDeviceRead(verses, gen, from) {
   if (!verses || !verses.length) { stopChapterRead(); return; }
@@ -1963,7 +1965,7 @@ function localExplain(text) {
     }
     if (gloss) line += '<div class="ai-local-gloss">' + esc(gloss) + "</div>";
     if (ms.length > 1) {
-      line += '<div class="ai-local-ctx">Tiene varios significados; el sentido exacto lo da la frase que lo rodea (prueba 🌐 Traducción).</div>';
+      line += '<div class="ai-local-ctx">Tiene varios significados; el sentido exacto lo da la frase que lo rodea (prueba «Traducción»).</div>';
     }
     line += "</div>";
     return line;
@@ -1980,7 +1982,7 @@ function aiShowLocal() {
   const div = document.createElement("div");
   div.className = "ai-msg ai-assistant ai-local";
   div.innerHTML =
-    '<div class="ai-local-head">📖 Explicación sencilla · <b class="ai-local-word">' +
+    '<div class="ai-local-head">Explicación sencilla · <b class="ai-local-word">' +
     esc(q) + "</b></div>" +
     (html || "<span class='dim'>Sin datos para ese texto.</span>");
   aiThread.appendChild(div);

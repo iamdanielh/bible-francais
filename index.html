@@ -59,7 +59,7 @@
           <div class="word-head">
             <div class="word-title-row">
               <h2 id="wordLabel"></h2>
-              <button id="speakBtn" class="round-btn" title="Escuchar pronunciación" disabled>🔊</button>
+              <button id="speakBtn" class="round-btn" title="Escuchar pronunciación" disabled><span data-icon="volume"></span></button>
             </div>
             <div class="word-actions">
               <button id="ctxBtn" class="ghost-btn" title="Traducción en línea de esta palabra o frase"><span class="btn-ico" data-icon="globe"></span>Traducción</button>
@@ -89,7 +89,7 @@
           <div class="study-head">
             <button id="studyBack" class="ghost-btn">← Vocabulario</button>
             <span id="studyTitle" class="study-title"></span>
-            <button id="studySpeak" class="round-btn" title="Escuchar">🔊</button>
+            <button id="studySpeak" class="round-btn" title="Escuchar"><span data-icon="volume"></span></button>
             <span id="studyProgress" class="study-progress"></span>
           </div>
           <div id="studyCard" class="study-card" role="button" tabindex="0" aria-label="Tarjeta de estudio, toca para ver el significado">
@@ -100,7 +100,7 @@
           </div>
           <div id="studyControls" class="study-controls" hidden>
             <button id="studyAgain" class="ghost-btn">↻ Repasar</button>
-            <button id="studyKnow" class="primary-btn">✓ Lo sabía</button>
+            <button id="studyKnow" class="primary-btn"><span class="btn-ico" data-icon="check"></span>Lo sabía</button>
           </div>
           <div id="studyDone" class="study-done" hidden>
             <div id="studyDoneMsg" class="study-done-msg">¡Lo has repasado todo!</div>
@@ -150,7 +150,7 @@
     </div>
   </div>
 
-  <script type="module" src="js/app.js?v=52"></script>
+  <script type="module" src="js/app.js?v=53"></script>
 
   <script>
     // Non-module trap (runs even if the module above fails to load or parse).
