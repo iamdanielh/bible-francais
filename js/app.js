@@ -52,6 +52,31 @@ let state = { lang: "fr", book: 0, chapter: 0, verse: 0, vocab: [], scrollTop: 0
 // ---- DOM refs -------------------------------------------------------------
 const $ = (id) => document.getElementById(id);
 
+// ---- vector icons ----------------------------------------------------------
+// One consistent icon set (inline SVG, currentColor): no emoji in the chrome,
+// so the icons render identically on every phone and match the theme.
+const _SVG_OPEN = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">';
+const ICONS = {
+  play: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.4v13.2a.9.9 0 0 0 1.38.76l10.1-6.6a.9.9 0 0 0 0-1.52L9.38 4.64A.9.9 0 0 0 8 5.4z" fill="currentColor" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>',
+  pause: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" aria-hidden="true"><path d="M9 5v14M15 5v14"/></svg>',
+  star: _SVG_OPEN + '<path d="M12 3.6l2.5 5.1 5.6.8-4 4 .9 5.6-5-2.6-5 2.6.9-5.6-4-4 5.6-.8z"/></svg>',
+  sparkles: _SVG_OPEN + '<path d="M12 4c.6 4.3 2.5 6.2 6.8 6.8-4.3.6-6.2 2.5-6.8 6.8-.6-4.3-2.5-6.2-6.8-6.8 4.3-.6 6.2-2.5 6.8-6.8z"/><path d="M18.6 3.2c.25 1.7 1 2.5 2.7 2.7-1.7.25-2.45 1-2.7 2.7-.25-1.7-1-2.45-2.7-2.7 1.7-.2 2.45-1 2.7-2.7z"/></svg>',
+  moon: _SVG_OPEN + '<path d="M20 13.6A8 8 0 0 1 10.4 4 8 8 0 1 0 20 13.6z"/></svg>',
+  sun: _SVG_OPEN + '<circle cx="12" cy="12" r="3.8"/><path d="M12 2.8v2.4M12 18.8v2.4M4.9 4.9l1.7 1.7M17.4 17.4l1.7 1.7M2.8 12h2.4M18.8 12h2.4M4.9 19.1l1.7-1.7M17.4 6.6l1.7-1.7"/></svg>',
+  globe: _SVG_OPEN + '<circle cx="12" cy="12" r="8.4"/><path d="M3.6 12h16.8M12 3.6c2.2 2.3 3.4 5.2 3.4 8.4s-1.2 6.1-3.4 8.4c-2.2-2.3-3.4-5.2-3.4-8.4S9.8 5.9 12 3.6z"/></svg>',
+  book: _SVG_OPEN + '<path d="M4 19.5v-14A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5z"/><path d="M4 20.5A2.5 2.5 0 0 1 6.5 18H20"/></svg>',
+  dots: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="5" cy="12" r="1.7"/><circle cx="12" cy="12" r="1.7"/><circle cx="19" cy="12" r="1.7"/></svg>',
+};
+function setIcon(span, name) {
+  if (!span || !ICONS[name]) return;
+  span.setAttribute("data-icon", name);
+  span.innerHTML = ICONS[name];
+}
+function hydrateIcons(root = document) {
+  root.querySelectorAll("[data-icon]").forEach((s) => setIcon(s, s.getAttribute("data-icon")));
+}
+hydrateIcons();
+
 // Surface ANY error (incl. mid-module-evaluation throws that would otherwise
 // abort bootstrap and leave an eternal loading screen) on the load box with a
 // recovery path. Registered first so it never misses something below.
@@ -279,11 +304,7 @@ function setTheme(t, persist = true) {
   const dark = t === "dark";
   document.documentElement.setAttribute("data-theme", dark ? "dark" : "light");
   const btn = $("themeBtn");
-  if (btn) {
-    const glyph = dark ? "☀️" : "🌙";
-    const ico = btn.querySelector(".mi-ico");
-    if (ico) ico.textContent = glyph; else btn.textContent = glyph;
-  }
+  if (btn) setIcon(btn.querySelector("[data-icon]"), dark ? "sun" : "moon");
   if (THEME_META) THEME_META.setAttribute("content", dark ? "#15171f" : "#f6f1e7");
   if (persist) { try { localStorage.setItem(THEME_KEY, t); } catch (e) {} }
 }
@@ -1014,18 +1035,15 @@ function currentVerseEls() {
 function refreshReadButton() {
   const play = $("readBtn");
   if (!play) return;
-  const setGlyph = (g) => {
-    const ico = play.querySelector(".mi-ico");
-    if (ico) ico.textContent = g; else play.textContent = g;
-  };
+  const setGlyph = (g) => setIcon(play.querySelector("[data-icon]"), g);
   if (!_readerActive) {
-    setGlyph("▶");
+    setGlyph("play");
     play.title = "Leer todo el capítulo";
   } else if (_readerPaused) {
-    setGlyph("▶");
+    setGlyph("play");
     play.title = "Reanudar lectura (mantén para detener)";
   } else {
-    setGlyph("⏸");
+    setGlyph("pause");
     play.title = "Pausar lectura (mantén para detener)";
   }
   play.classList.toggle("active", _readerActive);
@@ -1224,7 +1242,7 @@ function refreshReaderBar() {
   const n = verses.length;
   const play = $("rbPlay");
   if (play) {
-    play.textContent = _readerActive && !_readerPaused ? "⏸" : "▶";
+    setIcon(play.querySelector("[data-icon]"), _readerActive && !_readerPaused ? "pause" : "play");
     play.disabled = !n;
   }
   const title = $("rbTitle");

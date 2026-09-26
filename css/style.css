@@ -218,7 +218,16 @@ button:disabled { opacity: 0.38; cursor: not-allowed; transform: none; }
 .menu-item:hover { background: var(--ctrl-hover); }
 .menu-item:active { transform: none; }
 .menu-item.active { background: var(--accent-soft); color: var(--accent-deep); font-weight: 700; }
-.mi-ico { font-size: 1.1rem; width: 26px; text-align: center; flex: none; }
+.mi-ico { font-size: 1.1rem; width: 26px; text-align: center; flex: none; display: inline-flex; align-items: center; justify-content: center; }
+/* vector icon slots */
+[data-icon] { display: inline-flex; align-items: center; justify-content: center; }
+[data-icon] svg { display: block; width: 20px; height: 20px; }
+.btn-ico svg { width: 16px; height: 16px; }
+.more-btn svg { width: 22px; height: 22px; }
+.round-btn svg { width: 18px; height: 18px; }
+.ghost-btn:has(.btn-ico), .primary-btn:has(.btn-ico) {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+}
 .menu hr { border: none; border-top: 1px solid var(--border-soft); margin: 4px 8px; }
 .menu-label {
   font-size: 0.68rem;

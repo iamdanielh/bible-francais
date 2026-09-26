@@ -8,7 +8,7 @@
   <title>BiblioLingo — La Biblia en tu idioma</title>
   <link rel="manifest" href="manifest.webmanifest" />
   <link rel="apple-touch-icon" href="icon-180.png" />
-  <link rel="stylesheet" href="css/style.css?v=50" />
+  <link rel="stylesheet" href="css/style.css?v=51" />
 </head>
 <body>
   <header class="topbar">
@@ -19,11 +19,11 @@
       <button id="nextBtn" title="Capítulo siguiente" aria-label="Capítulo siguiente">›</button>
     </div>
     <div class="menu-wrap">
-      <button id="moreBtn" class="more-btn" title="Más opciones" aria-label="Más opciones" aria-haspopup="true" aria-expanded="false">⋯</button>
+      <button id="moreBtn" class="more-btn" title="Más opciones" aria-label="Más opciones" aria-haspopup="true" aria-expanded="false"><span data-icon="dots"></span></button>
       <div class="menu" id="moreMenu" role="menu" aria-label="Opciones">
-        <button id="readBtn" class="menu-item" role="menuitem"><span class="mi-ico">▶</span><span>Escuchar</span></button>
-        <button id="vocabBtn" class="menu-item" role="menuitem"><span class="mi-ico">⭐</span><span>Vocabulario</span></button>
-        <button id="aiBtn" class="menu-item" role="menuitem"><span class="mi-ico">✨</span><span>Pregunta a la IA</span></button>
+        <button id="readBtn" class="menu-item" role="menuitem"><span class="mi-ico" data-icon="play"></span><span>Escuchar</span></button>
+        <button id="vocabBtn" class="menu-item" role="menuitem"><span class="mi-ico" data-icon="star"></span><span>Vocabulario</span></button>
+        <button id="aiBtn" class="menu-item" role="menuitem"><span class="mi-ico" data-icon="sparkles"></span><span>Pregunta a la IA</span></button>
         <hr>
         <div class="menu-label">Tamaño de texto</div>
         <div class="menu-seg" role="group" aria-label="Tamaño del texto">
@@ -31,8 +31,8 @@
           <button id="fontIncBtn" title="Texto más grande" aria-label="Texto más grande">A+</button>
         </div>
         <hr>
-        <label class="menu-lang"><span class="menu-lang-title"><span class="mi-ico">🌐</span><span>Idioma</span></span><select id="langSelect" class="lang-select" aria-label="Idioma"></select></label>
-        <button id="themeBtn" class="menu-item" role="menuitem"><span class="mi-ico">🌙</span><span>Tema</span></button>
+        <label class="menu-lang"><span class="menu-lang-title"><span class="mi-ico" data-icon="globe"></span><span>Idioma</span></span><select id="langSelect" class="lang-select" aria-label="Idioma"></select></label>
+        <button id="themeBtn" class="menu-item" role="menuitem"><span class="mi-ico" data-icon="moon"></span><span>Tema</span></button>
       </div>
     </div>
   </header>
@@ -62,8 +62,8 @@
               <button id="speakBtn" class="round-btn" title="Escuchar pronunciación" disabled>🔊</button>
             </div>
             <div class="word-actions">
-              <button id="ctxBtn" class="ghost-btn" title="Traducción en línea de esta palabra o frase">🌐 Traducción</button>
-              <button id="wordAiBtn" class="ghost-btn" title="Preguntáselo a la IA">✨ IA</button>
+              <button id="ctxBtn" class="ghost-btn" title="Traducción en línea de esta palabra o frase"><span class="btn-ico" data-icon="globe"></span>Traducción</button>
+              <button id="wordAiBtn" class="ghost-btn" title="Preguntáselo a la IA"><span class="btn-ico" data-icon="sparkles"></span>IA</button>
             </div>
           </div>
           <div id="ctxWrap" class="ctx-wrap" hidden>
@@ -115,8 +115,8 @@
           <div class="ai-compose">
             <textarea id="aiInput" rows="2" placeholder="Ej. ¿Por qué «étaient» está en pasado? / Explícame esta frase."></textarea>
             <div class="ai-actions">
-              <button id="aiLocalBtn" class="ghost-btn" title="Explicación del diccionario, sin conexión">📖 Local</button>
-              <button id="aiSendBtn" class="primary-btn">Preguntar ✨</button>
+              <button id="aiLocalBtn" class="ghost-btn" title="Explicación del diccionario, sin conexión"><span class="btn-ico" data-icon="book"></span>Local</button>
+              <button id="aiSendBtn" class="primary-btn">Preguntar <span class="btn-ico" data-icon="sparkles"></span></button>
             </div>
           </div>
         </div>
@@ -135,7 +135,7 @@
       </div>
       <div class="rb-controls">
         <button id="rbPrev" class="icon-btn" title="Verso anterior" aria-label="Verso anterior">⏮</button>
-        <button id="rbPlay" class="round-btn" title="Reproducir / pausar" aria-label="Reproducir o pausar">▶</button>
+        <button id="rbPlay" class="round-btn" title="Reproducir / pausar" aria-label="Reproducir o pausar"><span data-icon="play"></span></button>
         <button id="rbNext" class="icon-btn" title="Verso siguiente" aria-label="Verso siguiente">⏭</button>
         <button id="rbStop" class="icon-btn" title="Detener" aria-label="Detener">⏹</button>
       </div>
@@ -150,7 +150,7 @@
     </div>
   </div>
 
-  <script type="module" src="js/app.js?v=51"></script>
+  <script type="module" src="js/app.js?v=52"></script>
 
   <script>
     // Non-module trap (runs even if the module above fails to load or parse).
