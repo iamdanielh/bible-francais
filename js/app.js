@@ -478,7 +478,7 @@ function gotoNextChapter() {
 function gotoPrevChapter() {
   closePanel();
   if (currentChapter > 0) { currentChapter--; el.chapterSelect.value = currentChapter; renderChapter(); saveState(); }
-  else if (currentBookIndex > 0) selectBook(currentBookIndex - 1);
+  else if (currentBookIndex > 0) selectBook(currentBookIndex - 1, false, bible[currentBookIndex - 1].chapters.length - 1);
 }
 
 function renderChapter() {
@@ -538,14 +538,17 @@ function renderChapter() {
   _lastScrollY = 0;
 }
 
-function selectBook(index, restoreChapter = false) {
+function selectBook(index, restoreChapter = false, chapterOverride = null) {
   if (index < 0 || index >= bible.length) return;
   currentBookIndex = index;
   el.bookSelect.value = index;
   buildChapterList();
+  const maxChap = bible[index].chapters.length - 1;
   let chap;
-  if (restoreChapter) chap = Math.min(Math.max(state.chapter, 0), bible[index].chapters.length - 1);
+  if (chapterOverride !== null && chapterOverride !== undefined) chap = Math.min(Math.max(chapterOverride, 0), maxChap);
+  else if (restoreChapter) chap = Math.min(Math.max(state.chapter, 0), maxChap);
   else chap = 0;
+  currentChapter = chap;
   el.chapterSelect.value = chap;
   renderChapter();
   closePanel();
