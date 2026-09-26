@@ -65,6 +65,7 @@ html, body {
   margin: 0;
   padding: 0;
   height: 100%;
+  overflow-x: clip;
 }
 
 body {
@@ -89,7 +90,7 @@ body {
   top: 0;
   left: 0;
   right: 0;
-  z-index: 40;
+  z-index: 70;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -570,6 +571,7 @@ html.touch .scrim.show { opacity: 0; }
   border-top: 1px solid var(--border-soft);
   box-shadow: var(--shadow-drawer);
   max-height: 64vh;
+  padding-bottom: env(safe-area-inset-bottom, 0px);
   transform: translateY(108%);
   transition: transform 0.34s var(--spring);
   visibility: hidden;
@@ -1042,19 +1044,23 @@ html.touch .scrim.show { opacity: 0; }
 
 /* ---------- mobile refinements ---------- */
 @media (max-width: 820px) {
+  :root { --topbar-h: 118px; }
   .reader { padding-bottom: 120px; }
-  .topbar { padding: 8px 10px; gap: 6px; }
-  .topbar-title { font-size: 1rem; }
+  /* Two-row topbar: flatten the controls wrapper so row 1 = brand + chapter
+     pill, row 2 = Oír / Vocab / IA + text-size. Nothing gets pushed off-screen. */
+  .topbar { padding: 8px 10px; gap: 6px; row-gap: 8px; flex-wrap: wrap; }
+  .topbar-controls { display: contents; }
+  .topbar-title { font-size: 1rem; flex: 1 1 auto; }
   .brand-title { display: none; }
-  .tool-btn { min-width: 46px; padding: 5px 6px 4px; }
+  .lang-select { max-width: 84px; padding: 6px; font-size: 0.78rem; }
+  .nav-group { flex: none; }
+  .nav-group select { max-width: 64px; padding: 7px 4px; font-size: 0.8rem; }
+  .nav-group button { min-width: 44px; min-height: 44px; padding: 7px 10px; }
+  .tool-btn { min-width: 46px; min-height: 44px; padding: 5px 6px 4px; }
   .tool-btn .t-label { font-size: 0.55rem; }
-  .nav-group select { max-width: 92px; }
+  .font-group button { min-height: 44px; padding: 7px 10px; }
   .ct-ch { font-size: 1.7rem; }
   .verse-text { line-height: 1.85; }
-}
-
-@media (max-width: 380px) {
-  .font-group { display: none; }
 }
 
 /* ---------- reduced motion ---------- */
