@@ -619,6 +619,19 @@ export class EnEngine {
     return [null, {}];
   }
 
+  // Dash-joined parts ("man—who" → ["man","who"]): each part is edge-trimmed
+  // and resolved with its own casing, so names inside still hit the name table.
+  _resolveDashParts(rawParts) {
+    const parts = rawParts.map((p) => String(p).replace(EN_TRIM, "")).filter(Boolean);
+    if (parts.length < 2) return null;
+    const rs = parts.map((p) => this._resolveBare(normalizeEn(p), p));
+    if (rs.every((r) => r[0] && r[0].length)) {
+      return [[rs.map((r) => r[0][0]).join(" · ")],
+        { root: parts.join("—"), form: "compuesto", suffixes: [] }];
+    }
+    return null;
+  }
+
   // Hyphen compounds: number words ("twenty-five" → "veinticinco",
   // "twenty-fourth" → ordinal 24) or part-by-part resolution.
   _resolveHyphen(bare) {
@@ -649,7 +662,8 @@ export class EnEngine {
 
   resolve(word, opts = {}) {
     const raw = String(word);
-    const w = normalizeEn(raw);
+    // Edge punctuation never carries meaning ("sins-" → "sins").
+    const w = normalizeEn(raw).replace(EN_TRIM, "");
     const bare = w;
     if (!bare) return [null, {}];
     // Digits: a pure number (commas allowed) becomes a Spanish cardinal;
@@ -662,6 +676,18 @@ export class EnEngine {
       const es = Number.isInteger(n) && n >= 0 ? enNumberEs(n) : null;
       if (es) return [[es], { root: bare, form: "número", isNumber: true, suffixes: [] }];
       return [null, {}];
+    }
+    // Em-dash / en-dash compounds from the source text ("man—who", "heaven—not",
+    // "drink,’—let"): resolve part-by-part, original casing kept for names.
+    // (References like "20:13–15" are handled above.) Also repairs missing-space
+    // artifacts ("suffering.They").
+    if (!EN_REFERENCE.test(bare) && /[—–]/.test(bare)) {
+      const dc = this._resolveDashParts(raw.split(/[—–]+/));
+      if (dc) return dc;
+    }
+    if (!EN_REFERENCE.test(bare) && /^[a-z]+\.[a-z]+$/.test(bare)) {
+      const dc = this._resolveDashParts(raw.split("."));
+      if (dc) return dc;
     }
     // Hyphen compounds before anything else.
     if (bare.includes("-")) {

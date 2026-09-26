@@ -721,11 +721,12 @@ function presentWord(word, ti, token, sentenceInitial) {
       currentES = "";
       return;
     }
-    el.meaning.innerHTML = "<span class='dim'>Sin traducción disponible en el diccionario.</span>";
+    el.meaning.innerHTML = "<b>" + esc(word) + "</b><br><span class='dim'>Palabra no registrada todavía en el diccionario.</span>";
     el.grammar.textContent = "";
     el.note.textContent = "Selecciona una palabra del texto para ver su significado.";
     el.saveBtn.disabled = true;
-    el.speakBtn.disabled = true;
+    el.speakBtn.disabled = false; // la pronunciación sigue disponible
+    currentES = "";
     return;
   }
   el.meaning.innerHTML = "<b>Español:</b>\n" + meanList(meanings.slice(0, 8));

@@ -44,12 +44,22 @@ palabras sin traducción: **6,8% → 0,6%**.
 - **Lote 4** (~40 entradas): `footman/craftsman/herdsman` (raíces de los
   irregulares en *-men*), `mistress`, `trough`, `extol`, `tetrarch`…
 - Ningún lote sobrescribió entradas existentes (`overwrote-existing: 0`).
+- **Lote 5** (1.053 entradas): cierre total de la cola larga — el arnés de toques
+  exactos (749.042 toques, mismo tokenizador que el lector) pasó de 2.070 huecos
+  (0,28%) a **0 huecos (0,00%)**: todo toque devuelve traducción, nombre propio o
+  nota amable. Además el motor `js/en-engine.js` recorta puntuación en
+  `resolve()` y parte compuestos con raya em/en (`ground—man`→«tierra · hombre»),
+  repara puntos sin espacio (`suffering.They`→«sufrimiento · ellos») y maneja
+  guiones finales (`sins-`→«pecado/pecar»).
 
 ## Nombres propios (`data/en/names.json`)
 
-1.322 entradas EN (minúsculas) → nombre en español, convenciones Reina-Valera
+1.432 entradas EN (minúsculas) → nombre en español, convenciones Reina-Valera
 (`yahweh`→Yahvé, `moses`→Moisés, `jerusalem`→Jerusalén, `judah`→Judá).
 Incluye gentilicios en minúscula (`philistines`→filisteos, `jews`→judíos) y
 formas idénticas al inglés para nombres raros (p. ej. `ashkenaz`→Ashkenaz),
-que el motor marca como nombre propio. Tabla curada por el proyecto
+que el motor marca como nombre propio. Suplemento 2026-09-26: +110 formas
+españolas Reina-Valera para nombres frecuentes que caían al modo de respaldo
+(`jochebed`→Jocabed, `moriah`→Moriah, `mehujael`→Mehújael,
+`shuhamites`→suhamitas…). Tabla curada por el proyecto
 (hechos onomásticos, sin licencia de terceros).
