@@ -1,0 +1,16 @@
+# Dependencies
+node_modules/
+
+# Capacitor build output (regenerate with `npm run cap:sync`)
+www/
+ios/App/App/public/
+android/app/src/main/assets/public/
+
+# Native build artifacts
+ios/App/build/
+android/app/build/
+android/.gradle/
+
+# Logs / OS
+npm-debug.log*
+.DS_Store
