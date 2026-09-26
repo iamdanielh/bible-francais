@@ -8,7 +8,7 @@
   <title>BiblioLingo — La Biblia en tu idioma</title>
   <link rel="manifest" href="manifest.webmanifest" />
   <link rel="apple-touch-icon" href="icon-180.png" />
-  <link rel="stylesheet" href="css/style.css?v=54" />
+  <link rel="stylesheet" href="css/style.css?v=55" />
 </head>
 <body>
   <header class="topbar">
@@ -22,6 +22,7 @@
     <div class="menu-wrap">
       <button id="moreBtn" class="more-btn" title="Más opciones" aria-label="Más opciones" aria-haspopup="true" aria-expanded="false"><span data-icon="dots"></span></button>
       <div class="menu" id="moreMenu" role="menu" aria-label="Opciones">
+        <button id="statsBtn" class="menu-item" role="menuitem"><span class="mi-ico" data-icon="chart"></span><span>Mi progreso</span></button>
         <button id="vocabBtn" class="menu-item" role="menuitem"><span class="mi-ico" data-icon="star"></span><span>Vocabulario</span></button>
         <hr>
         <div class="menu-label">Tamaño de texto</div>
@@ -121,6 +122,8 @@
             </div>
           </div>
         </div>
+        <div id="statsContent" hidden>
+        </div>
         </div>
       </div>
     </aside>
@@ -159,7 +162,9 @@
     </div>
   </div>
 
-  <script type="module" src="js/app.js?v=58"></script>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <script type="module" src="js/app.js?v=59"></script>
 
   <script>
     // Non-module trap (runs even if the module above fails to load or parse).

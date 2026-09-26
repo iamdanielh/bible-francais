@@ -83,6 +83,7 @@ const ICONS = {
   dots: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="5" cy="12" r="1.7"/><circle cx="12" cy="12" r="1.7"/><circle cx="19" cy="12" r="1.7"/></svg>',
   volume: _SVG_OPEN + '<path d="M11 5L6.8 9H3.5v6h3.3L11 19z"/><path d="M15 9.3a4 4 0 0 1 0 5.4M17.8 6.8a8 8 0 0 1 0 10.4"/></svg>',
   check: _SVG_OPEN + '<path d="M4.5 12.5l5 5L19.5 7"/></svg>',
+  chart: _SVG_OPEN + '<path d="M4 20V10M10 20V4M16 20v-7M21 20H3"/></svg>',
   prev: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18.5 5.4v13.2a.9.9 0 0 1-1.36.77l-8.2-5.07v4.3a1.1 1.1 0 0 1-2.2 0V5.4a1.1 1.1 0 0 1 2.2 0v4.3l8.2-5.07a.9.9 0 0 1 1.36.77z" fill="currentColor" stroke-width="1.2"/></svg>',
   next: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5.5 5.4v13.2a.9.9 0 0 0 1.36.77l8.2-5.07v4.3a1.1 1.1 0 0 0 2.2 0V5.4a1.1 1.1 0 0 0-2.2 0v4.3l-8.2-5.07a.9.9 0 0 0-1.36.77z" fill="currentColor" stroke-width="1.2"/></svg>',
   stop: '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="6.5" y="6.5" width="11" height="11" rx="2.2" fill="currentColor"/></svg>',
@@ -299,6 +300,10 @@ if (readerEl) {
     }
     _lastScrollY = readerEl.scrollTop;
     _lastScrollT = now;
+    // Reached the end of the chapter: mark it read (idempotent).
+    if (!programmatic && readerEl.scrollTop + readerEl.clientHeight >= readerEl.scrollHeight - 120) {
+      stats.complete(false);
+    }
   });
 }
 function flushReadingPosition() {
@@ -637,6 +642,7 @@ function renderChapter() {
   // would push a fresh chapter off its top — override it back to the top.
   if (readerEl) setReaderScroll(0);
   _lastScrollY = 0;
+  stats.touch(); // any chapter opened counts as a reading day
 }
 
 function selectBook(index, restoreChapter = false, chapterOverride = null) {
@@ -664,17 +670,21 @@ const vocabContent = $("vocabContent");
 const studyContent = $("studyContent");
 const aiContent = $("aiContent");
 const aiThread = $("aiThread");
+const statsContent = $("statsContent");
 
 function setPanelMode(mode) {
   const vocab = mode === "vocab";
   const study = mode === "study";
   const ai = mode === "ai";
+  const stats = mode === "stats";
   studyContent.hidden = !study;
   aiContent.hidden = !ai;
-  wordContent.hidden = vocab || study || ai;
-  vocabContent.hidden = !vocab || study || ai;
+  statsContent.hidden = !stats;
+  wordContent.hidden = vocab || study || ai || stats;
+  vocabContent.hidden = !vocab || study || ai || stats;
   $("panelTitle").textContent = ai ? "IA · Profesor"
     : study ? "Estudiar"
+    : stats ? "Mi progreso"
     : vocab ? "Vocabulario"
     : "Traducción";
 }
@@ -698,8 +708,20 @@ function closePanel() {
   clearSelectionHighlights();
 }
 
+// Small celebration toast (milestones, saves).
+let _toastTimer = null;
+function toast(msg) {
+  const t = $("toast");
+  if (!t) return;
+  t.textContent = msg;
+  t.classList.add("show");
+  clearTimeout(_toastTimer);
+  _toastTimer = setTimeout(() => t.classList.remove("show"), 3400);
+}
+
 function presentWord(word, ti, token, sentenceInitial) {
   if (!dictionary) return;
+  stats.tap();
   hideContextTranslation();
   const [meanings, info] = dictionary.resolve(word, { sentenceInitial, morphology: lang === "tr" });
   currentKey = word;
@@ -1550,7 +1572,7 @@ function readerUseDeviceFallback(i) {
 function speakReadVerse(i) {
   if (!_readerActive || _readerPaused) return;
   const verses = chapterVerses();
-  if (i >= verses.length) { stopChapterRead(); return; }
+  if (i >= verses.length) { stats.complete(true); stopChapterRead(); return; }
   _readerIdx = i;
   highlightReadVerse(i);
   // The word highlight is NOT started here — the audio element's own playing
@@ -2189,6 +2211,7 @@ async function aiAsk() {
   const input = $("aiInput");
   const q = input.value.trim();
   if (!q) return;
+  stats.ask();
   aiBubble("user", q);
   input.value = "";
   _aiHistory.push({ role: "user", content: q });
@@ -2245,6 +2268,7 @@ if (rbSpeed) rbSpeed.addEventListener("click", onSpeedBtnClick);
 if (rbClose) rbClose.addEventListener("click", stopChapterRead);
 el.saveBtn.addEventListener("click", saveCurrent);
 el.vocabBtn.addEventListener("click", () => { refreshVocab(); openPanel("vocab"); });
+$("statsBtn").addEventListener("click", () => { stats.render(); openPanel("stats"); });
 $("scopeAll").addEventListener("click", () => { _vocabScope = "all"; refreshVocab(); });
 $("scopeChapter").addEventListener("click", () => { _vocabScope = "chapter"; refreshVocab(); });
 $("studyBtn").addEventListener("click", () => startStudy(_vocabScope));
@@ -2262,6 +2286,145 @@ $("aiBtn").addEventListener("click", () => {
   openPanel("ai");
   setTimeout(() => $("aiInput").focus(), 60);
 });
+// ---- progress & motivation --------------------------------------------------
+// Streak (global), chapters read / listened, words tapped, AI questions and
+// badges — all local, per install. This is the "keep going" engine.
+const stats = (() => {
+  const KEY = "bl_stats_v1";
+  let s = null;
+  const dayStr = (d = new Date()) =>
+    d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
+  function load() {
+    try { s = JSON.parse(localStorage.getItem(KEY)) || null; } catch { s = null; }
+    if (!s || typeof s !== "object") s = { streak: 0, lastDay: null, days: {}, langs: {}, badges: [] };
+    if (!s.days) s.days = {};
+    if (!s.langs) s.langs = {};
+    if (!s.badges) s.badges = [];
+    return s;
+  }
+  function save() { try { localStorage.setItem(KEY, JSON.stringify(s)); } catch {} }
+  function L() {
+    const k = (typeof lang !== "undefined" && lang) || "fr";
+    if (!s.langs[k]) s.langs[k] = { read: [], listened: [], taps: 0, ai: 0 };
+    return s.langs[k];
+  }
+  function day() {
+    const d = dayStr();
+    if (!s.days[d]) s.days[d] = { taps: 0, chapters: 0, ai: 0 };
+    const keys = Object.keys(s.days).sort();
+    while (keys.length > 14) delete s.days[keys.shift()];
+    return s.days[d];
+  }
+  const totalChapters = () => bible.reduce((n, b) => n + (b.chapters ? b.chapters.length : 0), 0);
+  const key = () => currentBookIndex + ":" + currentChapter;
+
+  const BADGES = [
+    { id: "first", icon: "🌱", name: "Primera lectura", desc: "Completa tu primer capítulo", scope: "lang", test: (L) => L.read.length >= 1 },
+    { id: "book", icon: "📖", name: "Libro completo", desc: "Termina un libro entero", scope: "lang", test: (L) => bible.some((b, bi) => b.chapters.length > 0 && b.chapters.every((_, ci) => L.read.includes(bi + ":" + ci))) },
+    { id: "streak3", icon: "🔥", name: "Racha ×3", desc: "Lee 3 días seguidos", scope: "global", test: () => s.streak >= 3 },
+    { id: "streak7", icon: "🔥", name: "Una semana", desc: "Lee 7 días seguidos", scope: "global", test: () => s.streak >= 7 },
+    { id: "streak30", icon: "🔥", name: "Un mes", desc: "Lee 30 días seguidos", scope: "global", test: () => s.streak >= 30 },
+    { id: "words100", icon: "💬", name: "100 palabras", desc: "Consulta 100 palabras", scope: "lang", test: (L) => L.taps >= 100 },
+    { id: "words1000", icon: "💬", name: "1.000 palabras", desc: "Consulta 1.000 palabras", scope: "lang", test: (L) => L.taps >= 1000 },
+    { id: "vocab50", icon: "⭐", name: "Coleccionista", desc: "Guarda 50 palabras", scope: "global", test: () => (state.vocab || []).length >= 50 },
+    { id: "bible10", icon: "📚", name: "10% de la Biblia", desc: "Lee el 10% de los capítulos", scope: "lang", test: (L) => L.read.length >= totalChapters() * 0.1 },
+  ];
+  function checkBadges() {
+    const Lb = L();
+    for (const b of BADGES) {
+      const earned = b.scope === "global" ? s.badges : (Lb.badges = Lb.badges || []);
+      if (earned.includes(b.id)) continue;
+      let ok = false;
+      try { ok = !!b.test(Lb); } catch { ok = false; }
+      if (ok) {
+        earned.push(b.id);
+        toast("¡Logro desbloqueado! " + b.icon + " " + b.name);
+      }
+    }
+  }
+  // Any meaningful reading activity keeps the streak alive.
+  function touch() {
+    load();
+    const today = dayStr();
+    if (s.lastDay !== today) {
+      const y = new Date(); y.setDate(y.getDate() - 1);
+      s.streak = (s.lastDay === dayStr(y)) ? s.streak + 1 : 1;
+      s.lastDay = today;
+      checkBadges();
+    }
+    save();
+  }
+  function tap() { load(); touch(); L().taps++; day().taps++; checkBadges(); save(); }
+  function ask() { load(); touch(); L().ai++; day().ai++; checkBadges(); save(); }
+  function complete(listened) {
+    load(); touch();
+    const Lb = L(), k = key();
+    let changed = false;
+    if (!Lb.read.includes(k)) { Lb.read.push(k); changed = true; }
+    if (listened && !Lb.listened.includes(k)) { Lb.listened.push(k); changed = true; }
+    if (changed) { day().chapters++; checkBadges(); save(); }
+  }
+  function render() {
+    load();
+    const Lb = L();
+    const total = totalChapters();
+    const book = bible[currentBookIndex] || { name: "", chapters: [] };
+    const bookRead = book.chapters.filter((_, ci) => Lb.read.includes(currentBookIndex + ":" + ci)).length;
+    const pct = total ? Math.round((Lb.read.length / total) * 100) : 0;
+    const bookPct = book.chapters.length ? Math.round((bookRead / book.chapters.length) * 100) : 0;
+    const today = day();
+    const earned = new Set([...s.badges, ...((Lb.badges = Lb.badges || []))]);
+    // Last 7 days activity bars.
+    const WD = ["D", "L", "M", "M", "J", "V", "S"];
+    let bars = "";
+    let maxAct = 1;
+    const week = [];
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date(); d.setDate(d.getDate() - i);
+      const ds = dayStr(d);
+      const e = s.days[ds] || { taps: 0, chapters: 0, ai: 0 };
+      const act = e.taps + e.chapters * 12 + e.ai * 4;
+      week.push({ d: WD[d.getDay()], act, today: i === 0 });
+      if (act > maxAct) maxAct = act;
+    }
+    for (const w of week) {
+      const h = Math.max(6, Math.round((w.act / maxAct) * 100));
+      bars += '<div class="wk-col' + (w.today ? " wk-today" : "") + '"><div class="wk-bar" style="height:' + h + '%"></div><span>' + w.d + "</span></div>";
+    }
+    let cells = "";
+    book.chapters.forEach((_, ci) => {
+      const k = currentBookIndex + ":" + ci;
+      const cls = Lb.read.includes(k) ? " done" : (ci === currentChapter ? " cur" : "");
+      cells += '<span class="stat-cell' + cls + '">' + (ci + 1) + "</span>";
+    });
+    let badgesHtml = "";
+    for (const b of BADGES) {
+      const has = earned.has(b.id);
+      badgesHtml += '<div class="badge' + (has ? " got" : "") + '" title="' + esc(b.desc) + '"><span class="badge-ico">' + b.icon + '</span><span class="badge-name">' + esc(b.name) + "</span></div>";
+    }
+    const streakLine = s.streak > 0
+      ? '<div class="streak-num">🔥 ' + s.streak + '</div><div class="streak-sub">' + (s.streak === 1 ? "día seguido" : "días seguidos") + " · ¡sigue así!" + "</div>"
+      : '<div class="streak-num">🌱</div><div class="streak-sub">Hoy es el día 1.<br>Lee un capítulo para empezar tu racha.</div>';
+    statsContent.innerHTML =
+      '<div class="stat-hero">' + streakLine + "</div>" +
+      '<div class="stat-today">Hoy: <b>' + today.chapters + "</b> capítulos · <b>" + today.taps + "</b> palabras · <b>" + today.ai + "</b> preguntas</div>" +
+      '<div class="stat-card"><div class="stat-card-title">Tu Biblia <span>' + pct + '%</span></div>' +
+        '<div class="pbar"><div class="pfill" style="width:' + pct + '%"></div></div>' +
+        '<div class="stat-card-sub">' + Lb.read.length + " de " + total + " capítulos</div></div>" +
+      '<div class="stat-card"><div class="stat-card-title">' + esc(book.name) + " <span>" + bookPct + '%</span></div>' +
+        '<div class="stat-grid">' + cells + "</div>" +
+        '<div class="stat-card-sub">' + bookRead + " de " + book.chapters.length + " capítulos</div></div>" +
+      '<div class="stat-row">' +
+        '<div class="stat-tile"><div class="tile-num">' + Lb.taps + '</div><div class="tile-lbl">palabras<br>consultadas</div></div>' +
+        '<div class="stat-tile"><div class="tile-num">' + (state.vocab || []).length + '</div><div class="tile-lbl">palabras<br>guardadas</div></div>' +
+        '<div class="stat-tile"><div class="tile-num">' + Lb.listened.length + '</div><div class="tile-lbl">capítulos<br>escuchados</div></div>' +
+      "</div>" +
+      '<div class="stat-card"><div class="stat-card-title">Esta semana</div><div class="wk">' + bars + "</div></div>" +
+      '<div class="stat-card"><div class="stat-card-title">Logros</div><div class="badge-grid">' + badgesHtml + "</div></div>";
+  }
+  return { touch, tap, ask, complete, render, badges: BADGES };
+})();
+
 // ⋯ menu: every tool lives one tap away. Actions that open other UI dismiss
 // the menu; the text-size stepper keeps it open for repeated taps.
 (function moreMenu() {
@@ -2275,7 +2438,7 @@ $("aiBtn").addEventListener("click", () => {
   btn.addEventListener("click", (e) => { e.stopPropagation(); setMenu(); });
   document.addEventListener("click", (e) => { if (!menu.contains(e.target)) setMenu(false); });
   document.addEventListener("keydown", (e) => { if (e.key === "Escape") setMenu(false); });
-  ["readBtn", "vocabBtn", "aiBtn"].forEach((id) => {
+  ["readBtn", "vocabBtn", "aiBtn", "statsBtn"].forEach((id) => {
     const b = $(id);
     if (b) b.addEventListener("click", () => setMenu(false));
   });
