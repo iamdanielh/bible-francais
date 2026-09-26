@@ -279,7 +279,11 @@ function setTheme(t, persist = true) {
   const dark = t === "dark";
   document.documentElement.setAttribute("data-theme", dark ? "dark" : "light");
   const btn = $("themeBtn");
-  if (btn) btn.textContent = dark ? "☀️" : "🌙";
+  if (btn) {
+    const glyph = dark ? "☀️" : "🌙";
+    const ico = btn.querySelector(".mi-ico");
+    if (ico) ico.textContent = glyph; else btn.textContent = glyph;
+  }
   if (THEME_META) THEME_META.setAttribute("content", dark ? "#15171f" : "#f6f1e7");
   if (persist) { try { localStorage.setItem(THEME_KEY, t); } catch (e) {} }
 }
@@ -1010,14 +1014,18 @@ function currentVerseEls() {
 function refreshReadButton() {
   const play = $("readBtn");
   if (!play) return;
+  const setGlyph = (g) => {
+    const ico = play.querySelector(".mi-ico");
+    if (ico) ico.textContent = g; else play.textContent = g;
+  };
   if (!_readerActive) {
-    play.textContent = "▶";
+    setGlyph("▶");
     play.title = "Leer todo el capítulo";
   } else if (_readerPaused) {
-    play.textContent = "▶";
+    setGlyph("▶");
     play.title = "Reanudar lectura (mantén para detener)";
   } else {
-    play.textContent = "⏸";
+    setGlyph("⏸");
     play.title = "Pausar lectura (mantén para detener)";
   }
   play.classList.toggle("active", _readerActive);
@@ -2160,6 +2168,24 @@ $("aiBtn").addEventListener("click", () => {
   openPanel("ai");
   setTimeout(() => $("aiInput").focus(), 60);
 });
+// ⋯ menu: every tool lives one tap away. Actions that open other UI dismiss
+// the menu; the text-size stepper keeps it open for repeated taps.
+(function moreMenu() {
+  const btn = $("moreBtn"), menu = $("moreMenu");
+  if (!btn || !menu) return;
+  const setMenu = (open) => {
+    const willOpen = open !== undefined ? open : !menu.classList.contains("open");
+    menu.classList.toggle("open", willOpen);
+    btn.setAttribute("aria-expanded", willOpen ? "true" : "false");
+  };
+  btn.addEventListener("click", (e) => { e.stopPropagation(); setMenu(); });
+  document.addEventListener("click", (e) => { if (!menu.contains(e.target)) setMenu(false); });
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape") setMenu(false); });
+  ["readBtn", "vocabBtn", "aiBtn"].forEach((id) => {
+    const b = $(id);
+    if (b) b.addEventListener("click", () => setMenu(false));
+  });
+})();
 $("wordAiBtn").addEventListener("click", () => {
   $("aiInput").value = currentKey || "";
   openPanel("ai");

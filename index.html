@@ -8,28 +8,31 @@
   <title>BiblioLingo — La Biblia en tu idioma</title>
   <link rel="manifest" href="manifest.webmanifest" />
   <link rel="apple-touch-icon" href="icon-180.png" />
-  <link rel="stylesheet" href="css/style.css?v=49" />
+  <link rel="stylesheet" href="css/style.css?v=50" />
 </head>
 <body>
   <header class="topbar">
-    <div class="topbar-title">
-      <span class="brand">📖</span>
-      <span class="brand-title">BiblioLingo</span>
-      <select id="langSelect" class="lang-select" aria-label="Idioma"></select>
+    <div class="nav-group">
+      <select id="bookSelect" aria-label="Libro"></select>
+      <button id="prevBtn" title="Capítulo anterior" aria-label="Capítulo anterior">‹</button>
+      <select id="chapterSelect" aria-label="Capítulo"></select>
+      <button id="nextBtn" title="Capítulo siguiente" aria-label="Capítulo siguiente">›</button>
     </div>
-    <div class="topbar-controls">
-      <div class="nav-group">
-        <select id="bookSelect" aria-label="Libro"></select>
-        <button id="prevBtn" title="Capítulo anterior" aria-label="Capítulo anterior">‹</button>
-        <select id="chapterSelect" aria-label="Capítulo"></select>
-        <button id="nextBtn" title="Capítulo siguiente" aria-label="Capítulo siguiente">›</button>
-      </div>
-      <button id="readBtn" class="tool-btn" title="Leer todo el capítulo" aria-label="Leer todo el capítulo"><span class="t-ico">▶</span><span class="t-label">Oír</span></button>
-      <button id="vocabBtn" class="tool-btn" title="Ver vocabulario" aria-label="Ver vocabulario"><span class="t-ico">⭐</span><span class="t-label">Vocab</span></button>
-      <button id="aiBtn" class="tool-btn" title="Preguntar a la IA" aria-label="Preguntar a la IA"><span class="t-ico">✨</span><span class="t-label">IA</span></button>
-      <div class="font-group" role="group" aria-label="Tamaño del texto">
-        <button id="fontDecBtn" title="Texto más pequeño" aria-label="Texto más pequeño">A−</button>
-        <button id="fontIncBtn" title="Texto más grande" aria-label="Texto más grande">A+</button>
+    <div class="menu-wrap">
+      <button id="moreBtn" class="more-btn" title="Más opciones" aria-label="Más opciones" aria-haspopup="true" aria-expanded="false">⋯</button>
+      <div class="menu" id="moreMenu" role="menu" aria-label="Opciones">
+        <button id="readBtn" class="menu-item" role="menuitem"><span class="mi-ico">▶</span><span>Escuchar</span></button>
+        <button id="vocabBtn" class="menu-item" role="menuitem"><span class="mi-ico">⭐</span><span>Vocabulario</span></button>
+        <button id="aiBtn" class="menu-item" role="menuitem"><span class="mi-ico">✨</span><span>Pregunta a la IA</span></button>
+        <hr>
+        <div class="menu-label">Tamaño de texto</div>
+        <div class="menu-seg" role="group" aria-label="Tamaño del texto">
+          <button id="fontDecBtn" title="Texto más pequeño" aria-label="Texto más pequeño">A−</button>
+          <button id="fontIncBtn" title="Texto más grande" aria-label="Texto más grande">A+</button>
+        </div>
+        <hr>
+        <label class="menu-lang"><span class="menu-lang-title"><span class="mi-ico">🌐</span><span>Idioma</span></span><select id="langSelect" class="lang-select" aria-label="Idioma"></select></label>
+        <button id="themeBtn" class="menu-item" role="menuitem"><span class="mi-ico">🌙</span><span>Tema</span></button>
       </div>
     </div>
   </header>
@@ -49,7 +52,6 @@
       <div class="panel-head">
         <span id="panelTitle" class="panel-title">Traducción</span>
         <span class="panel-head-spacer"></span>
-        <button id="themeBtn" title="Cambiar tema">🌙</button>
         <button id="panelCloseBtn" class="icon-btn" title="Cerrar" aria-label="Cerrar">✕</button>
       </div>
       <div class="panel-body">
@@ -148,7 +150,7 @@
     </div>
   </div>
 
-  <script type="module" src="js/app.js?v=50"></script>
+  <script type="module" src="js/app.js?v=51"></script>
 
   <script>
     // Non-module trap (runs even if the module above fails to load or parse).
