@@ -13,10 +13,9 @@
 <body>
   <header class="topbar">
     <div class="nav-group">
-      <select id="bookSelect" aria-label="Libro"></select>
-      <button id="prevBtn" title="Capítulo anterior" aria-label="Capítulo anterior">‹</button>
-      <select id="chapterSelect" aria-label="Capítulo"></select>
-      <button id="nextBtn" title="Capítulo siguiente" aria-label="Capítulo siguiente">›</button>
+      <button id="prevBtn" class="nav-arrow" title="Capítulo anterior" aria-label="Capítulo anterior">‹</button>
+      <button id="navTitle" class="nav-title" aria-haspopup="dialog" aria-label="Elegir libro y capítulo">BiblioLingo</button>
+      <button id="nextBtn" class="nav-arrow" title="Capítulo siguiente" aria-label="Capítulo siguiente">›</button>
     </div>
     <div class="menu-wrap">
       <button id="moreBtn" class="more-btn" title="Más opciones" aria-label="Más opciones" aria-haspopup="true" aria-expanded="false"><span data-icon="dots"></span></button>
@@ -122,6 +121,15 @@
         </div>
         </div>
       </div>
+    </aside>
+    <aside class="panel nav-sheet" id="navSheet" role="dialog" aria-label="Elegir libro y capítulo" aria-hidden="true">
+      <div class="grabber" aria-hidden="true"></div>
+      <div class="panel-head">
+        <span class="panel-title">Libro y capítulo</span>
+        <span class="panel-head-spacer"></span>
+        <button id="navSheetClose" class="icon-btn" title="Cerrar" aria-label="Cerrar">✕</button>
+      </div>
+      <div class="panel-body nav-sheet-body" id="navSheetBody"></div>
     </aside>
     <div class="scrim" id="scrim"></div>
   </main>

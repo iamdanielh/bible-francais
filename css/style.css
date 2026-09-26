@@ -126,14 +126,92 @@ body.topbar-hidden .topbar { transform: translateY(-105%); }
   background: transparent !important;
 }
 .nav-group > * + * { border-left: 1px solid var(--border-soft) !important; }
-.nav-group button { padding: 7px 13px; font-size: 1.05rem; }
-.nav-group select {
-  padding: 7px 6px;
-  font-weight: 700;
-  font-size: 0.88rem;
-  max-width: 118px;
+/* Prev/next chapter arrows: big, calm, clearly tappable */
+.nav-group .nav-arrow {
+  padding: 6px 17px;
+  font-size: 1.45rem;
+  line-height: 1;
+  font-weight: 600;
+  color: var(--fg-soft);
+  flex: 0 0 auto;
 }
-.nav-group button:hover, .nav-group select:hover { background: var(--ctrl-hover) !important; }
+.nav-group .nav-arrow:active { color: var(--accent-deep); }
+/* The chapter label: one button that opens the book/chapter picker */
+.nav-group .nav-title {
+  flex: 1 1 auto;
+  min-width: 0;
+  padding: 7px 8px;
+  font-weight: 700;
+  font-size: 0.95rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.nav-group .nav-arrow:hover, .nav-group .nav-title:hover { background: var(--ctrl-hover) !important; }
+
+/* ---------- book/chapter picker sheet ---------- */
+.nav-sheet { max-height: 72vh; }
+.nav-sheet-body {
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 4px 14px calc(20px + env(safe-area-inset-bottom, 0px));
+}
+.nav-back {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  padding: 10px 4px;
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: var(--accent-deep);
+  background: none;
+  border: none;
+  box-shadow: none;
+  cursor: pointer;
+}
+.nav-book {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 11px 4px;
+  font-size: 1rem;
+  background: none;
+  border: none;
+  border-bottom: 1px solid var(--border-soft);
+  box-shadow: none;
+  border-radius: 0;
+  cursor: pointer;
+  color: var(--fg);
+  text-align: left;
+}
+.nav-book .nb-chaps { font-size: 0.8rem; color: var(--muted); font-weight: 400; }
+.nav-book.current { color: var(--accent-deep); font-weight: 700; }
+.nav-book:hover { background: var(--ctrl-hover); }
+.nav-chap-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(52px, 1fr));
+  gap: 8px;
+  padding: 6px 2px 8px;
+}
+.nav-chap {
+  padding: 11px 0;
+  font-size: 1rem;
+  font-weight: 600;
+  text-align: center;
+  background: var(--ctrl-bg);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-sm);
+  color: var(--fg);
+  cursor: pointer;
+}
+.nav-chap.current {
+  background: var(--accent);
+  border-color: var(--accent-deep);
+  color: var(--accent-fg);
+}
+.nav-chap:hover { border-color: var(--accent-soft); }
 
 select, button {
   font: inherit;

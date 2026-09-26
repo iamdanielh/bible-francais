@@ -156,7 +156,7 @@ function _fatalBoot(e, label) {
   l.appendChild(r);
 }
 const el = {
-  loading: $("loading"), langSelect: $("langSelect"), bookSelect: $("bookSelect"), chapterSelect: $("chapterSelect"),
+  loading: $("loading"), langSelect: $("langSelect"), navTitle: $("navTitle"),
   prevBtn: $("prevBtn"), nextBtn: $("nextBtn"), vocabBtn: $("vocabBtn"),
   readBtn: $("readBtn"),
   chapterTitle: $("chapterTitle"), verseText: $("verseText"),
@@ -470,14 +470,79 @@ const _hardResetTimer = setTimeout(() => {
 let currentBookIndex = 0;
 let currentChapter = 0;
 
-function buildBookList() {
-  el.bookSelect.innerHTML = "";
+function syncNavTitle() {
+  const book = bible[currentBookIndex];
+  if (el.navTitle && book) el.navTitle.textContent = book.name + " " + (currentChapter + 1);
+}
+
+// ---- book/chapter picker sheet --------------------------------------------
+const navSheet = $("navSheet");
+const navSheetBody = $("navSheetBody");
+
+function openNavSheet() {
+  closePanel();
+  renderNavBooks();
+  navSheet.classList.remove("collapsed");
+  navSheet.classList.add("open");
+  scrim.classList.add("show");
+  navSheet.setAttribute("aria-hidden", "false");
+}
+function closeNavSheet() {
+  if (!navSheet.classList.contains("open")) return;
+  navSheet.classList.remove("open");
+  navSheet.classList.add("collapsed");
+  navSheet.setAttribute("aria-hidden", "true");
+  if (!panel.classList.contains("open")) scrim.classList.remove("show");
+}
+function renderNavBooks() {
+  navSheetBody.innerHTML = "";
+  const frag = document.createDocumentFragment();
   bible.forEach((b, i) => {
-    const opt = document.createElement("option");
-    opt.value = i;
-    opt.textContent = b.name;
-    el.bookSelect.appendChild(opt);
+    const btn = document.createElement("button");
+    btn.className = "nav-book" + (i === currentBookIndex ? " current" : "");
+    const name = document.createElement("span");
+    name.textContent = b.name;
+    const meta = document.createElement("span");
+    meta.className = "nb-chaps";
+    meta.textContent = b.chapters.length + (b.chapters.length === 1 ? " cap." : " caps.");
+    btn.append(name, meta);
+    btn.addEventListener("click", () => renderNavChapters(i));
+    frag.appendChild(btn);
   });
+  navSheetBody.appendChild(frag);
+  const cur = navSheetBody.querySelector(".nav-book.current");
+  if (cur) cur.scrollIntoView({ block: "center" });
+}
+function renderNavChapters(bookIndex) {
+  const book = bible[bookIndex];
+  navSheetBody.innerHTML = "";
+  const back = document.createElement("button");
+  back.className = "nav-back";
+  back.textContent = "‹ Libros";
+  back.setAttribute("aria-label", "Volver a la lista de libros");
+  back.addEventListener("click", renderNavBooks);
+  navSheetBody.appendChild(back);
+  const grid = document.createElement("div");
+  grid.className = "nav-chap-grid";
+  book.chapters.forEach((_, c) => {
+    const b = document.createElement("button");
+    b.className = "nav-chap" + (bookIndex === currentBookIndex && c === currentChapter ? " current" : "");
+    b.textContent = c + 1;
+    b.setAttribute("aria-label", book.name + " capítulo " + (c + 1));
+    b.addEventListener("click", () => {
+      closeNavSheet();
+      if (bookIndex === currentBookIndex && c === currentChapter) return;
+      selectBook(bookIndex, false, c);
+    });
+    grid.appendChild(b);
+  });
+  navSheetBody.appendChild(grid);
+  navSheetBody.scrollTop = 0;
+}
+
+function buildBookList() {
+  // The picker sheet renders on demand; keep the name for the init flow.
+  syncNavTitle();
 }
 
 function buildLangList() {
@@ -503,26 +568,17 @@ el.langSelect.addEventListener("change", async () => {
   await initApp();
 });
 
-function buildChapterList() {
-  const book = bible[currentBookIndex];
-  el.chapterSelect.innerHTML = "";
-  for (let c = 0; c < book.chapters.length; c++) {
-    const opt = document.createElement("option");
-    opt.value = c;
-    opt.textContent = "Cap. " + (c + 1);
-    el.chapterSelect.appendChild(opt);
-  }
-}
-
 function gotoNextChapter() {
   closePanel();
+  closeNavSheet();
   const book = bible[currentBookIndex];
-  if (currentChapter < book.chapters.length - 1) { currentChapter++; el.chapterSelect.value = currentChapter; renderChapter(); saveState(); }
+  if (currentChapter < book.chapters.length - 1) { currentChapter++; syncNavTitle(); renderChapter(); saveState(); }
   else if (currentBookIndex < bible.length - 1) selectBook(currentBookIndex + 1);
 }
 function gotoPrevChapter() {
   closePanel();
-  if (currentChapter > 0) { currentChapter--; el.chapterSelect.value = currentChapter; renderChapter(); saveState(); }
+  closeNavSheet();
+  if (currentChapter > 0) { currentChapter--; syncNavTitle(); renderChapter(); saveState(); }
   else if (currentBookIndex > 0) selectBook(currentBookIndex - 1, false, bible[currentBookIndex - 1].chapters.length - 1);
 }
 
@@ -586,15 +642,13 @@ function renderChapter() {
 function selectBook(index, restoreChapter = false, chapterOverride = null) {
   if (index < 0 || index >= bible.length) return;
   currentBookIndex = index;
-  el.bookSelect.value = index;
-  buildChapterList();
   const maxChap = bible[index].chapters.length - 1;
   let chap;
   if (chapterOverride !== null && chapterOverride !== undefined) chap = Math.min(Math.max(chapterOverride, 0), maxChap);
   else if (restoreChapter) chap = Math.min(Math.max(state.chapter, 0), maxChap);
   else chap = 0;
   currentChapter = chap;
-  el.chapterSelect.value = chap;
+  syncNavTitle();
   renderChapter();
   closePanel();
   saveState();
@@ -626,6 +680,7 @@ function setPanelMode(mode) {
 }
 
 function openPanel(mode) {
+  closeNavSheet();
   panel.classList.remove("fullscreen");
   panel.classList.remove("collapsed");
   setPanelMode(mode || "word");
@@ -638,7 +693,7 @@ function openPanel(mode) {
 function closePanel() {
   panel.classList.remove("open");
   panel.classList.add("collapsed");
-  scrim.classList.remove("show");
+  if (!navSheet.classList.contains("open")) scrim.classList.remove("show");
   panel.setAttribute("aria-hidden", "true");
   clearSelectionHighlights();
 }
@@ -2158,16 +2213,8 @@ async function aiAsk() {
 }
 
 // ---- events ---------------------------------------------------------------
-el.bookSelect.addEventListener("change", (e) => selectBook(parseInt(e.target.value, 10), true));
-el.chapterSelect.addEventListener("change", (e) => {
-  const chap = parseInt(e.target.value, 10);
-  if (chap >= 0 && chap !== currentChapter) {
-    currentChapter = chap;
-    renderChapter();
-    saveState();
-    closePanel();
-  }
-});
+el.navTitle.addEventListener("click", openNavSheet);
+$("navSheetClose").addEventListener("click", closeNavSheet);
 el.prevBtn.addEventListener("click", gotoPrevChapter);
 el.nextBtn.addEventListener("click", gotoNextChapter);
 el.speakBtn.addEventListener("click", speak);
@@ -2271,7 +2318,7 @@ $("aiInput").addEventListener("keydown", (e) => {
   }, { passive: true });
 })();
 $("panelCloseBtn").addEventListener("click", closePanel);
-scrim.addEventListener("click", closePanel);
+scrim.addEventListener("click", () => { closePanel(); closeNavSheet(); });
 
 // ---- multi-word selection (phrase lookup) ---------------------------------
 let _selectedTimer = null;
@@ -2606,9 +2653,7 @@ async function initApp() {
   currentChapter = state.chapter || 0;
   buildLangList();
   buildBookList();
-  el.bookSelect.value = currentBookIndex;
-  buildChapterList();
-  el.chapterSelect.value = currentChapter;
+  syncNavTitle();
   renderChapter();
   syncTopbarHeight();
   if (readerEl) {
