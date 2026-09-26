@@ -657,6 +657,18 @@ html.touch .scrim.show { opacity: 0; }
   max-height: none;
   border-radius: 0;
   padding-top: env(safe-area-inset-top, 0px);
+  /* Maximized: the panel must own the whole screen, above the sticky
+     reader topbar, so its close button and drag handle stay reachable. */
+  z-index: 1000;
+}
+.panel.fullscreen .grabber {
+  width: 72px;
+  height: 6px;
+  margin-top: 14px;
+}
+.panel.fullscreen #panelCloseBtn {
+  width: 44px;
+  height: 44px;
 }
 @supports not (height: 100dvh) {
   .panel.fullscreen { height: 100vh; }

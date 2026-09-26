@@ -2610,6 +2610,9 @@ el.verseText.addEventListener("click", (e) => {
     const full = panel.classList.contains("fullscreen");
     if (!full && raw < -70) { setPanelFullscreen(true); return; }
     if (!full && (raw >= 110 || (raw > 60 && vy > 0.55))) { closePanel(); return; }
+    // Maximized: a short pull drops back to the drawer; a long, deliberate
+    // pull dismisses the panel outright.
+    if (full && raw > 280) { setPanelFullscreen(false); closePanel(); return; }
     if (full && raw > 120) setPanelFullscreen(false);
   };
   panel.addEventListener("pointerdown", onDown);
