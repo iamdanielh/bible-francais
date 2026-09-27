@@ -51,6 +51,13 @@ palabras sin traducción: **6,8% → 0,6%**.
   `resolve()` y parte compuestos con raya em/en (`ground—man`→«tierra · hombre»),
   repara puntos sin espacio (`suffering.They`→«sufrimiento · ellos») y maneja
   guiones finales (`sins-`→«pecado/pecar»).
+- **Lote 6** (672 entradas): cobertura total del texto BSB — el escaneo de toques
+  sobre los 734.676 tokens del BSB pasó de 1.942 huecos (805 formas distintas) a
+  **0 huecos (0,00%)**. Además el motor `js/en-engine.js` resuelve cada parte de
+  compuestos con raya em/en con el pipeline completo (`brothers—12`→«hermano ·
+  doce», `foot—twenty-four`→«pie · veinticuatro»), acepta `-le` en adverbios
+  (`favorably`→«favorable»), mapea plurales irregulares en `-men`
+  (`foremen`→«capataz») y reconoce la locución `to and fro`→«de aquí para allá».
 
 ## Nombres propios (`data/en/names.json`)
 

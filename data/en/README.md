@@ -1,7 +1,6 @@
 # English Bible data pack
 
-**Source:** World English Bible (Classic edition), [eBible.org](https://eBible.org/eng-web/)
-— public domain.
+**Source:** Berean Standard Bible (2022), [berean.bible](https://berean.bible) — formally dedicated to the public domain by the rights-holder on April 30, 2023.
 
 This pack contains the full 66-book Protestant canon (Old Testament:
 Genesis–Malachi; New Testament: Matthew–Revelation) as
@@ -14,29 +13,28 @@ Genesis–Malachi; New Testament: Matthew–Revelation) as
 
 ## Translation
 
-The **World English Bible** is a modern-English update of the American
-Standard Version (1901), dedicated to the public domain by its translators.
-The Classic edition renders God's proper name in the Old Testament as
-"Yahweh". This pack was built from eBible.org's current WEB Classic HTML
-edition (chapter pages under `https://eBible.org/eng-web/`); 264 of the
-1,189 chapters could not be fetched from eBible.org (the network persistently
-blackholed those chapter URLs) and were filled from the same translation via
-the `world-english-bible` npm snapshot (parsed from eBible.org's WEB HTML,
-November 2025).
+The **Berean Standard Bible** is a modern-English translation (final text
+2022) by the Berean Bible Translation Committee, formally dedicated to the
+public domain on April 30, 2023. It uses natural contemporary English with
+no archaic pronouns (no thee/thou/thy).
 
-**Attribution:** English: World English Bible — public domain.
+**Attribution:** English: Berean Standard Bible — public domain (2022).
 
 ## Build notes
 
-- Verse text is plain text: footnotes, cross-references, and all markup
-  (including *words-of-Jesus* spans) were stripped; paragraph and poetry
-  breaks were normalized to single spaces. Psalm titles and Hebrew stanza
-  letters (e.g. "BETH" in Psalm 119) are omitted so each verse starts with
-  its own words.
-- Five verses are empty strings in the WEB itself (omitted verses with no
-  text: Acts 8:37, Acts 15:34, Acts 24:7, Luke 17:36, Romans 16:25); they are
-  kept with empty text so verse numbering stays intact.
-- Chapter/verse counts were validated against the French reference pack
-  (`../bible.json`). The only mismatch in the 12-chapter validation sample
-  is on the French side: the French pack's Numbers 1 is missing verses
-  21–43 (its verse IDs jump from 20 to 44).
+- Built 2026-09-27 from the official USFM
+  (`https://ebible.org/Scriptures/engbsb_usfm.zip`, mirrored from
+  bereanbible.com). Verse text is plain text: `\w` Strong's word markup,
+  footnotes, cross-references, section headers, and paragraph/poetry markers
+  were stripped; `\nd` (LORD) and `\wj` (words of Jesus) spans were kept as
+  plain text.
+- Verse numbering follows the previous World English Bible pack exactly
+  (31,103 verses) so all navigation and references stay intact:
+  - 31,084 verses are BSB text.
+  - 19 verses the BSB omits as footnotes (the classic disputed verses:
+    Matthew 17:21, 18:11, 23:14; Mark 7:16, 9:44, 9:46, 11:26, 15:28;
+    Luke 17:36, 23:17; John 5:4; Acts 8:37, 15:34, 24:7, 28:29;
+    Romans 16:24; plus the Romans 14:24–26 doxology placement) keep their
+    WEB wording.
+  - BSB's Romans 16:26–27 (the doxology's 2nd half, which WEB places at
+    14:24–26) is merged into Romans 16:25 so no text is lost.

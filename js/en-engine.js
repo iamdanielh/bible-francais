@@ -307,6 +307,8 @@ const EN_IRREGULAR = {
   "horsemen": "horseman", "watchmen": "watchman", "fishermen": "fisherman", "kinsmen": "kinsman",
   "countrymen": "countryman", "madmen": "madman",
   "craftsmen": "craftsman", "herdsmen": "herdsman",
+  "foremen": "foreman", "swordsmen": "swordsman", "woodsmen": "woodsman",
+  "spearmen": "spearman", "spokesmen": "spokesman", "oarsmen": "oarsman",
   "staves": "staff", "denarii": "denarius",
 };
 
@@ -484,6 +486,7 @@ export const EN_PHRASES = {
   "wipe away": { es: ["enjugar"], kind: "verbo frasal" },
   // locuciones
   "kingdom of heaven": { es: ["reino de los cielos"], kind: "locución" },
+  "to and fro": { es: ["de aquí para allá"], kind: "locución" },
   "kingdom of god": { es: ["reino de Dios"], kind: "locución" },
   "son of man": { es: ["hijo del hombre"], kind: "locución" },
   "son of god": { es: ["Hijo de Dios"], kind: "locución" },
@@ -591,7 +594,7 @@ const EN_MODAL_ES = {
 // Detect the grammatical subject of an English verb from the tokens before it.
 // Returns "1s" | "2s" | "3s" | "1p" | "2p" | "3p". A proper name or any other
 // noun phrase falls back to 3rd person singular (Bible narrative default).
-const EN_SUBJ_SKIP = new Set("and but or nor for yet so then now also even just".split(" "));
+const EN_SUBJ_SKIP = new Set("and but or nor for yet so then now also even just have has had hath am is are was were be been being will would shall should can could may might must do does did not n't never".split(" "));
 export function enDetectSubject(preceding) {
   const toks = (preceding || []).slice(-3);
   for (let i = toks.length - 1; i >= 0; i--) {
@@ -937,11 +940,12 @@ export class EnEngine {
           tryStem(undoubleEn(noIng), "-ing", "ing", "gerundio", "gerund");
       if (m) return m;
     }
-    // -ly adverbs ("quickly" → "quick").
+    // -ly adverbs ("quickly" → "quick"; "favorably" → "favorable").
     if (bare.length > 4 && bare.endsWith("ly")) {
       const noLy = bare.slice(0, -2);
       m = tryStem(noLy, "-ly", "ly", "adverbio", null) ||
-          tryStem(noLy + "e", "-ly", "ly", "adverbio", null);
+          tryStem(noLy + "e", "-ly", "ly", "adverbio", null) ||
+          tryStem(noLy + "le", "-ly", "ly", "adverbio", null);
       if (m) return m;
     }
     // -ness nouns ("darkness" → "dark").
@@ -1141,7 +1145,9 @@ export class EnEngine {
   _resolveDashParts(rawParts) {
     const parts = rawParts.map((p) => String(p).replace(EN_TRIM, "")).filter(Boolean);
     if (parts.length < 2) return null;
-    const rs = parts.map((p) => this._resolveBare(normalizeEn(p), p));
+    // Full resolve() per part (not _resolveBare): parts can be numbers
+    // ("brothers—12" → "hermano · doce").
+    const rs = parts.map((p) => this.resolve(p));
     if (rs.every((r) => r[0] && r[0].length)) {
       return [[rs.map((r) => r[0][0]).join(" · ")],
         { root: parts.join("—"), form: "compuesto", suffixes: [] }];
@@ -1283,5 +1289,281 @@ export class EnEngine {
       }
     }
     return out;
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// Extras para el aprendizaje: falsos amigos, confusables, arcaísmos,
+// pronunciación, morfología no verbal, construcciones verbales y
+// familias de palabras.
+// ═══════════════════════════════════════════════════════════════════
+
+// --- Falsos amigos (inglés → trampa para hispanohablantes) ---
+export const EN_FALSE_FRIENDS = {
+  actually: "Falso amigo de «actualmente» (= currently)",
+  actual: "Falso amigo de «actual» (= current); es «real, verdadero»",
+  currently: "Este sí es «actualmente» (no confundir con actually)",
+  assist: "Falso amigo de «asistir»; es «ayudar»",
+  advertise: "Falso amigo de «advertir» (= to warn); es «anunciar»",
+  carpet: "Falso amigo de «carpeta» (= folder); es «alfombra»",
+  rope: "Falso amigo de «ropa» (= clothes); es «cuerda»",
+  pie: "Falso amigo de «pie» (= foot); es «pastel»",
+  sensible: "Falso amigo de «sensible» (= sensitive); es «sensato»",
+  sensitive: "Este sí es «sensible» (no confundir con sensible)",
+  lecture: "Falso amigo de «lectura» (= reading); es «conferencia»",
+  library: "Falso amigo de «librería» (= bookstore); es «biblioteca»",
+  exit: "Falso amigo de «éxito» (= success); es «salida»",
+  success: "Falso amigo de «suceso» (= event); es «éxito»",
+  embarrass: "Falso amigo de «embarazada» (= pregnant); es «avergonzar»",
+  embarrassed: "Falso amigo de «embarazada» (= pregnant); es «avergonzado»",
+  fabric: "Falso amigo de «fábrica» (= factory); es «tela»",
+  college: "Falso amigo de «colegio» (= school); es «universidad»",
+  diversion: "Falso amigo de «diversión» (= fun); es «desvío»",
+  pretend: "Falso amigo de «pretender» (= to intend); es «fingir»",
+  realize: "Falso amigo de «realizar» (= to carry out); es «darse cuenta»",
+  remove: "Falso amigo de «remover» (= to stir); es «quitar»",
+  resume: "Falso amigo de «resumir» (= to summarize); es «reanudar»",
+  sympathetic: "Falso amigo de «simpático» (= nice); es «compasivo»",
+  sympathy: "Falso amigo de «simpatía»; es «compasión»",
+  large: "Falso amigo de «largo» (= long); es «grande»",
+  deception: "Falso amigo de «decepción» (= disappointment); es «engaño»",
+  injury: "Falso amigo de «injuria» (= insult); es «herida, lesión»",
+  molest: "Falso amigo fuerte de «molestar» (= to bother); es «abusar»",
+  officer: "No es «oficial» militar; es «agente, funcionario»",
+  pan: "Falso amigo de «pan» (= bread); es «sartén»",
+  parents: "No son «parientes» (= relatives); son «padres»",
+  party: "Falso amigo de «partido» (= match); es «fiesta»",
+  policy: "Falso amigo de «política» (= politics); es «norma»",
+  presume: "Falso amigo de «presumir» (= to show off); es «suponer»",
+  prevent: "Más fuerte que «prevenir»; es «impedir»",
+  prime: "Falso amigo de «primo» (= cousin); es «principal»",
+  procure: "Falso amigo de «procurar» (= to try); es «conseguir»",
+  professor: "En EE.UU.: catedrático (no cualquier «profesor» = teacher)",
+  proper: "Falso amigo de «propio» (= own); es «adecuado»",
+  propitiate: "Falso amigo de «propiciar» (= fomentar); es «aplacar, expiar»",
+  billion: "Falso amigo de «billón» (= trillion); es «mil millones»",
+  casual: "Falso amigo parcial de «casual» (= accidental); es «informal»",
+  compromise: "No es «compromiso» (= commitment); es «acuerdo mutuo»",
+  conductor: "Falso amigo de «conductor» (= driver); es «director (orquesta)»",
+  genial: "Falso amigo de «genial» (= brilliant); es «afable»",
+  idiom: "Falso amigo de «idioma» (= language); es «modismo»",
+  relief: "Es «alivio, socorro» (no «relieve» escultórico)",
+  resent: "Es «guardar rencor» (no «resentirse» = sentirse mal)",
+  retire: "Falso amigo de «retirar» (= to withdraw); es «jubilarse»",
+  review: "Falso amigo de «revista» (= magazine); es «reseña, revisión»",
+  rude: "Falso amigo de «rudo» (= rough); es «grosero»",
+  sane: "Falso amigo de «sano» (= healthy); es «cuerdo»",
+  scheme: "Es «plan» (a veces «ardid»); no «esquema» (= diagram)",
+  scholar: "Falso amigo de «escolar» (= schoolchild); es «erudito»",
+};
+
+function _ffCands(info, surface) {
+  const cands = [String(surface || "").toLowerCase()];
+  if (info) {
+    if (info.infinitive) cands.push(String(info.infinitive).toLowerCase());
+    if (info.root) cands.push(String(info.root).toLowerCase());
+    const s = cands[0];
+    if (s.endsWith("s") && !s.endsWith("ss") && s.length > 3) cands.push(s.slice(0, -1));
+  }
+  return cands;
+}
+
+// Nota de falso amigo para la palabra, o null.
+export function enFalseFriend(info, surface) {
+  for (const c of _ffCands(info, surface)) {
+    if (EN_FALSE_FRIENDS[c]) return EN_FALSE_FRIENDS[c];
+  }
+  return null;
+}
+
+// --- Confusables: grupos de palabras que se confunden entre sí ---
+const EN_CONFUSABLE_GROUPS = [
+  { w: ["they're", "their", "there"], es: { "they're": "ellos son / están", their: "su, sus (de ellos)", there: "ahí, allí" } },
+  { w: ["your", "you're"], es: { your: "tu, su (posesivo)", "you're": "tú eres / estás" } },
+  { w: ["its", "it's"], es: { its: "su (de eso)", "it's": "es / está (it is)" } },
+  { w: ["to", "too", "two"], es: { to: "a, hacia, para", too: "también; demasiado", two: "dos" } },
+  { w: ["then", "than"], es: { then: "entonces, luego", than: "que (comparación)" } },
+  { w: ["whose", "who's"], es: { whose: "cuyo", "who's": "quién es (who is)" } },
+  { w: ["affect", "effect"], es: { affect: "afectar (verbo)", effect: "efecto (sustantivo)" } },
+  { w: ["accept", "except"], es: { accept: "aceptar", except: "excepto" } },
+  { w: ["weather", "whether"], es: { weather: "clima", whether: "si (alternativa)" } },
+  { w: ["loose", "lose"], es: { loose: "suelto, flojo", lose: "perder" } },
+  { w: ["quiet", "quite"], es: { quiet: "silencioso, callado", quite: "bastante" } },
+  { w: ["desert", "dessert"], es: { desert: "desierto", dessert: "postre" } },
+  { w: ["principal", "principle"], es: { principal: "principal", principle: "principio" } },
+  { w: ["complement", "compliment"], es: { complement: "complemento", compliment: "cumplido, halago" } },
+];
+const EN_CONFUSABLES = {};
+for (const g of EN_CONFUSABLE_GROUPS) for (const w of g.w) EN_CONFUSABLES[w] = g;
+
+// Grupo confusable de la palabra: { words: [{w, es, current}] } o null.
+export function enConfusable(info, surface) {
+  const s = String(surface || "").toLowerCase();
+  let key = EN_CONFUSABLES[s] ? s : null;
+  if (!key && info && info.root) {
+    const r = String(info.root).toLowerCase();
+    if (EN_CONFUSABLES[r]) key = r;
+  }
+  if (!key) return null;
+  const g = EN_CONFUSABLES[key];
+  return { words: g.w.map((w) => ({ w, es: g.es[w], current: w === key })) };
+}
+
+// --- Arcaísmos (defensivo: la WEB actual no los contiene) ---
+export const EN_ARCHAIC = {
+  thou: "«you» (tú) — arcaico",
+  thee: "«you» (te / ti) — arcaico",
+  thy: "«your» (tu) — arcaico",
+  thine: "«yours» (tuyo) — arcaico",
+  ye: "«you» plural (vosotros) — arcaico",
+  hath: "«has» (ha) — arcaico",
+  doth: "«does» — arcaico",
+  saith: "«says» (dice) — arcaico",
+  believeth: "«believes» (cree) — arcaico",
+  spake: "«spoke» (habló) — arcaico",
+  verily: "«truly» (en verdad) — arcaico",
+  whence: "«from where» (de dónde) — arcaico",
+};
+export function enArchaic(surface) {
+  const s = String(surface || "").toLowerCase().replace(/^[^a-z']+|[^a-z']+$/g, "");
+  return EN_ARCHAIC[s] || null;
+}
+
+// --- Pronunciación aproximada para hispanohablantes ---
+export const EN_PRON = {
+  though: "dou", through: "zru", thought: "zot", tough: "taf", enough: "ináf",
+  sword: "sord", colonel: "kérnel", choir: "kuáyer", bury: "béri",
+  blood: "blad", flood: "flad", door: "dor", floor: "flor", poor: "pur",
+  sure: "shur", sugar: "shúgar", ocean: "óushen", nation: "néishen",
+  nature: "néicher", answer: "ánser", island: "áiland", debt: "det",
+  doubt: "daut", subtle: "sátel", listen: "lísen", often: "ófen",
+  castle: "kásel", knowledge: "nólich", character: "kérákter",
+  chorus: "kórus", school: "skul", stomach: "stómak", anchor: "ánkor",
+  ghost: "goust", honest: "ónest", hour: "áuer", heir: "er", honor: "ónor",
+  rhythm: "rídem", busy: "bísi", business: "bísnes",
+  women: "uímen", woman: "wúman", heart: "jart", heard: "jerd",
+  earth: "erz", learn: "lern", pearl: "perl", word: "uord", world: "uorld",
+  work: "uork", worse: "uors", worship: "uórship", iron: "áiorn",
+  lion: "láion", quiet: "kuáiet", quite: "kuáit", guide: "gaid",
+  build: "bild", built: "bilt", circuit: "sérkit", pretty: "príti",
+  said: "sed", says: "sez", again: "aguén", against: "aguénst",
+  many: "méni", any: "éni", friend: "frend", machine: "mashín",
+  technique: "tekník", unique: "iuník",
+};
+export function enPron(info, surface) {
+  for (const c of _ffCands(info, surface)) {
+    if (EN_PRON[c]) return EN_PRON[c];
+  }
+  return null;
+}
+
+// --- Morfología no verbal: plural de X, comparativo de X, etc. ---
+// Devuelve { root, texto } o null. Solo cuando la lectura no es verbal.
+export function enMorphGloss(info) {
+  if (!info || info.infinitive || !info.suffixes || !info.suffixes.length || !info.root) return null;
+  const s = info.suffixes[info.suffixes.length - 1];
+  const root = info.root;
+  const nm = s.name || "", es = s.es || "", surf = s.surface || "";
+  if (nm === "(irregular)") return { root, texto: `plural irregular de «${root}»` };
+  if (es === "plural") return { root, texto: `plural de «${root}»` };
+  if (nm === "-er" && (surf === "ier" || es === "comparativo"))
+    return { root, texto: `comparativo de «${root}»` };
+  if (nm === "-er" && es === "comparativo / agente")
+    return { root, texto: `comparativo de «${root}» (o sustantivo: el que …)` };
+  if (nm === "-est") return { root, texto: `superlativo de «${root}»` };
+  if ((nm === "-er" || nm === "-or") && es === "agente")
+    return { root, texto: `sustantivo: el/la que «${root}»` };
+  if (nm === "-ly") return { root, texto: `adverbio formado de «${root}»` };
+  if (nm === "-ness") return { root, texto: `sustantivo abstracto de «${root}»` };
+  if (nm === "-less") return { root, texto: `adjetivo: sin «${root}»` };
+  if (nm === "-ful") return { root, texto: `adjetivo: lleno de «${root}»` };
+  return null;
+}
+
+// --- Construcciones verbales compuestas ---
+// Detecta have/has/had + participio, be + gerundio, will/would + base.
+// Devuelve { kind, aux } o null.
+export function enConstructionMatch(preceding, info) {
+  if (!info || !info.infinitive || !info.enTense) return null;
+  const toks = (preceding || []).slice(-3).map((t) =>
+    String(t).toLowerCase().replace(/^[^a-z']+|[^a-z']+$/g, ""));
+  let aux = null;
+  for (let i = toks.length - 1; i >= 0; i--) {
+    const w = toks[i];
+    if (!w || w === "not" || w === "n't" || w === "never") continue;
+    aux = w;
+    break;
+  }
+  if (!aux) return null;
+  const T = info.enTense;
+  if ((aux === "has" || aux === "have" || aux === "hath") && T.includes("participle"))
+    return { kind: "perfecto", aux };
+  if (aux === "had" && T.includes("participle")) return { kind: "pluscuamperfecto", aux };
+  if ((aux === "am" || aux === "is" || aux === "are") && T === "gerund")
+    return { kind: "continuo-pres", aux };
+  if ((aux === "was" || aux === "were") && T === "gerund")
+    return { kind: "continuo-pas", aux };
+  if (aux === "will" || aux === "shall") return { kind: "futuro", aux };
+  if (aux === "would") return { kind: "condicional", aux };
+  return null;
+}
+
+export const EN_CONSTRUCTION_LABEL = {
+  perfecto: ["Pretérito perfecto", "have/has + participio"],
+  pluscuamperfecto: ["Pretérito pluscuamperfecto", "had + participio"],
+  "continuo-pres": ["Presente continuo", "am/is/are + gerundio"],
+  "continuo-pas": ["Pasado continuo", "was/were + gerundio"],
+  futuro: ["Futuro", "will + verbo"],
+  condicional: ["Condicional", "would + verbo"],
+};
+
+// --- Familias de palabras (perezoso, con caché) ---
+// Señal primaria: el motor descompone el candidato hasta la raíz.
+// Respaldo: sufijos derivativos conocidos (para entradas lexicalizadas
+// en el diccionario, que el motor no descompone: "faithful" → "faith").
+const EN_FAM_SUFFIX = ["fulness", "lessness", "fully", "lessly", "ness", "less", "ful", "ly", "est"];
+export function enWordFamily(engine, root, max = 6) {
+  root = String(root || "").toLowerCase();
+  if (root.length < 4 || !engine || !engine._index) return [];
+  const cache = engine._familyCache || (engine._familyCache = {});
+  if (cache[root]) return cache[root];
+  const cands = [];
+  for (const k of engine._index.keys()) {
+    if (k.length <= root.length || k.length > root.length + 8 || k === root) continue;
+    if (!k.startsWith(root)) continue;
+    cands.push(k);
+    if (cands.length > 120) break;
+  }
+  const out = [];
+  for (const k of cands) {
+    let ok = false;
+    try {
+      const r = engine.resolve(k);
+      const inf = r && r[1];
+      if (inf && inf.root === root) ok = true;
+    } catch (e) { /* noop */ }
+    if (!ok && EN_FAM_SUFFIX.includes(k.slice(root.length))) ok = true;
+    if (ok && !out.includes(k)) out.push(k);
+    if (out.length >= max) break;
+  }
+  cache[root] = out;
+  return out;
+}
+
+// Construye el español de una construcción verbal compuesta:
+// "they have gone" → "han ido", "she was walking" → "estaba caminando".
+// kind: uno de EN_CONSTRUCTION_LABEL. persona: "1s".."3p".
+export function enConstructionEs(kind, persona, glosses) {
+  const infs = esInfinitivos(glosses);
+  if (!infs.length) return "";
+  const inf = infs[0];
+  switch (kind) {
+    case "perfecto": return conjugarEs("haber", "presente", persona) + " " + conjugarEs(inf, "participio");
+    case "pluscuamperfecto": return conjugarEs("haber", "imperfecto", persona) + " " + conjugarEs(inf, "participio");
+    case "continuo-pres": return conjugarEs("estar", "presente", persona) + " " + conjugarEs(inf, "gerundio");
+    case "continuo-pas": return conjugarEs("estar", "imperfecto", persona) + " " + conjugarEs(inf, "gerundio");
+    case "futuro": return conjugarEs(inf, "futuro", persona);
+    case "condicional": return conjugarEs(inf, "condicional", persona);
+    default: return "";
   }
 }

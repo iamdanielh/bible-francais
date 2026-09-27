@@ -1,6 +1,6 @@
 import { Dictionary, friendlyTense, friendlyForm, esInfinitive, esConjugado, esCompuesto } from "./dict.js?v=45";
 import { TrEngine } from "./tr-engine.js?v=46";
-import { EnEngine, enVerbGloss, enVerbShort, enPhrasalMatch, enDetectSubject, enParticipleHint, enConjugarGlosa } from "./en-engine.js?v=4";
+import { EnEngine, enVerbGloss, enVerbShort, enPhrasalMatch, enDetectSubject, enParticipleHint, enConjugarGlosa, enFalseFriend, enConfusable, enArchaic, enPron, enMorphGloss, enConstructionMatch, enConstructionEs, EN_CONSTRUCTION_LABEL, enWordFamily } from "./en-engine.js?v=5";
 
 // ---- language packs --------------------------------------------------------
 // Every language is a self-contained pack: which data files to fetch, how to
@@ -32,7 +32,7 @@ const LANGS = {
     bibleUrl: "data/en/bible.json",
     dictUrl: "data/en/dict.json",
     namesUrl: "data/en/names.json",
-    attribution: "English: World English Bible — public domain.",
+    attribution: "English: Berean Standard Bible — public domain (2022).",
     tts: { lang: "en-US", voice: pickEnVoice },
     aliases: {},
   },
@@ -719,6 +719,31 @@ function toast(msg) {
   _toastTimer = setTimeout(() => t.classList.remove("show"), 3400);
 }
 
+// Up to 3 verses (outside the current chapter) containing the tapped English
+// word, for repeated exposure in varied contexts. Scans the in-memory
+// normalized bible; common words match almost immediately.
+function enFindExamples(word) {
+  if (lang !== "en" || !bible || !bible.length) return [];
+  const w = String(word || "").toLowerCase().replace(/^[^a-z']+|[^a-z']+$/g, "");
+  if (w.length < 3) return [];
+  let rx;
+  try {
+    rx = new RegExp("\\b" + w.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + "\\b");
+  } catch (e) { return []; }
+  const out = [];
+  for (let bi = 0; bi < bible.length && out.length < 3; bi++) {
+    const book = bible[bi];
+    for (let ci = 0; ci < book.chapters.length && out.length < 3; ci++) {
+      if (bi === currentBookIndex && ci === currentChapter) continue;
+      const ch = book.chapters[ci];
+      for (let vi = 0; vi < ch.length && out.length < 3; vi++) {
+        if (rx.test(ch[vi])) out.push({ bi, ci, vi });
+      }
+    }
+  }
+  return out;
+}
+
 function presentWord(word, ti, token, sentenceInitial, followingTokens, precedingTokens) {
   if (!dictionary) return;
   stats.tap();
@@ -769,9 +794,63 @@ function presentWord(word, ti, token, sentenceInitial, followingTokens, precedin
     currentES = "";
     return;
   }
-  el.meaning.innerHTML = "<b>Español:</b>\n" + meanList(meanings.slice(0, 8)) + phrasal;
+  // English learner extras: constructions, false friends, confusables,
+  // archaic forms, non-verb morphology, pronunciation, word families and
+  // example verses.
+  let extras = "";
+  let morphNote = "";
+  if (lang === "en" && info) {
+    const cm = enConstructionMatch(precedingTokens, info);
+    if (cm && meanings) {
+      const built = enConstructionEs(cm.kind, enPersona, meanings);
+      if (built) {
+        const [lbl, tpl] = EN_CONSTRUCTION_LABEL[cm.kind];
+        extras += `<div class="construction">🔗 Construcción: <b>${esc(lbl)}</b> <span class="dim">(${esc(tpl)})</span> → <b>«${esc(built)}»</b></div>`;
+      }
+    }
+    const ff = enFalseFriend(info, word);
+    if (ff) extras += `<div class="warn-block">⚠️ ${esc(ff)}</div>`;
+    const cf = enConfusable(info, word);
+    if (cf) {
+      extras += `<div class="info-block">🔀 No confundir: ` +
+        cf.words.map((x) => `<b${x.current ? ' class="cur"' : ""}>${esc(x.w)}</b> = ${esc(x.es)}`).join(" · ") +
+        `</div>`;
+    }
+    const ar = enArchaic(word);
+    if (ar) extras += `<div class="info-block">📜 Arcaico: hoy se dice ${esc(ar)}</div>`;
+    const pr = enPron(info, word);
+    if (pr) extras += `<div class="pron-block">🗣️ Se pronuncia aprox.: <b>«${esc(pr)}»</b></div>`;
+    const mg = enMorphGloss(info);
+    if (mg) {
+      let rootEs = "";
+      try {
+        const [rm] = dictionary.resolve(mg.root);
+        if (rm && rm.length) rootEs = rm[0];
+      } catch (e) {}
+      morphNote = mg.texto + (rootEs ? ` (${rootEs})` : "");
+    }
+    if (!info.infinitive && info.root && info.root.length >= 4) {
+      const fam = enWordFamily(dictionary, info.root);
+      if (fam.length) {
+        extras += `<div class="family">🧬 Familia: ` + fam.map((w) => `<b>${esc(w)}</b>`).join(" · ") + `</div>`;
+      }
+    }
+    const exs = enFindExamples(word);
+    if (exs.length) {
+      extras += `<div class="examples">📖 También aparece en: ` +
+        exs.map((e) => `<button class="ex-ref" data-bi="${e.bi}" data-ci="${e.ci}">${esc(bible[e.bi].name)} ${e.ci + 1}:${e.vi + 1}</button>`).join(" · ") +
+        `</div>`;
+    }
+  }
+  el.meaning.innerHTML = "<b>Español:</b>\n" + meanList(meanings.slice(0, 8)) + phrasal + extras;
   if (morphHtml) el.grammar.innerHTML = morphHtml;
-  else el.grammar.textContent = grammar;
+  else el.grammar.textContent = grammar + (morphNote ? (grammar ? " · " : "") + morphNote : "");
+  el.meaning.querySelectorAll(".ex-ref").forEach((b) => {
+    b.addEventListener("click", (ev) => {
+      ev.stopPropagation();
+      selectBook(parseInt(b.dataset.bi, 10), false, parseInt(b.dataset.ci, 10));
+    });
+  });
   el.note.textContent = "";
   el.saveBtn.disabled = false;
   el.speakBtn.disabled = false;
