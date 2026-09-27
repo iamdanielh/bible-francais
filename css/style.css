@@ -831,6 +831,11 @@ html.touch .scrim.show { opacity: 0; }
   border-radius: var(--radius-sm);
   padding: 12px 14px;
 }
+.phrasal-verb {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px dashed var(--border-soft);
+}
 .grammar {
   color: var(--accent-deep);
   font-size: 0.94rem;

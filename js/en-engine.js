@@ -46,6 +46,8 @@ const EN_CONTRACT = {
   "isn't": "be", "aren't": "be", "wasn't": "be", "weren't": "be",
   "haven't": "have", "hasn't": "have", "hadn't": "have",
   "shouldn't": "shall",
+  "it's": "be", "there's": "be", "here's": "be", "what's": "be",
+  "that's": "be", "let's": "let",
 };
 // Suffix contractions: "he'll" → "will", "i'm" → "be", …
 const EN_CONTRACT_SUF = [
@@ -302,6 +304,283 @@ const EN_IRREGULAR = {
   "staves": "staff", "denarii": "denarius",
 };
 
+// ---- English verb tense classification ------------------------------------
+// Most irregular forms are genuinely ambiguous in English ("put", "read",
+// "said" are both past and past participle). Only forms whose tense is
+// unambiguous are listed; anything else in EN_IRREGULAR gets
+// "past-or-participle".
+const EN_PAST_ONLY = new Set(
+  ("was wast wert were did went came saw ate drank drove fell forgave gave knew ran rode rose sang sank spoke stole swore threw took tore woke wore wrote began drew bade bore blew broke chose clave clove forbade forgat froze gainsaid grew hamstrung mistook overcame overdrew overthrew overtook rang reran shook shrank slew smote spake sprang stank strode strove swam trod unfroze unhid unwove arose awoke durst").split(" ")
+);
+const EN_PPLE_ONLY = new Set(
+  ("gone been done seen taken given known gotten eaten written spoken broken chosen driven fallen forgotten forgiven frozen grown hidden risen arisen beaten begun bitten blown born borne drawn drunk foreseen forsaken mown sawn sewn shaken shaven shorn shown slain smitten sown stridden stricken striven swollen swum thrown trodden woken worn woven withdrawn overdrawn overridden overthrown overtaken undergone undertaken undone unfrozen unhidden unwoven chidden cloven cleft laden lain mistaken overdone proven ridden rung sung torn bidden befallen begotten").split(" ")
+);
+const EN_PRESENT_ONLY = new Set("am art is are".split(" "));
+const EN_PRESENT3SG = new Set("has hath does doth says saith goes".split(" "));
+// Modals / auxiliaries: they are verbs, but tense labels don't apply to them.
+const EN_MODAL = new Set("shall will would can could should may might must".split(" "));
+
+export function enIrregularTense(form) {
+  if (EN_PAST_ONLY.has(form)) return "past";
+  if (EN_PPLE_ONLY.has(form)) return "past-participle";
+  if (EN_PRESENT_ONLY.has(form)) return "present";
+  if (EN_PRESENT3SG.has(form)) return "present-3sg";
+  return "past-or-participle";
+}
+
+// A dictionary gloss reads as a verb when one of its words is a Spanish
+// infinitive ("caminar", "ir", "dar"). Accents are stripped first ("oír").
+function enLooksLikeVerb(glosses) {
+  return !!enFirstVerbGloss(glosses);
+}
+
+// First gloss that reads as a Spanish verb ("andar" over "paseo"), so verb
+// explanations lead with the verbal meaning instead of a noun homograph.
+function enFirstVerbGloss(glosses) {
+  for (const g of (glosses || [])) {
+    const hit = String(g).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+      .split(/[\s/]+/).some((t) => t.length > 1 && /(ar|er|ir)(se)?$/.test(t));
+    if (hit) return g;
+  }
+  return null;
+}
+
+// Verb roots whose dictionary entry is missing or noun-only ("lie" only has
+// "mentira", "sow" only "cerda"). Prepended to the dictionary entry at lookup
+// so verb forms resolve to a verb and the verb detector sees them.
+const EN_DICT_PATCH = {
+  "lie": ["yacer", "echarse", "recostarse", "mentir"],
+  "behold": ["contemplar", "mirar"],
+  "sow": ["sembrar"],
+  "ring": ["sonar", "tañer"],
+  "wind": ["enrollar", "girar"],
+  "crow": ["cacarear", "cantar (el gallo)"],
+  "pen": ["encerrar"],
+  "bleed": ["sangrar"],
+  "mistake": ["equivocarse"],
+  "slide": ["deslizarse", "resbalar"],
+  "sting": ["picar"],
+  "stride": ["andar a zancadas"],
+  "string": ["ensartar"],
+  "swell": ["hincharse"],
+  "hamstring": ["desjarretar"],
+  "backslide": ["apostatar", "recaer"],
+  "befall": ["acontecer", "sobrevenir"],
+  "beset": ["asediar", "rodear"],
+  "chide": ["reprender"],
+  "gainsay": ["contradecir"],
+  "gird": ["ceñir"],
+  "hew": ["labrar", "talar"],
+  "inlay": ["incrustar"],
+  "lade": ["cargar"],
+  "mislead": ["desviar", "engañar"],
+  "mow": ["segar"],
+  "overdo": ["excederse"],
+  "overdraw": ["sobregirar"],
+  "overhear": ["oír por casualidad"],
+  "override": ["anular", "invalidar"],
+  "oversleep": ["quedarse dormido"],
+  "rive": ["hender", "rajar"],
+  "slit": ["rajar", "cortar"],
+  "sneak": ["escabullirse"],
+  "unbend": ["enderezar"],
+  "unbind": ["desatar"],
+  "unfreeze": ["descongelar"],
+  "unhide": ["descubrir"],
+  "unlearn": ["olvidar lo aprendido"],
+  "unsay": ["retractarse"],
+  "unspin": ["destorcer"],
+  "unstick": ["despegar"],
+  "unstring": ["desencordar"],
+  "unweave": ["destejer"],
+  "unwind": ["desenrollar"],
+  "waylay": ["acechar", "tender una emboscada"],
+  // Frequent -ing nouns the dictionary lacks: keeps the noun reading so the
+  // gerund rule doesn't claim them ("weeping" = llanto, not "weep" gerund).
+  "weeping": ["llanto", "lloro"], "mourning": ["luto", "duelo"],
+  "threshing": ["trilla"], "signify": ["significar", "indicar", "dar a entender"],
+};
+
+// Words where the dictionary reading dominates in Bible text, so it keeps
+// winning over the verb/inflection ("ground" = tierra, "offering" = ofrenda,
+// "evening" = tarde). Without these, the verb-first heuristics below would
+// misread very common verses.
+const EN_DICT_WINS = new Set([
+  "ground", "wound", "lay", "evening", "anything", "notwithstanding",
+  "unwitting", "shaving", "wedding", "saying", "according", "offering",
+  "concerning", "living", "coming", "understanding", "meeting", "clothing",
+  "beginning", "teaching", "blessing", "dwelling", "hearing", "weeping",
+  "mourning", "following", "threshing", "covering", "willing",
+]);
+
+// Tense-bearing contractions: "wasn't" is the past of "be", "don't" the
+// present of "do".
+const EN_CONTRACT_TENSE = {
+  "isn't": "present", "aren't": "present", "wasn't": "past", "weren't": "past",
+  "haven't": "present", "hasn't": "present", "hadn't": "past",
+  "don't": "present", "doesn't": "present", "didn't": "past",
+  "it's": "present", "there's": "present", "here's": "present", "what's": "present",
+  "that's": "present", "let's": "present",
+};
+const EN_CONTRACT_SUF_TENSE = { "'m": "present", "'re": "present", "'ve": "present" };
+
+// ---- Phrasal verbs & multi-word biblical concepts --------------------------
+// "give up" is not "give" + "up", and "kingdom of heaven" is not three
+// separate words. Keys are lowercase; segment() matches them greedily and
+// enPhrasalMatch() matches them from a tapped verb + following words.
+export const EN_PHRASES = {
+  // verbos frasales (verb in infinitive + particle)
+  "bear witness": { es: ["dar testimonio"], kind: "verbo frasal" },
+  "bow down": { es: ["postrarse", "inclinarse"], kind: "verbo frasal" },
+  "break down": { es: ["derribar"], kind: "verbo frasal" },
+  "bring forth": { es: ["producir", "dar a luz"], kind: "verbo frasal" },
+  "bring up": { es: ["criar"], kind: "verbo frasal" },
+  "cast down": { es: ["derribar", "abatir"], kind: "verbo frasal" },
+  "cast out": { es: ["expulsar", "echar fuera"], kind: "verbo frasal" },
+  "come forth": { es: ["salir", "aparecer"], kind: "verbo frasal" },
+  "come upon": { es: ["venir sobre", "sobrevenir"], kind: "verbo frasal" },
+  "cry out": { es: ["clamar"], kind: "verbo frasal" },
+  "cut off": { es: ["cortar", "separar", "exterminar"], kind: "verbo frasal" },
+  "fall down": { es: ["caer", "postrarse"], kind: "verbo frasal" },
+  "give up": { es: ["entregar", "renunciar"], kind: "verbo frasal" },
+  "go forth": { es: ["salir"], kind: "verbo frasal" },
+  "go up": { es: ["subir"], kind: "verbo frasal" },
+  "hold fast": { es: ["retener", "aferrarse"], kind: "verbo frasal" },
+  "lay down": { es: ["poner", "dar (la vida)"], kind: "verbo frasal" },
+  "lay hands on": { es: ["imponer las manos"], kind: "verbo frasal" },
+  "lead forth": { es: ["sacar", "guiar"], kind: "verbo frasal" },
+  "lift up": { es: ["levantar", "alzar"], kind: "verbo frasal" },
+  "look upon": { es: ["mirar"], kind: "verbo frasal" },
+  "make known": { es: ["dar a conocer"], kind: "verbo frasal" },
+  "pass away": { es: ["pasar", "desaparecer"], kind: "verbo frasal" },
+  "pass over": { es: ["pasar por alto"], kind: "verbo frasal" },
+  "pour out": { es: ["derramar"], kind: "verbo frasal" },
+  "put away": { es: ["repudiar", "desechar"], kind: "verbo frasal" },
+  "put forth": { es: ["extender"], kind: "verbo frasal" },
+  "put off": { es: ["quitarse", "despojarse"], kind: "verbo frasal" },
+  "put on": { es: ["vestirse", "ponerse"], kind: "verbo frasal" },
+  "raise up": { es: ["levantar", "resucitar"], kind: "verbo frasal" },
+  "rise up": { es: ["levantarse"], kind: "verbo frasal" },
+  "run away": { es: ["huir"], kind: "verbo frasal" },
+  "send forth": { es: ["enviar"], kind: "verbo frasal" },
+  "set apart": { es: ["apartar", "consagrar"], kind: "verbo frasal" },
+  "set free": { es: ["libertar", "poner en libertad"], kind: "verbo frasal" },
+  "sit down": { es: ["sentarse"], kind: "verbo frasal" },
+  "stand up": { es: ["ponerse de pie"], kind: "verbo frasal" },
+  "stretch forth": { es: ["extender"], kind: "verbo frasal" },
+  "stretch out": { es: ["extender"], kind: "verbo frasal" },
+  "take away": { es: ["quitar"], kind: "verbo frasal" },
+  "take up": { es: ["tomar", "recoger"], kind: "verbo frasal" },
+  "throw down": { es: ["derribar"], kind: "verbo frasal" },
+  "turn away": { es: ["apartarse"], kind: "verbo frasal" },
+  "turn back": { es: ["volverse atrás"], kind: "verbo frasal" },
+  "wash away": { es: ["lavar", "limpiar"], kind: "verbo frasal" },
+  "wipe away": { es: ["enjugar"], kind: "verbo frasal" },
+  // locuciones
+  "kingdom of heaven": { es: ["reino de los cielos"], kind: "locución" },
+  "kingdom of god": { es: ["reino de Dios"], kind: "locución" },
+  "son of man": { es: ["hijo del hombre"], kind: "locución" },
+  "son of god": { es: ["Hijo de Dios"], kind: "locución" },
+  "son of david": { es: ["hijo de David"], kind: "locución" },
+  "holy spirit": { es: ["Espíritu Santo"], kind: "locución" },
+  "most high": { es: ["Altísimo"], kind: "locución" },
+  "good news": { es: ["buenas nuevas", "evangelio"], kind: "locución" },
+  "eternal life": { es: ["vida eterna"], kind: "locución" },
+  "new covenant": { es: ["nuevo pacto"], kind: "locución" },
+  "day of judgment": { es: ["día del juicio"], kind: "locución" },
+  "last days": { es: ["últimos días"], kind: "locución" },
+  "house of god": { es: ["casa de Dios"], kind: "locución" },
+  "word of god": { es: ["palabra de Dios"], kind: "locución" },
+  "fear of the lord": { es: ["temor del Señor"], kind: "locución" },
+  "promised land": { es: ["tierra prometida"], kind: "locución" },
+  "ten commandments": { es: ["diez mandamientos"], kind: "locución" },
+  "golden calf": { es: ["becerro de oro"], kind: "locución" },
+  "burning bush": { es: ["zarza ardiente"], kind: "locución" },
+  "tree of life": { es: ["árbol de la vida"], kind: "locución" },
+  "body of christ": { es: ["cuerpo de Cristo"], kind: "locución" },
+  "blood of christ": { es: ["sangre de Cristo"], kind: "locución" },
+  "lamb of god": { es: ["Cordero de Dios"], kind: "locución" },
+  "bread of life": { es: ["pan de vida"], kind: "locución" },
+  "light of the world": { es: ["luz del mundo"], kind: "locución" },
+  "salt of the earth": { es: ["sal de la tierra"], kind: "locución" },
+  "narrow gate": { es: ["puerta estrecha"], kind: "locución" },
+  "outer darkness": { es: ["tinieblas de afuera"], kind: "locución" },
+  "lake of fire": { es: ["lago de fuego"], kind: "locución" },
+  "new jerusalem": { es: ["nueva Jerusalén"], kind: "locución" },
+  "holy city": { es: ["ciudad santa"], kind: "locución" },
+  "lord of hosts": { es: ["Señor de los ejércitos"], kind: "locución" },
+  "king of kings": { es: ["Rey de reyes"], kind: "locución" },
+  "lord of lords": { es: ["Señor de señores"], kind: "locución" },
+  "alpha and omega": { es: ["Alfa y Omega"], kind: "locución" },
+};
+
+// A tapped verb plus the words after it: "gave" + ["up", ...] → "give up".
+// Tries the infinitive first, then the surface form ("lay" + "down").
+export function enPhrasalMatch(infinitive, surface, following) {
+  const cands = [];
+  const inf = normalizeEn(infinitive || "");
+  const sur = normalizeEn(surface || "");
+  if (inf) cands.push(inf);
+  if (sur && sur !== inf) cands.push(sur);
+  const parts = (following || [])
+    .map((t) => normalizeEn(t).replace(/[^a-z']/g, ""))
+    .filter(Boolean);
+  for (const vb of cands) {
+    for (let n = Math.min(2, parts.length); n >= 1; n--) {
+      const key = [vb, ...parts.slice(0, n)].join(" ");
+      const p = EN_PHRASES[key];
+      if (p && p.kind === "verbo frasal") return { phrase: key, es: p.es.slice() };
+    }
+  }
+  return null;
+}
+
+const EN_TENSE_LABEL = {
+  "present": "presente",
+  "present-3sg": "presente, 3ª persona",
+  "past": "pasado",
+  "past-participle": "participio",
+  "past-or-participle": "pasado o participio",
+  "gerund": "gerundio",
+  "base": "forma base",
+};
+const EN_TENSE_TIP = {
+  "past": "El pasado regular añade «-ed»: «walk» → «walked».",
+  "past-or-participle": "El pasado regular añade «-ed»: «walk» → «walked»; con «have» es participio («has walked» = ha caminado).",
+  "past-participle": "El participio se usa con «have / has / had» («has eaten» = ha comido) o en pasiva.",
+  "present-3sg": "En presente, «he / she / it» añade «-s»: «he walks» = él camina.",
+  "gerund": "El gerundio («-ing») equivale a «-ando / -iendo»: «walking» = caminando.",
+  "present": "«be» es irregular: I am, he is, we are (y «was / were» en pasado).",
+  "base": "Es la forma del diccionario: se usa con «to» («to go» = ir) y después de auxiliares («will go» = irá).",
+};
+
+// Spanish grammar explanation for an English verb form. Pure (no DOM).
+export function enVerbGloss(info, firstMean, allGlosses) {
+  if (!info || !info.infinitive) return "";
+  const inf = info.infinitive;
+  // Lead with the verb-shaped gloss ("andar", not the noun "paseo").
+  const verbMean = enFirstVerbGloss(allGlosses) || firstMean;
+  let s = "Es el verbo «" + inf + "»" + (verbMean ? " (" + verbMean + ")" : "") + ".";
+  const t = info.enTense;
+  if (t === "past") s += " Aquí está en pasado.";
+  else if (t === "past-participle") s += " Aquí está en participio.";
+  else if (t === "past-or-participle") s += " Aquí está en pasado o participio.";
+  else if (t === "present-3sg") s += " Aquí está en presente, 3ª persona (he / she / it).";
+  else if (t === "gerund") s += " Aquí está en gerundio.";
+  else if (t === "present") s += " Aquí está en presente.";
+  const tip = EN_TENSE_TIP[t];
+  if (tip) s += " " + tip;
+  if (verbMean) s += " Aquí significa «" + verbMean + "».";
+  return s;
+}
+
+// Short inline label, e.g. pasado de «go».
+export function enVerbShort(info) {
+  if (!info || !info.infinitive) return "";
+  const label = EN_TENSE_LABEL[info.enTense];
+  return label ? label + " de «" + info.infinitive + "»" : "verbo «" + info.infinitive + "»";
+}
+
 // Prefixes that compose with a full inflected stem:
 // "overlaid" → over + laid → lay; "outstretched" → out + stretch + -ed.
 const EN_PREFIX = ["over", "under", "out"];
@@ -411,8 +690,30 @@ export class EnEngine {
 
   _dictGet(key) {
     const arr = this._index.get(key);
-    if (arr && Array.isArray(arr) && arr.length) return arr.slice();
-    return null;
+    const base = arr && Array.isArray(arr) && arr.length ? arr.slice() : [];
+    const patch = EN_DICT_PATCH[key];
+    if (patch && patch.length) return patch.concat(base);
+    return base.length ? base : null;
+  }
+
+  // Dictionary membership, patch-aware (some verb roots only live in the patch).
+  _hasWord(key) {
+    return this._index.has(key) || Object.prototype.hasOwnProperty.call(EN_DICT_PATCH, key);
+  }
+
+  // Verb metadata for an English root: { infinitive, enTense?, enVerb: true },
+  // or null when the root isn't a verb. surfaceForm is the inflected form when
+  // known (irregular table); forceTense overrides it (contractions and suffix
+  // stripping pass their own tense). forceTense === null means a derivational
+  // suffix ("teacher" → "teach"): not a verb form, no metadata.
+  _enVerbInfo(root, surfaceForm, forceTense) {
+    if (!root || forceTense === null) return null;
+    const g = this._dictGet(root);
+    if (!enLooksLikeVerb(g)) return null;
+    const out = { infinitive: root, enVerb: true };
+    if (EN_MODAL.has(root)) return out;
+    out.enTense = forceTense || (surfaceForm ? enIrregularTense(surfaceForm) : "base");
+    return out;
   }
 
   // The dictionary key a surface word resolves through (contraction handling
@@ -424,9 +725,9 @@ export class EnEngine {
     }
     if (w.length > 2 && w.endsWith("'")) {
       const b = w.slice(0, -1);
-      if (this._index.has(b)) return b;
+      if (this._hasWord(b)) return b;
     }
-    return this._index.has(w) ? w : null;
+    return this._hasWord(w) ? w : null;
   }
 
   // Single source of truth: lookup() runs the same pipeline as resolve().
@@ -438,8 +739,8 @@ export class EnEngine {
   // Irregular table, dict-gated (a lemma missing from the dictionary is skipped).
   _irregularForm(bare) {
     const irr = EN_IRREGULAR[bare];
-    if (irr && this._index.has(irr)) {
-      return { root: irr, name: "(irregular)", surface: bare, es: "forma irregular" };
+    if (irr && this._hasWord(irr)) {
+      return { root: irr, name: "(irregular)", surface: bare, es: "forma irregular", tense: enIrregularTense(bare) };
     }
     return null;
   }
@@ -449,119 +750,136 @@ export class EnEngine {
   // level is allowed ("blessings" → -s → "blessing" → -ing → "bless").
   _stripRegular(bare, depth) {
     const self = this;
-    const tryStem = (stem, name, surface, es) => {
+    const tryStem = (stem, name, surface, es, tense) => {
       if (!stem || stem.length < 2 || !/^[a-z]/.test(stem)) return null;
-      if (self._index.has(stem)) return { root: stem, name, surface, es };
+      if (self._hasWord(stem)) return { root: stem, name, surface, es, tense: tense || null };
       if (depth < 1 && stem.length > 3) {
         const chained = self._stripRegular(stem, depth + 1);
-        if (chained) return { root: chained.root, name, surface, es };
+        if (chained) return { root: chained.root, name, surface, es, tense: chained.tense || null };
       }
       return null;
     };
-    const PL = "plural / 3ª persona";
+    // -s / -es / -ies: 3rd-person singular when the stem is a verb ("walks"),
+    // plural when it is a noun ("kings"). One chained level kept for words
+    // like "blessings" (old "plural / 3ª persona" label, no tense).
+    const tryStemVerbNoun = (stem, name, surface) => {
+      if (stem && stem.length >= 2 && /^[a-z]/.test(stem) && self._hasWord(stem)) {
+        const verb = enLooksLikeVerb(self._dictGet(stem));
+        return {
+          root: stem, name, surface,
+          es: verb ? "3ª persona (presente)" : "plural",
+          tense: verb ? "present-3sg" : null,
+        };
+      }
+      if (depth < 1 && stem && stem.length > 3) {
+        const chained = self._stripRegular(stem, depth + 1);
+        if (chained) return { root: chained.root, name, surface, es: "plural / 3ª persona", tense: null };
+      }
+      return null;
+    };
     let m;
     if (bare.length > 4 && bare.endsWith("ies")) {
-      m = tryStem(bare.slice(0, -3) + "y", "-ies", "ies", PL);
+      m = tryStemVerbNoun(bare.slice(0, -3) + "y", "-ies", "ies");
       if (m) return m;
     }
     if (bare.length > 4 && bare.endsWith("es")) {
-      m = tryStem(bare.slice(0, -2), "-es", "es", PL) ||
-          tryStem(bare.slice(0, -1), "-es", "es", PL);
+      m = tryStemVerbNoun(bare.slice(0, -2), "-es", "es") ||
+          tryStemVerbNoun(bare.slice(0, -1), "-es", "es");
       if (m) return m;
     }
     if (bare.length > 3 && bare.endsWith("s") && !bare.endsWith("ss")) {
-      m = tryStem(bare.slice(0, -1), "-s", "s", PL);
+      m = tryStemVerbNoun(bare.slice(0, -1), "-s", "s");
       if (m) return m;
     }
-    // f → -ves ("wolves" → "wolf").
+    // f → -ves ("wolves" → "wolf"): noun plurals only, no verb tense.
     if (bare.length > 4 && bare.endsWith("ves")) {
       const noVes = bare.slice(0, -3);
-      m = tryStem(noVes + "f", "-ves", "ves", PL) ||
-          tryStem(noVes + "fe", "-ves", "ves", PL);
+      m = tryStem(noVes + "f", "-ves", "ves", "plural", null) ||
+          tryStem(noVes + "fe", "-ves", "ves", "plural", null);
       if (m) return m;
     }
     if (bare.length > 4 && bare.endsWith("ied")) {
-      m = tryStem(bare.slice(0, -3) + "y", "-ied", "ied", "pasado");
+      m = tryStem(bare.slice(0, -3) + "y", "-ied", "ied", "pasado / participio", "past-or-participle");
       if (m) return m;
     }
     if (bare.length > 3 && bare.endsWith("ed")) {
       const noEd = bare.slice(0, -2);
-      m = tryStem(noEd, "-ed", "ed", "pasado") ||
-          tryStem(bare.slice(0, -1), "-ed", "ed", "pasado") ||
-          tryStem(undoubleEn(noEd), "-ed", "ed", "pasado") ||
-          tryStem(noEd.slice(0, -1) + "y", "-ed", "ed", "pasado");
+      m = tryStem(noEd, "-ed", "ed", "pasado / participio", "past-or-participle") ||
+          tryStem(bare.slice(0, -1), "-ed", "ed", "pasado / participio", "past-or-participle") ||
+          tryStem(undoubleEn(noEd), "-ed", "ed", "pasado / participio", "past-or-participle") ||
+          tryStem(noEd.slice(0, -1) + "y", "-ed", "ed", "pasado / participio", "past-or-participle");
       if (m) return m;
     }
     if (bare.length > 4 && bare.endsWith("ing")) {
       const noIng = bare.slice(0, -3);
-      m = tryStem(noIng, "-ing", "ing", "gerundio") ||
-          tryStem(noIng + "e", "-ing", "ing", "gerundio") ||
-          tryStem(undoubleEn(noIng), "-ing", "ing", "gerundio");
+      m = tryStem(noIng, "-ing", "ing", "gerundio", "gerund") ||
+          tryStem(noIng + "e", "-ing", "ing", "gerundio", "gerund") ||
+          tryStem(undoubleEn(noIng), "-ing", "ing", "gerundio", "gerund");
       if (m) return m;
     }
     // -ly adverbs ("quickly" → "quick").
     if (bare.length > 4 && bare.endsWith("ly")) {
       const noLy = bare.slice(0, -2);
-      m = tryStem(noLy, "-ly", "ly", "adverbio") ||
-          tryStem(noLy + "e", "-ly", "ly", "adverbio");
+      m = tryStem(noLy, "-ly", "ly", "adverbio", null) ||
+          tryStem(noLy + "e", "-ly", "ly", "adverbio", null);
       if (m) return m;
     }
     // -ness nouns ("darkness" → "dark").
     if (bare.length > 6 && bare.endsWith("ness")) {
-      m = tryStem(bare.slice(0, -4), "-ness", "ness", "sustantivo");
+      m = tryStem(bare.slice(0, -4), "-ness", "ness", "sustantivo", null);
       if (m) return m;
     }
     // -less adjectives ("fatherless" → "father").
     if (bare.length > 6 && bare.endsWith("less")) {
-      m = tryStem(bare.slice(0, -4), "-less", "less", "adjetivo");
+      m = tryStem(bare.slice(0, -4), "-less", "less", "adjetivo", null);
       if (m) return m;
     }
     // -ful adjectives ("faithful" → "faith").
     if (bare.length > 5 && bare.endsWith("ful")) {
       const noFul = bare.slice(0, -3);
-      m = tryStem(noFul, "-ful", "ful", "adjetivo") ||
-          (noFul.endsWith("i") ? tryStem(noFul.slice(0, -1) + "y", "-ful", "ful", "adjetivo") : null);
+      m = tryStem(noFul, "-ful", "ful", "adjetivo", null) ||
+          (noFul.endsWith("i") ? tryStem(noFul.slice(0, -1) + "y", "-ful", "ful", "adjetivo", null) : null);
       if (m) return m;
     }
     // feminine -ess ("lioness" → "lion").
     if (bare.length > 6 && bare.endsWith("ess")) {
-      m = tryStem(bare.slice(0, -3), "-ess", "ess", "femenino");
+      m = tryStem(bare.slice(0, -3), "-ess", "ess", "femenino", null);
       if (m) return m;
     }
     if (bare.length > 5 && bare.endsWith("ier")) {
-      m = tryStem(bare.slice(0, -3) + "y", "-er", "ier", "comparativo");
+      m = tryStem(bare.slice(0, -3) + "y", "-er", "ier", "comparativo", null);
       if (m) return m;
     }
     // Archaic KJV 3rd-person singular («believeth» → «believe»).
     if (bare.length > 5 && bare.endsWith("eth")) {
       const noEth = bare.slice(0, -3);
-      m = tryStem(noEth, "-eth", "eth", "3ª persona (arcaico)") ||
-          tryStem(noEth + "e", "-eth", "eth", "3ª persona (arcaico)") ||
-          tryStem(bare.slice(0, -4), "-eth", "eth", "3ª persona (arcaico)");
+      m = tryStem(noEth, "-eth", "eth", "3ª persona (arcaico)", "present-3sg") ||
+          tryStem(noEth + "e", "-eth", "eth", "3ª persona (arcaico)", "present-3sg") ||
+          tryStem(bare.slice(0, -4), "-eth", "eth", "3ª persona (arcaico)", "present-3sg");
       if (m) return m;
     }
     if (bare.length > 4 && bare.endsWith("er")) {
       const noEr = bare.slice(0, -2);
-      m = tryStem(noEr, "-er", "er", "comparativo / agente") ||
-          tryStem(undoubleEn(noEr), "-er", "er", "comparativo / agente") ||
-          tryStem(noEr + "e", "-er", "er", "comparativo / agente");
+      m = tryStem(noEr, "-er", "er", "comparativo / agente", null) ||
+          tryStem(undoubleEn(noEr), "-er", "er", "comparativo / agente", null) ||
+          tryStem(noEr + "e", "-er", "er", "comparativo / agente", null);
       if (m) return m;
     }
     if (bare.length > 4 && bare.endsWith("or")) {
       const noOr = bare.slice(0, -2);
-      m = tryStem(noOr, "-or", "or", "agente") ||
-          tryStem(undoubleEn(noOr), "-or", "or", "agente") ||
-          tryStem(noOr + "e", "-or", "or", "agente");
+      m = tryStem(noOr, "-or", "or", "agente", null) ||
+          tryStem(undoubleEn(noOr), "-or", "or", "agente", null) ||
+          tryStem(noOr + "e", "-or", "or", "agente", null);
       if (m) return m;
     }
     if (bare.length > 5 && bare.endsWith("iest")) {
-      m = tryStem(bare.slice(0, -4) + "y", "-est", "iest", "superlativo");
+      m = tryStem(bare.slice(0, -4) + "y", "-est", "iest", "superlativo", null);
       if (m) return m;
     }
     if (bare.length > 4 && bare.endsWith("est")) {
       const noEst = bare.slice(0, -3);
-      m = tryStem(noEst, "-est", "est", "superlativo") ||
-          tryStem(undoubleEn(noEst), "-est", "est", "superlativo");
+      m = tryStem(noEst, "-est", "est", "superlativo", null) ||
+          tryStem(undoubleEn(noEst), "-est", "est", "superlativo", null);
       if (m) return m;
     }
     return null;
@@ -572,14 +890,31 @@ export class EnEngine {
   _inflect(bare) {
     const irr = this._irregularForm(bare);
     if (irr) return irr;
+    return this._inflectAffixes(bare);
+  }
+
+  // Prefixes + regular suffix stripping (no irregular table).
+  _inflectAffixes(bare) {
     for (const pre of EN_PREFIX) {
       if (bare.length > pre.length + 3 && bare.startsWith(pre)) {
         const rest = bare.slice(pre.length);
         const r = this._irregularForm(rest) || this._stripRegular(rest, 0);
-        if (r) return { root: r.root, name: "(prefijo)", surface: pre, es: "prefijo" };
+        if (r) return { root: r.root, name: "(prefijo)", surface: pre, es: "prefijo", tense: r.tense || null };
       }
     }
     return this._stripRegular(bare, 0);
+  }
+
+  // Candidate phrase keys for the first word of a window: the raw word, its
+  // irregular root ("laid" → "lay") and its stripped root ("walking" → "walk"),
+  // so "laid hands on" and "took away" match the table entries.
+  _phraseFirstKeys(w) {
+    const keys = [w];
+    const irr = this._irregularForm(w);
+    if (irr && irr.root !== w) keys.push(irr.root);
+    const st = this._stripRegular(w, 0);
+    if (st && st.root !== w && !keys.includes(st.root)) keys.push(st.root);
+    return keys;
   }
 
   // The bare (lowercased, no hyphen, no possessive) resolution step.
@@ -592,16 +927,78 @@ export class EnEngine {
       const nmCap = this._nameIndex.get(bare);
       if (nmCap) return [[nmCap], { isName: true, root: bare, form: "nombre propio", suffixes: [] }];
     }
-    const key = this._lookupKey(bare);
-    if (key) {
-      return [this._dictGet(key), { root: key, form: "", isBare: true, suffixes: [] }];
+    // Tense-bearing contractions ("wasn't" → past of be, "i'm" → present).
+    const ct = EN_CONTRACT_TENSE[bare];
+    let ckey = null, ctense = null;
+    if (ct) {
+      ckey = this._lookupKey(bare); ctense = ct;
+    } else {
+      for (const suf of Object.keys(EN_CONTRACT_SUF_TENSE)) {
+        if (bare.length > suf.length && bare.endsWith(suf)) {
+          ckey = this._lookupKey(bare); ctense = EN_CONTRACT_SUF_TENSE[suf]; break;
+        }
+      }
     }
-    const st = this._inflect(bare);
+    if (ckey) {
+      const cinfo = { root: ckey, form: "", suffixes: [] };
+      return [this._dictGet(ckey), Object.assign(cinfo, this._enVerbInfo(ckey, null, ctense))];
+    }
+    const key = this._lookupKey(bare);
+    const irr = this._irregularForm(bare);
+    // An irregular verb form that is ALSO a dictionary word ("saw", "thought",
+    // "found", "left", "felt"): the verb reading wins, because in Bible text
+    // it almost always is the verb. Exceptions: the dictionary reading
+    // dominates (EN_DICT_WINS: "ground" = tierra), or the irregular root has
+    // no verb meaning (plurals like "children", demonstratives).
+    if (key && irr && !EN_DICT_WINS.has(bare)) {
+      const vinfo = this._enVerbInfo(irr.root, bare);
+      if (vinfo) {
+        const iinfo = {
+          root: irr.root, form: "",
+          suffixes: [{ name: "(irregular)", surface: bare, es: "forma irregular" }],
+        };
+        return [this._dictGet(irr.root), Object.assign(iinfo, vinfo)];
+      }
+    }
+    if (key) {
+      const info = { root: key, form: "", isBare: true, suffixes: [] };
+      // EN_DICT_WINS: the dictionary reading dominates, no verb metadata.
+      if (!EN_DICT_WINS.has(bare)) {
+        // A gerund whose dictionary entry is noun-only or missing ("walking" →
+        // "excursionismo", "gnashing" → "crujir"): the verb reading wins in
+        // Bible text, because -ing forms there are gerunds far more often
+        // than lexicalized nouns.
+        if (bare.length > 4 && bare.endsWith("ing")) {
+          const ing = this._stripRegular(bare, 0);
+          if (ing && ing.tense === "gerund" && ing.root !== bare) {
+            const gv = this._enVerbInfo(ing.root, null, ing.tense);
+            if (gv) {
+              const ginfo = {
+                root: ing.root, form: "",
+                suffixes: [{ name: ing.name, surface: ing.surface, es: ing.es }],
+              };
+              return [this._dictGet(ing.root), Object.assign(ginfo, gv)];
+            }
+          }
+        }
+        Object.assign(info, this._enVerbInfo(key, null));
+      }
+      return [this._dictGet(key), info];
+    }
+    if (irr) {
+      const iinfo = {
+        root: irr.root, form: "",
+        suffixes: [{ name: "(irregular)", surface: bare, es: "forma irregular" }],
+      };
+      return [this._dictGet(irr.root), Object.assign(iinfo, this._enVerbInfo(irr.root, bare))];
+    }
+    const st = this._inflectAffixes(bare);
     if (st) {
-      return [this._dictGet(st.root), {
+      const sinfo = {
         root: st.root, form: "",
         suffixes: [{ name: st.name, surface: st.surface, es: st.es }],
-      }];
+      };
+      return [this._dictGet(st.root), Object.assign(sinfo, this._enVerbInfo(st.root, null, st.tense))];
     }
     // Name-table hit on the lowercase form ("yahweh" in running text).
     const nmLo = this._nameIndex.get(bare);
@@ -694,6 +1091,14 @@ export class EnEngine {
       const h = this._resolveHyphen(bare);
       if (h) return h;
     }
+    // Full contractions before the possessive -'s rule: "it's" is "it is",
+    // not the possessive of "it".
+    if (EN_CONTRACT[bare]) {
+      const cRoot = EN_CONTRACT[bare];
+      const cinfo = { root: cRoot, form: "", suffixes: [] };
+      return [this._dictGet(cRoot),
+        Object.assign(cinfo, this._enVerbInfo(cRoot, null, EN_CONTRACT_TENSE[bare] || null))];
+    }
     // Possessive -'s: run the FULL pipeline on the base, so "children's"
     // reaches child and "neighbor's" reaches neighbor.
     if (bare.length > 3 && bare.endsWith("'s")) {
@@ -719,13 +1124,43 @@ export class EnEngine {
     return this._resolveBare(bare, raw);
   }
 
+  // Phrasal verbs and multi-word concepts are matched greedily (3 words,
+  // then 2) before falling back to word-by-word, so "kingdom of heaven" and
+  // "cast out devils" come back as single units. The first word may be
+  // inflected ("laid hands on", "took away").
+  _phraseAt(toks, i) {
+    for (let n = Math.min(3, toks.length - i); n >= 2; n--) {
+      const win = toks.slice(i, i + n);
+      const rest = win.slice(1).map(normalizeEn).join(" ");
+      for (const first of this._phraseFirstKeys(normalizeEn(win[0]))) {
+        const p = EN_PHRASES[first + " " + rest];
+        if (p) return { span: win.join(" "), entry: p, len: n };
+      }
+    }
+    return null;
+  }
+
   segment(text, opts = {}) {
     const out = [];
+    const toks = [];
     for (const tok of String(text).split(/\s+/)) {
       const w = tok.replace(EN_TRIM, "");
-      if (!w) continue;
-      const [m, info] = this.resolve(w, opts);
-      out.push([w, m, info]);
+      if (w) toks.push(w);
+    }
+    let i = 0;
+    while (i < toks.length) {
+      const hit = this._phraseAt(toks, i);
+      if (hit) {
+        out.push([hit.span, hit.entry.es.slice(), {
+          root: hit.span.toLowerCase(), form: hit.entry.kind, isPhrase: true, suffixes: [],
+        }]);
+        i += hit.len;
+      } else {
+        const w = toks[i];
+        const [m, info] = this.resolve(w, opts);
+        out.push([w, m, info]);
+        i++;
+      }
     }
     return out;
   }

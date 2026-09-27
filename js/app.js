@@ -1,6 +1,6 @@
 import { Dictionary, friendlyTense, friendlyForm, esInfinitive, esConjugado, esCompuesto } from "./dict.js?v=45";
 import { TrEngine } from "./tr-engine.js?v=46";
-import { EnEngine } from "./en-engine.js?v=2";
+import { EnEngine, enVerbGloss, enVerbShort, enPhrasalMatch } from "./en-engine.js?v=3";
 
 // ---- language packs --------------------------------------------------------
 // Every language is a self-contained pack: which data files to fetch, how to
@@ -614,7 +614,7 @@ function renderChapter() {
       word.textContent = token;
       word.dataset.word = token.replace(/[.,;:!?…«»"'“”‘’()[\]*–—]+$/g, "").replace(/^[.,;:!?…«»"'“”‘’()[\]*–—]+/g, "");
       const atSentenceStart = sentenceStart;
-      word.addEventListener("click", () => presentWord(word.dataset.word, ti, token, atSentenceStart));
+      word.addEventListener("click", () => presentWord(word.dataset.word, ti, token, atSentenceStart, tokens.slice(ti + 1, ti + 5)));
       verse.appendChild(word);
       if (ti < tokens.length - 1) verse.appendChild(document.createTextNode(" "));
       sentenceStart = /[.!?…]+$/.test(token);
@@ -719,7 +719,7 @@ function toast(msg) {
   _toastTimer = setTimeout(() => t.classList.remove("show"), 3400);
 }
 
-function presentWord(word, ti, token, sentenceInitial) {
+function presentWord(word, ti, token, sentenceInitial, followingTokens) {
   if (!dictionary) return;
   stats.tap();
   hideContextTranslation();
@@ -731,6 +731,15 @@ function presentWord(word, ti, token, sentenceInitial) {
   let grammar = "";
   if (!morphHtml && meanings && (info.form || info.infinitive || info.tense)) {
     grammar = plainGloss(info, meanings[0], meanings);
+  }
+  // English: a tapped verb may open a phrasal verb with the words after it
+  // ("gave" + "up" → «give up» = entregar, renunciar).
+  let phrasal = "";
+  if (lang === "en" && info && info.infinitive && followingTokens && followingTokens.length) {
+    const ph = enPhrasalMatch(info.infinitive, word, followingTokens);
+    if (ph) {
+      phrasal = `<div class="phrasal-verb">Verbo frasal: <b>«${esc(ph.phrase)}»</b> — ${ph.es.map(esc).join(" · ")}</div>`;
+    }
   }
   if (!meanings) {
     if (info.isName) {
@@ -751,7 +760,7 @@ function presentWord(word, ti, token, sentenceInitial) {
     currentES = "";
     return;
   }
-  el.meaning.innerHTML = "<b>Español:</b>\n" + meanList(meanings.slice(0, 8));
+  el.meaning.innerHTML = "<b>Español:</b>\n" + meanList(meanings.slice(0, 8)) + phrasal;
   if (morphHtml) el.grammar.innerHTML = morphHtml;
   else el.grammar.textContent = grammar;
   el.note.textContent = "";
@@ -778,7 +787,7 @@ function presentSelection(segments, phrase) {
       const details = [];
       if (info.form) details.push(esc(friendlyForm(info.form)));
       if (info.infinitive || info.tense) {
-        const note = verbNote(info, false, meanings);
+        const note = lang === "en" ? enVerbShort(info) : verbNote(info, false, meanings);
         if (note) details.push(esc(note));
       }
       if (details.length) line += ` <span class='dim'>(${details.join(", ")})</span>`;
@@ -829,7 +838,7 @@ async function translateContext() {
   _translateBusy = true;
   el.ctxResult.innerHTML = "<span class='dim'>Traduciendo…</span>";
   try {
-    const body = new URLSearchParams({ q: _ctxQuery.slice(0, 3000), langpair: lang === "tr" ? "tr|es" : "fr|es" });
+    const body = new URLSearchParams({ q: _ctxQuery.slice(0, 3000), langpair: lang === "en" ? "en|es" : lang === "tr" ? "tr|es" : "fr|es" });
     const resp = await fetch("https://api.mymemory.translated.net/get", {
       method: "POST",
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
@@ -1961,6 +1970,11 @@ function trMorphHtml(info) {
 
 function plainGloss(info, firstMean, glosses) {
   if (!info) return "";
+  // English verbs carry their own tense metadata (enTense) and get a
+  // dedicated explanation; the French machinery below doesn't apply.
+  if (lang === "en" && info.infinitive) {
+    return enVerbGloss(info, firstMean, glosses);
+  }
   const form = info.form ? String(info.form) : "";
   if (info.isName && (form === "nombre propio" || !form)) {
     return "Es un nombre propio: una persona o un lugar.";
