@@ -3,7 +3,9 @@
 import { readFileSync } from "node:fs";
 import {
   EnEngine, enVerbGloss, enVerbShort, enPhrasalMatch,
+  enDetectSubject, enParticipleHint, enConjugarGlosa,
 } from "../js/en-engine.js";
+import { conjugarEs, esInfinitivos } from "../js/es-conj.js";
 
 const eng = new EnEngine(
   JSON.parse(readFileSync("data/en/dict.json", "utf8")),
@@ -74,7 +76,7 @@ const g = enVerbGloss(iWent, mWent[0], mWent);
 ok(g.includes("«go»") && g.includes("pasado") && g.includes("ir"), "enVerbGloss(went) explains past of go", g);
 ok(enVerbShort(iWent) === "pasado de «go»", "enVerbShort(went)");
 const [mWalk, iWalk] = res("walking");
-ok(enVerbGloss(iWalk, mWalk[0], mWalk).includes("«walk» (andar)"), "gloss leads with verb gloss andar");
+ok(enVerbGloss(iWalk, mWalk[0], mWalk).includes("«walk» (andar o caminar)"), "gloss leads with infinitive list");
 
 // --- phrasal match from tap context ---
 let ph = enPhrasalMatch("give", "gave", ["up", "his", "spirit"]);
@@ -103,5 +105,63 @@ ok(s.length === 1 && s[0][0] === "kingdom of heaven", "longest match: single 3-w
 // no-phrase fallback still word-by-word
 s = seg("he walked home");
 ok(s.length === 3 && s[1][2] !== "verbo frasal", "no false phrase match");
+
+// ---- Spanish conjugation ----
+const cj = (inf, t, p, want) =>
+  ok(conjugarEs(inf, t, p) === want, `conjugarEs(${inf},${t},${p}) = ${want}`, conjugarEs(inf, t, p));
+cj("caminar", "presente", "1s", "camino");
+cj("caminar", "preterito", "3s", "caminó");
+cj("caminar", "preterito", "3p", "caminaron");
+cj("comer", "presente", "2s", "comes");
+cj("vivir", "preterito", "1s", "viví");
+cj("ser", "presente", "1s", "soy");
+cj("ir", "preterito", "3s", "fue");
+cj("estar", "presente", "3s", "está");
+cj("tener", "presente", "1s", "tengo");
+cj("hacer", "participio", null, "hecho");
+cj("decir", "gerundio", null, "diciendo");
+cj("pensar", "presente", "1s", "pienso");
+cj("volver", "presente", "3s", "vuelve");
+cj("pedir", "presente", "1s", "pido");
+cj("pedir", "preterito", "3p", "pidieron");
+cj("buscar", "preterito", "1s", "busqué");
+cj("llegar", "preterito", "1s", "llegué");
+cj("conocer", "presente", "1s", "conozco");
+cj("coger", "presente", "1s", "cojo");
+cj("construir", "presente", "1s", "construyo");
+cj("creer", "gerundio", null, "creyendo");
+cj("dormir", "gerundio", null, "durmiendo");
+cj("ir", "gerundio", null, "yendo");
+cj("jugar", "presente", "1s", "juego");
+cj("bendecir", "presente", "3s", "bendice");
+cj("andar", "preterito", "3s", "anduvo");
+ok(JSON.stringify(esInfinitivos(["ser o estar"])) === '["ser","estar"]', "esInfinitivos splits alternatives");
+ok(JSON.stringify(esInfinitivos(["poner en libertad"])) === '["poner"]', "esInfinitivos takes the verb");
+
+// ---- subject detection + participle hint ----
+ok(enDetectSubject(["they"]) === "3p", "subject they → 3p");
+ok(enDetectSubject(["I"]) === "1s", "subject I → 1s");
+ok(enDetectSubject(["Jesus"]) === "3s", "subject proper name → 3s");
+ok(enDetectSubject(["thou"]) === "2s", "subject thou → 2s (KJV)");
+ok(enDetectSubject(["and", "they"]) === "3p", "subject skips conjunctions");
+ok(enDetectSubject([]) === "3s", "subject default → 3s");
+ok(enParticipleHint(["has"]) === true, "has + verb → participle");
+ok(enParticipleHint(["they"]) === false, "they + verb → not participle");
+
+// ---- conjugated explanations ----
+const glossFor = (w, prec) => {
+  const [m, info] = eng.resolve(w);
+  return enVerbGloss(info, m && m[0], m, { persona: enDetectSubject(prec), participle: enParticipleHint(prec) });
+};
+ok(glossFor("went", ["they"]).includes("«fueron"), "they went → fueron", glossFor("went", ["they"]));
+ok(glossFor("went", ["I"]).includes("«fui"), "I went → fui");
+ok(glossFor("walks", ["he"]).includes("camina"), "he walks → camina");
+ok(glossFor("walking", ["am"]).includes("caminando"), "walking → caminando");
+ok(glossFor("gone", ["has"]).includes("«ido"), "has gone → ido");
+ok(glossFor("walked", ["has"]).includes("caminado"), "has walked → caminado");
+ok(glossFor("believeth", []).includes("«cree"), "believeth → cree");
+ok(glossFor("will", []).startsWith("Es un verbo modal"), "will → modal explanation");
+const sh = (() => { const [m, info] = eng.resolve("went"); return enVerbShort(info, m, { persona: "3p" }); })();
+ok(sh.includes("fueron") && sh.includes("pasado"), "enVerbShort conjugates: fueron · pasado", sh);
 
 console.log(`ALL OK (${pass} checks)`);

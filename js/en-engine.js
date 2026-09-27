@@ -14,6 +14,12 @@
 //   capitalized unknown → proper name (curated table, else surface form)
 //   unknown → [null, {}]
 //
+// Spanish conjugation of the resolved verb (conjugarEs, from es-conj.js) lets
+// the app show the verb in the matching Spanish tense and person
+// ("they went" → fueron).
+
+import { conjugarEs, esInfinitivos } from "./es-conj.js";
+//
 // lookup() runs the SAME pipeline as resolve() (returns just the meanings),
 // so there is a single source of truth for "does this word have a translation".
 
@@ -554,31 +560,145 @@ const EN_TENSE_TIP = {
   "base": "Es la forma del diccionario: se usa con «to» («to go» = ir) y después de auxiliares («will go» = irá).",
 };
 
+// English tense → conjugation tense for conjugarEs.
+const EN_TIEMPO_CONJ = {
+  present: "presente",
+  "present-3sg": "presente",
+  past: "preterito",
+  "past-participle": "participio",
+  "past-or-participle": "preterito",
+  gerund: "gerundio",
+  base: "infinitivo",
+};
+
+const ES_PERSONA = {
+  "1s": "yo", "2s": "tú", "3s": "él/ella",
+  "1p": "nosotros", "2p": "vosotros", "3p": "ellos",
+};
+
+const EN_MODAL_ES = {
+  shall: "indica futuro u obligación",
+  will: "indica futuro",
+  would: "indica condición o hipótesis",
+  can: "indica capacidad o posibilidad",
+  could: "indica capacidad en el pasado o posibilidad",
+  should: "indica deber o consejo",
+  may: "indica permiso o posibilidad",
+  might: "indica posibilidad",
+  must: "indica obligación o necesidad",
+};
+
+// Detect the grammatical subject of an English verb from the tokens before it.
+// Returns "1s" | "2s" | "3s" | "1p" | "2p" | "3p". A proper name or any other
+// noun phrase falls back to 3rd person singular (Bible narrative default).
+const EN_SUBJ_SKIP = new Set("and but or nor for yet so then now also even just".split(" "));
+export function enDetectSubject(preceding) {
+  const toks = (preceding || []).slice(-3);
+  for (let i = toks.length - 1; i >= 0; i--) {
+    const w = String(toks[i]).toLowerCase().replace(/^[^a-z']+|[^a-z']+$/g, "");
+    if (!w || EN_SUBJ_SKIP.has(w)) continue;
+    if (w === "i") return "1s";
+    if (w === "thou" || w === "thee" || w === "thy" || w === "thine") return "2s";
+    if (w === "you") return "2s";
+    if (w === "ye") return "3p";
+    if (w === "he" || w === "she" || w === "it") return "3s";
+    if (w === "we") return "1p";
+    if (w === "they") return "3p";
+    return "3s";
+  }
+  return "3s";
+}
+
+// True when the verb is likely a participle: preceded by has/have/had/hath
+// ("has gone", "had walked").
+export function enParticipleHint(preceding) {
+  const toks = (preceding || []).slice(-2);
+  for (let i = toks.length - 1; i >= 0; i--) {
+    const w = String(toks[i]).toLowerCase().replace(/^[^a-z']+|[^a-z']+$/g, "");
+    if (!w) continue;
+    return w === "has" || w === "have" || w === "had" || w === "hath";
+  }
+  return false;
+}
+
+// Conjugate the Spanish gloss(es) of an English verb form into the matching
+// Spanish tense and person: "they went" → "fueron", "he walks" → "camina".
+// opts: { persona: "1s"|"2s"|"3s"|"1p"|"2p"|"3p", participle: bool }.
+// Returns "" when there is nothing to conjugate (modals, no verb gloss).
+export function enConjugarGlosa(info, glosses, opts = {}) {
+  if (!info || !info.infinitive) return "";
+  if (EN_MODAL.has(info.infinitive)) return "";
+  const infs = esInfinitivos(glosses);
+  if (!infs.length) return "";
+  const t = info.enTense;
+  const persona = opts.persona || "3s";
+  const both = (tiempo, p) => {
+    const seen = new Set();
+    const out = [];
+    for (const i of infs) {
+      const c = conjugarEs(i, tiempo, p);
+      if (c && !seen.has(c)) { seen.add(c); out.push(c); }
+    }
+    return out.join(" o ");
+  };
+  if (t === "past-participle" || (t === "past-or-participle" && opts.participle)) {
+    return both("participio");
+  }
+  if (t === "past-or-participle") {
+    return both("preterito", persona) + " / " + both("participio");
+  }
+  if (t === "gerund") return both("gerundio");
+  if (t === "present") return both("presente", persona);
+  if (t === "present-3sg") return both("presente", "3s");
+  if (t === "past") return both("preterito", persona);
+  return infs.join(" o ");
+}
+
 // Spanish grammar explanation for an English verb form. Pure (no DOM).
-export function enVerbGloss(info, firstMean, allGlosses) {
+// Now conjugates the Spanish gloss into the matching tense and person:
+//   "Es el verbo «go» (ir). Aquí está en pasado (ellos): «fueron»."
+export function enVerbGloss(info, firstMean, allGlosses, opts = {}) {
   if (!info || !info.infinitive) return "";
   const inf = info.infinitive;
+  if (EN_MODAL.has(inf)) {
+    return `Es un verbo modal («${inf}»): ${EN_MODAL_ES[inf] || "expresa modo verbal"}.`;
+  }
   // Lead with the verb-shaped gloss ("andar", not the noun "paseo").
+  // Prefer the infinitive list ("ser o estar") over a single contextual gloss.
+  const infs = esInfinitivos(allGlosses);
   const verbMean = enFirstVerbGloss(allGlosses) || firstMean;
-  let s = "Es el verbo «" + inf + "»" + (verbMean ? " (" + verbMean + ")" : "") + ".";
+  const leadMean = infs.join(" o ") || verbMean;
+  let s = "Es el verbo «" + inf + "»" + (leadMean ? " (" + leadMean + ")" : "") + ".";
   const t = info.enTense;
-  if (t === "past") s += " Aquí está en pasado.";
+  const conj = enConjugarGlosa(info, allGlosses, opts);
+  if (conj) {
+    let det = "Aquí está en " + (EN_TENSE_LABEL[t] || t);
+    if (t === "present" || t === "past") det += " (" + (ES_PERSONA[opts.persona] || ES_PERSONA["3s"]) + ")";
+    else if (t === "present-3sg") det += " (él/ella)";
+    s += " " + det + ": «" + conj + "».";
+  } else if (t === "past") s += " Aquí está en pasado.";
   else if (t === "past-participle") s += " Aquí está en participio.";
   else if (t === "past-or-participle") s += " Aquí está en pasado o participio.";
   else if (t === "present-3sg") s += " Aquí está en presente, 3ª persona (he / she / it).";
   else if (t === "gerund") s += " Aquí está en gerundio.";
   else if (t === "present") s += " Aquí está en presente.";
-  const tip = EN_TENSE_TIP[t];
+  // Irregular forms get an irregular note instead of the regular "-ed"/"-s" tip.
+  const isIrregular = (info.suffixes || []).some((x) => x.name === "(irregular)");
+  const tip = (isIrregular && (t === "past" || t === "past-participle" || t === "past-or-participle" || t === "present-3sg"))
+    ? "Es un verbo irregular: su forma no sigue la regla general."
+    : EN_TENSE_TIP[t];
   if (tip) s += " " + tip;
-  if (verbMean) s += " Aquí significa «" + verbMean + "».";
   return s;
 }
 
-// Short inline label, e.g. pasado de «go».
-export function enVerbShort(info) {
+// Short inline label, e.g. «fueron» · pasado de «go».
+export function enVerbShort(info, glosses, opts = {}) {
   if (!info || !info.infinitive) return "";
+  if (EN_MODAL.has(info.infinitive)) return "verbo modal «" + info.infinitive + "»";
   const label = EN_TENSE_LABEL[info.enTense];
-  return label ? label + " de «" + info.infinitive + "»" : "verbo «" + info.infinitive + "»";
+  const base = label ? label + " de «" + info.infinitive + "»" : "verbo «" + info.infinitive + "»";
+  const conj = enConjugarGlosa(info, glosses, opts);
+  return conj ? "«" + conj + "» · " + base : base;
 }
 
 // Prefixes that compose with a full inflected stem:
