@@ -1048,6 +1048,9 @@ let _activeAudio = null;
 function playViaAudio(url, guardMs) {
   return new Promise((resolve) => {
     const audio = new Audio();
+    // Google 404s translate_tts when the request carries our Referer
+    // (hotlink protection). no-referrer gets the MP3 back.
+    audio.setAttribute("referrerpolicy", "no-referrer");
     let settled = false;
     const finish = (ok) => {
       if (settled) return;
@@ -1639,6 +1642,8 @@ function playReadChunk() {
   // device voice, so a single flaky request doesn't switch voices mid-chapter.
   const tryIdx = (_readerTtsTry || 0) % TTS_URLS.length;
   const audio = _readerAudio || new Audio();
+  // Same hotlink protection as the word speaker: no Referer → Google serves audio.
+  audio.setAttribute("referrerpolicy", "no-referrer");
   _readerAudio = audio;
   audio.playbackRate = _readerRate;
   audio.onplaying = () => { _readerTtsTry = 0; startChunkKaraoke(_readerChunk); };
